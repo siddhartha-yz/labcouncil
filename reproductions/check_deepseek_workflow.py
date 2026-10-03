@@ -325,7 +325,26 @@ class Workflow:
     def run(self, stage):
         if stage == "continue" and self.state["status"] == "completed":
             return {"status": "already_completed", "new_api_calls": 0, "new_tool_calls": 0}
-        if stage == "reassess":
+        if stage == "retry-report":
+            if self.state.get("failure_message") != "API transport failure":
+                raise ValueError("Report retry requires a recorded transport failure")
+            events = [json.loads(line) for line in (self.root / "events.jsonl").read_text().splitlines()]
+            requests = [event for event in events if event.get("type") == "api_request"]
+            pending = requests[-1]
+            if pending["phase"] != "round-2-reviewer" or pending["payload"]["messages"][-1]["role"] != "tool":
+                raise ValueError("Report retry requires the completed second-round verification tool")
+            self.event({"type": "explicit_report_retry", "source_call_id": pending["call_id"],
+                        "new_experiments": 0, "new_tool_executions": 0})
+            message = self.call(pending["phase"], pending["payload"]["messages"], pending["payload"]["tools"][0])
+            if message.get("tool_calls"):
+                raise ValueError("Retry requested another tool; shared API budget does not permit a new cycle")
+            report = json.loads(message.get("content", ""))
+            validate_report(report, 2, self.state["artifacts"][-1], "reviewer",
+                            [item["evidence_id"] for item in self.state["artifacts"]])
+            self.state["reports"]["round-2-reviewer"] = report
+            write_json(self.root / "round-2-reviewer.json", report)
+            self.state["status"] = "completed"
+        elif stage == "reassess":
             if self.state.get("failure_message") != "Report evidence references mismatch":
                 raise ValueError("Reassessment supports only the recorded citation validator failure")
             responses = [json.loads(line) for line in (self.root / "events.jsonl").read_text().splitlines()]
@@ -362,7 +381,7 @@ class Workflow:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("stage", choices=("first", "continue", "reassess"))
+    parser.add_argument("stage", choices=("first", "continue", "reassess", "retry-report"))
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--source-dir", type=Path,
                         help="Copy a failed checkpoint for explicit offline reassessment")
@@ -386,14 +405,14 @@ def main():
                 "tool_calls": 0, "artifacts": [], "manifests": {}, "reports": {},
                 "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}}
         else:
-            if args.stage == "reassess":
+            if args.stage in ("reassess", "retry-report"):
                 if args.source_dir is None or root.exists():
                     raise ValueError("Reassessment requires a source and a fresh output directory")
                 shutil.copytree(args.source_dir, root)
             state = json.loads((root / "state.json").read_text())
-            if args.stage == "reassess":
-                state["reassessment_source"] = str(args.source_dir)
-                state["original_script_sha256"] = state["script_sha256"]
+            if args.stage in ("reassess", "retry-report"):
+                state.setdefault("recovery_history", []).append({"source": str(args.source_dir),
+                    "source_script_sha256": state["script_sha256"], "operation": args.stage})
                 state["script_sha256"] = digest(Path(__file__))
             elif state["script_sha256"] != digest(Path(__file__)):
                 raise ValueError("Workflow script changed between stages")
