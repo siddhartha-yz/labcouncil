@@ -205,14 +205,17 @@ class Workflow:
         with (self.root / "events.jsonl").open("a") as file:
             file.write(json.dumps(event, ensure_ascii=False) + "\n")
 
-    def call(self, phase, messages, tool):
-        if self.state["api_calls"] >= 12:
+    def call(self, phase, messages, tool, require_tool=False):
+        if self.state["api_calls"] + self.state.get("prior_api_calls", 0) >= 12:
             raise ValueError("API request budget exhausted")
         if len(json.dumps(messages)) > 40000:
             raise ValueError("Context character budget exhausted")
         payload = {"model": self.state["model"], "messages": messages, "tools": [tool],
                    "thinking": {"type": "disabled"}, "temperature": 0, "max_tokens": 2048,
                    "stream": False, "response_format": {"type": "json_object"}}
+        payload["tool_choice"] = (
+            {"type": "function", "function": {"name": tool["function"]["name"]}}
+            if require_tool else "auto")
         self.state["api_calls"] += 1
         self.save()
         call_id = self.state["api_calls"]
@@ -271,7 +274,7 @@ class Workflow:
             tool_name = "verify_evidence"
         tool_count = 0
         for _ in range(3):
-            message = self.call(phase, messages, tool_schema(tool_name))
+            message = self.call(phase, messages, tool_schema(tool_name), require_tool=not tool_count)
             messages.append(message)
             calls = message.get("tool_calls", [])
             if calls:
@@ -338,9 +341,13 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("stage", choices=("first", "continue"))
     parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument("--prior-api-calls", type=int, default=0,
+                        help="Requests consumed by previous attempts under the shared 12-call budget")
     args = parser.parse_args()
     try:
         config = load_config(Path(".env"))
+        if not 0 <= args.prior_api_calls < 12:
+            raise ValueError("Invalid prior request count")
         if config["DEEPSEEK_MODEL"] != "deepseek-flash":
             raise ValueError("Protocol requires deepseek-flash")
         root = args.output_dir
@@ -350,12 +357,15 @@ def main():
                 "started_at_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
                 "script_sha256": digest(Path(__file__)),
                 "config_loader_sha256": digest(Path(__file__).with_name("check_deepseek_connectivity.py")),
-                "api_calls": 0, "tool_calls": 0, "artifacts": [], "manifests": {}, "reports": {},
+                "api_calls": 0, "prior_api_calls": args.prior_api_calls,
+                "tool_calls": 0, "artifacts": [], "manifests": {}, "reports": {},
                 "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}}
         else:
             state = json.loads((root / "state.json").read_text())
             if state["script_sha256"] != digest(Path(__file__)):
                 raise ValueError("Workflow script changed between stages")
+            if state["config_loader_sha256"] != digest(Path(__file__).with_name("check_deepseek_connectivity.py")):
+                raise ValueError("Configuration loader changed between stages")
             for artifact in state["artifacts"]:
                 verify_artifact(root, artifact, state["manifests"][artifact["evidence_id"]])
         workflow = Workflow(root, config, state)

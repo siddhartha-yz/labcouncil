@@ -65,6 +65,13 @@ class IntegrityTests(unittest.TestCase):
         self.assertEqual(result["new_api_calls"], 0)
         self.assertEqual(result["new_tool_calls"], 0)
 
+    def test_prior_attempts_count_toward_shared_network_budget(self):
+        workflow = Workflow(self.root, {"DEEPSEEK_API_KEY": "offline-placeholder"},
+                            {"api_calls": 9, "prior_api_calls": 3})
+        with patch("urllib.request.urlopen", side_effect=AssertionError("Network must not be used")):
+            with self.assertRaisesRegex(ValueError, "budget exhausted"):
+                workflow.call("unused", [], {})
+
 
 if __name__ == "__main__":
     unittest.main()
