@@ -116,7 +116,7 @@ Agent Runtime Adapter 提供运行、事件读取、干预、取消和恢复接�
 
 - [x] 确定项目名 LabCouncil。
 - [x] 写入项目定位、计划和参考资料。
-- [ ] 建立并验证 public GitHub 仓库。
+- [x] 建立并验证 public GitHub 仓库：[siddhartha-yz/labcouncil](https://github.com/siddhartha-yz/labcouncil)。
 
 ### M1：验证完整流程的本地原型
 
