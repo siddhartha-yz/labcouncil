@@ -41,7 +41,7 @@ def load_config(path):
                 config[name] = values[0]
     if not config["DEEPSEEK_API_KEY"]:
         raise ValueError("DeepSeek key is missing")
-    config["DEEPSEEK_MODEL"] = config["DEEPSEEK_MODEL"] or "deepseek-v4-pro"
+    config["DEEPSEEK_MODEL"] = config["DEEPSEEK_MODEL"] or "deepseek-flash"
     if not re.fullmatch(r"[a-zA-Z0-9_.-]+", config["DEEPSEEK_MODEL"]):
         raise ValueError("Malformed model name")
     return config

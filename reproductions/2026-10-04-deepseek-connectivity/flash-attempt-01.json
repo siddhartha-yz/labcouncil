@@ -1,0 +1,41 @@
+{
+  "started_at_utc": "2026-10-03T18:41:17.797180+00:00",
+  "python": "3.14.4",
+  "script_sha256": "26c5572bee4cb85a30f0835521eefdcc76282c740acf16d8c5efd44a36c3dc7d",
+  "endpoint": "https://api.deepseek.com/chat/completions",
+  "request": {
+    "model": "deepseek-flash",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Reply with exactly LABCOUNCIL_OK. Do not include any other text."
+      }
+    ],
+    "thinking": {
+      "type": "disabled"
+    },
+    "max_tokens": 128,
+    "temperature": 0,
+    "stream": false
+  },
+  "request_attempts": 1,
+  "automatic_retries": 0,
+  "timeout_seconds": 45,
+  "scope": "API connectivity and exact text response only; not agent/research validation",
+  "usage": {
+    "prompt_tokens": 20,
+    "completion_tokens": 5,
+    "total_tokens": 25,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "prompt_cache_hit_tokens": 0,
+    "prompt_cache_miss_tokens": 20
+  },
+  "http_status": 200,
+  "provider_model": "deepseek-flash",
+  "finish_reason": "stop",
+  "response_text": "LABCOUNCIL_OK",
+  "passed": true,
+  "elapsed_seconds": 0.411
+}

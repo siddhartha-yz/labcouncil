@@ -60,7 +60,7 @@ This makes one potentially billable request to `gemini-3.8-flash`, with no autom
 
 ## Minimal DeepSeek connectivity check
 
-Subsequent validation will use DeepSeek at the user's request. The [first DeepSeek API check](reproductions/2026-10-04-deepseek-connectivity/REPORT.md) passed with `deepseek-v4-pro`. Put `DEEPSEEK_API_KEY` and `DEEPSEEK_MODEL` in the local `.env`, then run:
+Subsequent validation will use `deepseek-flash` at the user's request. Both the initial Pro check and the corrected Flash check passed; see the [DeepSeek API record](reproductions/2026-10-04-deepseek-connectivity/REPORT.md). Put `DEEPSEEK_API_KEY` and `DEEPSEEK_MODEL` in the local `.env`, then run:
 
 ```bash
 python3 reproductions/check_deepseek_connectivity.py --output logs/deepseek-check-01.json

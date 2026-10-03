@@ -41,6 +41,20 @@ python3 reproductions/check_deepseek_connectivity.py --output logs/deepseek-conn
 
 该结果不证明科研评审质量、工具调用正确性、长任务可靠性或持续运行额度，也不是上游论文的复现。与此前 Gemini 的单次耗时不能构成模型性能比较：接口、tokenizer 和生成设置不同，且样本数均为 1。
 
-后续验证将按用户选择使用 DeepSeek。下一步应执行有明确验收标准的工具任务、生成证据报告、接收人的修改意见，再验证下一轮行为，另行记录失败、耗时和用量。
+## 默认模型更正与 Flash 检查
+
+初始将 Pro 设为默认，未先比较当前版本，选择依据不足。用户指出版本差异后，核对官方模型表：`deepseek-flash` 当前对应 DeepSeek-V4.1-Flash，`deepseek-v4-pro` 对应 DeepSeek-V4-Pro-0813；旧名称 `deepseek-v4-flash` 仍被接受，但官方建议使用 `deepseek-flash`。[官方模型表](https://api-docs.deepseek.com/quick_start/pricing/)
+
+后续验证按用户选择使用 `deepseek-flash`；本地配置、公开配置模板和脚本缺省值均已更正。之前的 Pro 记录保留为实际历史结果。其脚本 SHA256 对应仓库 commit `0189a1e` 中的脚本，不能用更正后的脚本哈希替代。
+
+采用相同固定输入和生成设置重跑一次，无重试：
+
+```bash
+python3 reproductions/check_deepseek_connectivity.py --output logs/deepseek-flash-connectivity-attempt-01.json
+```
+
+结果：HTTP 200、退出码 0、返回模型 `deepseek-flash`、`finish_reason=stop`、输出 `LABCOUNCIL_OK`；耗时 0.411 秒，输入 20 / 输出 5 / 总计 25 token。脱敏记录见 [flash-attempt-01.json](flash-attempt-01.json)。这是 Flash 连通证据，不能由两个单次固定文本请求判断模型的科研能力高低。
+
+下一步应执行有明确验收标准的工具任务、生成证据报告、接收人的修改意见，再验证下一轮行为，另行记录失败、耗时和用量。
 
 复跑时填写本地 `.env` 的 `DEEPSEEK_API_KEY` 和 `DEEPSEEK_MODEL`，选择新的输出文件名。每次运行发送一次可能计费的 API 请求。结果仅代表本次观察，后续权限、额度和模型行为可能变化。
