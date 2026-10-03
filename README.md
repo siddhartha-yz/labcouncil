@@ -35,6 +35,7 @@ The initial focus is computational research that can be checked through document
 
 - [实施计划 / Project plan](docs/PLAN.md): scope, architecture, milestones, and acceptance criteria.
 - [研究参考 / Research references](docs/REFERENCES.md): relevant repositories, papers, results, and limitations.
+- [复现与采用规则 / Reproduction](docs/REPRODUCTION.md): evidence levels, validation gates, and experiment records.
 - [开发协作 / Contributing](CONTRIBUTING.md): how to contribute while the design is being established.
 
 ## 中文简介
@@ -42,6 +43,8 @@ The initial focus is computational research that can be checked through document
 LabCouncil 是一个正在规划的个人虚拟研究组平台。你提供 idea；agent 团队开展调研和实验，保存结果与证据；你定期开组会、追问并评审；确认后的决定变成下一轮任务，agent 会后继续工作。
 
 核心目标是验证：**人工组会能否让 agent 的下一轮工作更符合研究意图，并持续产出可检查的新证据。**
+
+Upstream projects remain candidates. We will record reproducible checks and their limitations before selecting integrations. Published results are author-reported until independently checked; see the [initial audit](reproductions/2026-10-04-initial-audit/REPORT.md).
 
 ## License
 

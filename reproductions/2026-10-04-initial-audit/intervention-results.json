@@ -1,0 +1,47 @@
+{
+  "scope": "component behavior only; no LLM, socket transport, full agent loop, or scientific results",
+  "timestamp": "2026-10-04T02:18:13.346677+08:00",
+  "upstream_commit": "9102d18a161037294d3d963b2799351aa724c58b",
+  "source_sha256": "09b85650a21d0bbc9e03c60467084c3002891faa8f79e871e3a71cb28de40ba6",
+  "python": "3.12.14",
+  "smolagents": "1.20.0",
+  "model_calls": 0,
+  "fixtures": "Queue inputs and an agent-shaped object holding real AgentMemory",
+  "results": [
+    {
+      "case": "no_input",
+      "outcome": "confirmed",
+      "exit_code": 0,
+      "stdout": "CALLBACK_STARTED\nCASE_CONFIRMED\n",
+      "stderr": ""
+    },
+    {
+      "case": "modify",
+      "outcome": "confirmed",
+      "exit_code": 0,
+      "stdout": "CALLBACK_STARTED\n\n🛑 Interrupt received — pausing for user instruction...\n\n============================================================\n📝 WAITING FOR USER INSTRUCTION\n============================================================\n--- PROVIDE INSTRUCTION (leave empty to cancel) ---\n>>> Type your instruction. Press Enter twice to finish.\n\n\nIs this a 'modification' to the current task or a 'new' task? (m/n)\n\n✅ User modification appended to memory.\n✅ Resuming...\n\nCASE_CONFIRMED\n",
+      "stderr": ""
+    },
+    {
+      "case": "new_task",
+      "outcome": "confirmed",
+      "exit_code": 0,
+      "stdout": "CALLBACK_STARTED\n\n🛑 Interrupt received — pausing for user instruction...\n\n============================================================\n📝 WAITING FOR USER INSTRUCTION\n============================================================\n--- PROVIDE INSTRUCTION (leave empty to cancel) ---\n>>> Type your instruction. Press Enter twice to finish.\n\n\nIs this a 'modification' to the current task or a 'new' task? (m/n)\n\n✅ New user task appended to memory.\n✅ Resuming...\n\nCASE_CONFIRMED\n",
+      "stderr": ""
+    },
+    {
+      "case": "cancel",
+      "outcome": "confirmed",
+      "exit_code": 0,
+      "stdout": "CALLBACK_STARTED\n\n🛑 Interrupt received — pausing for user instruction...\n\n============================================================\n📝 WAITING FOR USER INSTRUCTION\n============================================================\n--- PROVIDE INSTRUCTION (leave empty to cancel) ---\n>>> Type your instruction. Press Enter twice to finish.\n\n\nℹ️ No instruction provided. Resuming without change.\n✅ Resuming...\n\nCASE_CONFIRMED\n",
+      "stderr": ""
+    },
+    {
+      "case": "incomplete_input",
+      "outcome": "observed_block",
+      "timeout_seconds": 8,
+      "stdout": "CALLBACK_STARTED\n",
+      "stderr": ""
+    }
+  ]
+}
