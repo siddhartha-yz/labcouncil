@@ -1,0 +1,25 @@
+{
+  "started_at_utc": "2026-10-03T18:31:20.479773+00:00",
+  "python": "3.14.4",
+  "endpoint": "https://generativelanguage.googleapis.com/v1beta/interactions",
+  "request": {
+    "model": "gemini-3.8-flash",
+    "input": "Reply with exactly LABCOUNCIL_OK. Do not include any other text.",
+    "store": false,
+    "generation_config": {
+      "thinking_level": "low",
+      "max_output_tokens": 256
+    }
+  },
+  "request_attempts": 1,
+  "automatic_retries": 0,
+  "timeout_seconds": 45,
+  "scope": "API connectivity and exact text response only; not agent/research validation",
+  "usage": null,
+  "passed": false,
+  "failure": "transport_error",
+  "error_type": "URLError",
+  "transport_reason_type": "gaierror",
+  "elapsed_seconds": 0.006,
+  "script_sha256": "f97fbf3dde85e2856484f9b8200591488d36854de22b4d4332d853b0c6486481"
+}

@@ -1,0 +1,72 @@
+{
+  "started_at_utc": "2026-10-03T18:31:41.005577+00:00",
+  "python": "3.14.4",
+  "endpoint": "https://generativelanguage.googleapis.com/v1beta/interactions",
+  "request": {
+    "model": "gemini-3.8-flash",
+    "input": "Reply with exactly LABCOUNCIL_OK. Do not include any other text.",
+    "store": false,
+    "generation_config": {
+      "thinking_level": "low",
+      "max_output_tokens": 256
+    }
+  },
+  "request_attempts": 1,
+  "automatic_retries": 0,
+  "timeout_seconds": 45,
+  "scope": "API connectivity and exact text response only; not agent/research validation",
+  "usage": {
+    "total_tokens": 22,
+    "total_input_tokens": 17,
+    "input_tokens_by_modality": [
+      {
+        "modality": "text",
+        "tokens": 17
+      }
+    ],
+    "total_cached_tokens": 0,
+    "total_output_tokens": 5,
+    "total_tool_use_tokens": 0,
+    "total_thought_tokens": 0,
+    "raw_prompt_token": 48,
+    "model_invocation_token_counts": [
+      {
+        "prompt_tokens_details": [
+          {
+            "modality": "text",
+            "tokens": 48
+          }
+        ],
+        "candidates_tokens_details": [
+          {
+            "modality": "text",
+            "tokens": 9
+          }
+        ]
+      }
+    ],
+    "non_grounding_model_invocation_token_counts": [
+      {
+        "prompt_tokens_details": [
+          {
+            "modality": "text",
+            "tokens": 48
+          }
+        ],
+        "candidates_tokens_details": [
+          {
+            "modality": "text",
+            "tokens": 9
+          }
+        ]
+      }
+    ]
+  },
+  "http_status": 200,
+  "provider_model": "gemini-3.8-flash",
+  "provider_status": "completed",
+  "response_text": "LABCOUNCIL_OK",
+  "passed": true,
+  "elapsed_seconds": 1.646,
+  "script_sha256": "f97fbf3dde85e2856484f9b8200591488d36854de22b4d4332d853b0c6486481"
+}

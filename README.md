@@ -46,6 +46,28 @@ LabCouncil 是一个正在规划的个人虚拟研究组平台。你提供 idea�
 
 Upstream projects remain candidates. We will record reproducible checks and their limitations before selecting integrations. Published results are author-reported until independently checked; see the [initial audit](reproductions/2026-10-04-initial-audit/REPORT.md).
 
+## Minimal Gemini connectivity check
+
+The [first API check](reproductions/2026-10-04-gemini-connectivity/REPORT.md) passed. This verifies one fixed text response, not an agent workflow or scientific result.
+
+Copy `.env.example` to a local `.env` and fill `GEMINI_API_KEY`. The `.env` file is excluded from Git. Run from the repository root:
+
+```bash
+python3 reproductions/check_gemini_connectivity.py --output logs/gemini-check-01.json
+```
+
+This makes one potentially billable request to `gemini-3.8-flash`, with no automatic retries. Use a new output filename for each attempt. No runnable platform exists yet.
+
+## Minimal DeepSeek connectivity check
+
+Subsequent validation will use DeepSeek at the user's request. The [first DeepSeek API check](reproductions/2026-10-04-deepseek-connectivity/REPORT.md) passed with `deepseek-v4-pro`. Put `DEEPSEEK_API_KEY` and `DEEPSEEK_MODEL` in the local `.env`, then run:
+
+```bash
+python3 reproductions/check_deepseek_connectivity.py --output logs/deepseek-check-01.json
+```
+
+This makes one potentially billable request with thinking disabled and no automatic retries. Use a new output filename for each attempt. Agent behavior has not been tested yet; this provider choice does not establish a quality advantage or validate any upstream paper.
+
 ## License
 
 MIT. See [LICENSE](LICENSE).
