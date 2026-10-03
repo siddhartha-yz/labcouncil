@@ -10,6 +10,7 @@ import math
 from pathlib import Path
 import platform
 import random
+import shutil
 import statistics
 import sys
 import time
@@ -162,10 +163,14 @@ def tool_schema(name):
                            "required": list(fields), "additionalProperties": False}}}
 
 
-def validate_report(report, version, artifact, role):
+def validate_report(report, version, artifact, role, known_ids=None):
     if report.get("task_version") != version:
         raise ValueError("Report task version mismatch")
-    if report.get("evidence_refs") != [artifact["evidence_id"]]:
+    refs = report.get("evidence_refs")
+    allowed = set(known_ids or [artifact["evidence_id"]])
+    if (not isinstance(refs, list) or not all(isinstance(ref, str) for ref in refs)
+            or len(set(refs)) != len(refs) or artifact["evidence_id"] not in refs
+            or not set(refs).issubset(allowed)):
         raise ValueError("Report evidence references mismatch")
     limitations = report.get("limitations")
     if not isinstance(limitations, list) or not limitations or not all(
@@ -307,7 +312,8 @@ class Workflow:
             if not tool_count:
                 raise ValueError("Model returned a report without executing the required tool")
             report = json.loads(message.get("content", ""))
-            validate_report(report, version, self.state["artifacts"][-1], role)
+            validate_report(report, version, self.state["artifacts"][-1], role,
+                            [item["evidence_id"] for item in self.state["artifacts"]])
             self.state["reports"][phase] = report
             if role == "executor":
                 self.state["executor_history"] = messages
@@ -319,7 +325,24 @@ class Workflow:
     def run(self, stage):
         if stage == "continue" and self.state["status"] == "completed":
             return {"status": "already_completed", "new_api_calls": 0, "new_tool_calls": 0}
-        if stage == "first":
+        if stage == "reassess":
+            if self.state.get("failure_message") != "Report evidence references mismatch":
+                raise ValueError("Reassessment supports only the recorded citation validator failure")
+            responses = [json.loads(line) for line in (self.root / "events.jsonl").read_text().splitlines()]
+            candidates = [event for event in responses if event.get("type") == "api_response"
+                          and event.get("phase") == "round-2-executor"]
+            report = json.loads(candidates[-1]["response"]["choices"][0]["message"]["content"])
+            artifact = self.state["artifacts"][-1]
+            validate_report(report, 2, artifact, "executor",
+                            [item["evidence_id"] for item in self.state["artifacts"]])
+            self.state["reports"]["round-2-executor"] = report
+            write_json(self.root / "round-2-executor.json", report)
+            self.event({"type": "offline_reassessment", "source_call_id": candidates[-1]["call_id"],
+                        "reason": "Permit accurate registered historical evidence references",
+                        "new_experiments": 0, "new_executor_api_calls": 0})
+            self.phase(2, "reviewer")
+            self.state["status"] = "completed"
+        elif stage == "first":
             self.phase(1, "executor")
             self.phase(1, "reviewer")
             self.state["status"] = "meeting_ready"
@@ -339,8 +362,10 @@ class Workflow:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("stage", choices=("first", "continue"))
+    parser.add_argument("stage", choices=("first", "continue", "reassess"))
     parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument("--source-dir", type=Path,
+                        help="Copy a failed checkpoint for explicit offline reassessment")
     parser.add_argument("--prior-api-calls", type=int, default=0,
                         help="Requests consumed by previous attempts under the shared 12-call budget")
     args = parser.parse_args()
@@ -361,8 +386,16 @@ def main():
                 "tool_calls": 0, "artifacts": [], "manifests": {}, "reports": {},
                 "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}}
         else:
+            if args.stage == "reassess":
+                if args.source_dir is None or root.exists():
+                    raise ValueError("Reassessment requires a source and a fresh output directory")
+                shutil.copytree(args.source_dir, root)
             state = json.loads((root / "state.json").read_text())
-            if state["script_sha256"] != digest(Path(__file__)):
+            if args.stage == "reassess":
+                state["reassessment_source"] = str(args.source_dir)
+                state["original_script_sha256"] = state["script_sha256"]
+                state["script_sha256"] = digest(Path(__file__))
+            elif state["script_sha256"] != digest(Path(__file__)):
                 raise ValueError("Workflow script changed between stages")
             if state["config_loader_sha256"] != digest(Path(__file__).with_name("check_deepseek_connectivity.py")):
                 raise ValueError("Configuration loader changed between stages")

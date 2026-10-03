@@ -51,6 +51,14 @@ class IntegrityTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "task version mismatch"):
             validate_report(report, 2, self.artifact, "reviewer")
 
+    def test_registered_history_does_not_invalidate_current_evidence(self):
+        report = {"task_version": 1, "evidence_refs": ["previous-registered", "experiment-0001"],
+                  "verified": True, "limitations": ["Synthetic data"]}
+        validate_report(report, 1, self.artifact, "reviewer", ["previous-registered", "experiment-0001"])
+        report["evidence_refs"] = ["invented", "experiment-0001"]
+        with self.assertRaisesRegex(ValueError, "references mismatch"):
+            validate_report(report, 1, self.artifact, "reviewer", ["previous-registered", "experiment-0001"])
+
     def test_exhausted_budget_prevents_any_network_call(self):
         workflow = Workflow(self.root, {"DEEPSEEK_API_KEY": "offline-placeholder"}, {"api_calls": 12})
         with patch("urllib.request.urlopen", side_effect=AssertionError("Network must not be used")):
