@@ -26,6 +26,24 @@ class SummaryBoundaryTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "claims experiments"):
             validate_summary(json.dumps(self.report), self.evidence, False)
 
+    def test_single_trailing_object_is_accepted_without_rewriting_text(self):
+        self.assertEqual(validate_summary('### Summary\nText\n' + json.dumps(self.report), self.evidence, False), self.report)
+
+    def test_two_unfenced_objects_are_rejected(self):
+        text = json.dumps(self.report) + '\n' + json.dumps(self.report)
+        with self.assertRaisesRegex(ValueError, 'unambiguous'):
+            validate_summary(text, self.evidence, False)
+
+    def test_text_after_object_is_rejected(self):
+        text = '### Summary\n' + json.dumps(self.report) + '\nUnverified extra conclusions'
+        with self.assertRaisesRegex(ValueError, 'unambiguous'):
+            validate_summary(text, self.evidence, False)
+
+    def test_block_and_unfenced_object_are_rejected_together(self):
+        text = self.block + '\n' + json.dumps(self.report)
+        with self.assertRaisesRegex(ValueError, 'violation'):
+            validate_summary(text, self.evidence, False)
+
 
 if __name__ == '__main__':
     unittest.main()

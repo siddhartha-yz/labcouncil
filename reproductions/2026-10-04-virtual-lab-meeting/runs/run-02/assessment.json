@@ -1,0 +1,101 @@
+{
+  "status": "passed_under_revised_format_contract",
+  "assessment_kind": "offline",
+  "new_api_calls": 0,
+  "original_execution_status_preserved": "failed",
+  "validator_script_sha256": "c7ec1ec8f47584ec863532376e7fc21ab1328ad886b7ad919dd409868aa6558e",
+  "meeting_checks": [
+    {
+      "meeting": "meeting-1",
+      "passed": true,
+      "agent_response_counts": {
+        "Principal Investigator": 2,
+        "Experimentalist": 1,
+        "Methodologist": 1
+      },
+      "json_sha256": "7008b9f1bd1a0b11cd06c0757ce1f0be76251a9531215b59b27a72693cc38d8b",
+      "markdown_sha256": "457ac515fdb1f53cb347c83db65024592d77cabb6067ca6968a0b07a5d4f3ae6",
+      "validated_summary": {
+        "evidence_refs": [
+          "experiment-0001"
+        ],
+        "observed_mse": {
+          "linear": 0.17046895861013783,
+          "baseline": 12.888358499556563
+        },
+        "limitations": [
+          "Only one seed (7) observed; no variance or seed-sensitivity estimate.",
+          "Single metric (mse); no robustness or outlier checks.",
+          "Observed MSE is a measurement, not evidence of scientific quality.",
+          "No mechanism or leakage analysis available."
+        ],
+        "next_steps": [
+          "Rerun task_version 1 with outlier_fraction 0.0 and metric mse on seeds [7, 13, 21].",
+          "Report per-seed linear and baseline MSE plus mean and spread.",
+          "Reassess scientific quality only after replication; do not change metrics and seeds together."
+        ],
+        "planned_seeds": [
+          7,
+          13,
+          21
+        ],
+        "planned_metrics": [
+          "mse"
+        ],
+        "decision_ids": [
+          "decision-0001"
+        ],
+        "new_experiments_executed": false
+      }
+    },
+    {
+      "meeting": "meeting-2",
+      "passed": true,
+      "agent_response_counts": {
+        "Principal Investigator": 2,
+        "Experimentalist": 1,
+        "Methodologist": 1
+      },
+      "json_sha256": "e250a6f62b12accb5384be7dfd9981d0e3d24e94abab881ff9d4b9b2676935dd",
+      "markdown_sha256": "7b785f9089a42495b3118fce8a7976e32878d797a93246ac6210b3fa5c18c4b0",
+      "validated_summary": {
+        "evidence_refs": [
+          "experiment-0001"
+        ],
+        "observed_mse": {
+          "linear": 0.17046895861013783,
+          "baseline": 12.888358499556563
+        },
+        "limitations": [
+          "Only one seed (7) observed; no variance or seed-sensitivity estimate.",
+          "Single metric (mse); no robustness or outlier checks.",
+          "Observed MSE is a measurement, not evidence of scientific quality.",
+          "No mechanism or leakage analysis available.",
+          "Expanded metric set (mae, median_absolute_error) is unvalidated and untested here.",
+          "Changing seeds and metrics together confounds seed variance with metric sensitivity."
+        ],
+        "next_steps": [
+          "Record fixture plan: seeds [7,19,31], metrics [mse,mae,median_absolute_error], decision_ids ['TEST_REVIEW_MAE_3SEEDS'].",
+          "Do not execute new experiments in this meeting.",
+          "Reassess scientific quality only after seeds and metrics are varied separately."
+        ],
+        "planned_seeds": [
+          7,
+          19,
+          31
+        ],
+        "planned_metrics": [
+          "mse",
+          "mae",
+          "median_absolute_error"
+        ],
+        "decision_ids": [
+          "TEST_REVIEW_MAE_3SEEDS"
+        ],
+        "new_experiments_executed": false
+      }
+    }
+  ],
+  "source_hashes_match_pinned_git_objects": true,
+  "offline_boundary_tests_passed": 7
+}

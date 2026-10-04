@@ -42,9 +42,30 @@ def validate_summary(summary, evidence, second):
         report = json.loads(summary)
     except json.JSONDecodeError:
         blocks = re.findall(r"```json\s*\n(.*?)\n```", summary, flags=re.DOTALL)
-        if len(blocks) != 1:
-            raise ValueError("Summary must contain exactly one unambiguous JSON block") from None
-        report = json.loads(blocks[0])
+        if len(blocks) == 1:
+            outside = re.sub(r"```json\s*\n.*?\n```", "", summary, flags=re.DOTALL)
+            for match in re.finditer(r"(?m)^\s*\{", outside):
+                try:
+                    json.JSONDecoder().raw_decode(outside[match.start():].lstrip())
+                except json.JSONDecodeError:
+                    continue
+                raise ValueError("Summary contains an unambiguous-block violation: another JSON object")
+            report = json.loads(blocks[0])
+        elif blocks:
+            raise ValueError("Summary must contain one unambiguous JSON object") from None
+        else:
+            candidates = []
+            decoder = json.JSONDecoder()
+            for match in re.finditer(r"(?m)^\s*\{", summary):
+                suffix = summary[match.start():].lstrip()
+                try:
+                    value, end = decoder.raw_decode(suffix)
+                except json.JSONDecodeError:
+                    continue
+                candidates.append((value, suffix[end:].strip()))
+            if len(candidates) != 1 or candidates[0][1]:
+                raise ValueError("Summary must contain one unambiguous trailing JSON object") from None
+            report = candidates[0][0]
     if report.get("evidence_refs") != [evidence["evidence_id"]]:
         raise ValueError("Summary evidence mismatch")
     for model in ("linear", "baseline"):
@@ -117,6 +138,9 @@ def main():
     commit = subprocess.check_output(["git", "-C", str(upstream), "rev-parse", "HEAD"], text=True).strip()
     if commit != COMMIT:
         print("Upstream commit does not match protocol; no request sent.")
+        return 2
+    if subprocess.run(["git", "-C", str(upstream), "diff", "--quiet", "HEAD", "--", "src"]).returncode:
+        print("Upstream source differs from the pinned commit; no request sent.")
         return 2
     previous = None
     if args.resume_first is not None:

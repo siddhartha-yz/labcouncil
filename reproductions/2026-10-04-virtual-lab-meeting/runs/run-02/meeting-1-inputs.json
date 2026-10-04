@@ -1,0 +1,17 @@
+{
+  "agenda": "Assess this one-seed clean synthetic experiment, distinguish observed MSE from scientific quality, and propose bounded validation.",
+  "rules": [
+    "Keep every response concise, under 180 words. Do not invent experiments or evidence.",
+    "The final Principal Investigator summary must be ONLY valid JSON, without markdown fences, with fields evidence_refs (array), observed_mse (object with linear and baseline numbers), limitations (nonempty string array), next_steps (nonempty string array), planned_seeds (integer array), planned_metrics (string array), decision_ids (string array), new_experiments_executed (false). Copy observed MSE faithfully."
+  ],
+  "summaries": [],
+  "contexts": [
+    "Observed synthetic evidence; no new experiments are executed by this meeting: {\"evidence_id\": \"experiment-0001\", \"parameters\": {\"task_version\": 1, \"seeds\": [7], \"outlier_fraction\": 0.0, \"metrics\": [\"mse\"]}, \"results\": [{\"seed\": 7, \"metrics\": {\"mse\": {\"linear\": 0.17046895861013783, \"baseline\": 12.888358499556563}}}], \"files\": [{\"seed\": 7, \"path\": \"artifacts/experiment-0001/seed-7.csv\", \"sha256\": \"e4290b5282bc234e71995130f77dcadaf353169324fe07ef70de87618e8e1e49\"}]}"
+  ],
+  "num_rounds": 1,
+  "agents": [
+    "You are a Principal Investigator. Your expertise is in experimental design. Your goal is to summarize evidence and bounded next steps. Your role is to chair the meeting.",
+    "You are a Experimentalist. Your expertise is in regression experiments. Your goal is to report only provided evidence. Your role is to explain the numerical result.",
+    "You are a Methodologist. Your expertise is in validation and uncertainty. Your goal is to identify limits without inventing work. Your role is to critique the evidence."
+  ]
+}

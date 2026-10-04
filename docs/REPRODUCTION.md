@@ -56,3 +56,5 @@ callback 返回、记忆被追加、模型执行了新任务和完整系统恢�
 当前状态见 [首次检查记录](../reproductions/2026-10-04-initial-audit/REPORT.md)。
 
 补充记录：[DeepSeek Flash 两轮自有工作流验证](../reproductions/2026-10-04-deepseek-workflow/REPORT.md)。其中的模型失败、验收实现修正、网络超时与恢复均保留；该检查不代替上游框架或论文复现。
+
+[Virtual Lab 固定上游会议函数验证](../reproductions/2026-10-04-virtual-lab-meeting/REPORT.md) 使用真实源码入口和改变后的模型条件；保留格式失败和离线重新验收。其可用性证据仅限于被测会议功能，当前决定暂不直接作为平台后端。

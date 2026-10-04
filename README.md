@@ -79,6 +79,10 @@ python3 reproductions/check_deepseek_workflow.py continue --output-dir logs/my-w
 
 Use a fresh directory and configure the local `.env`. Each experiment has a shared limit of 12 API request attempts; requests may be billable. No platform UI, scheduler, arbitrary code execution, or general recovery is implemented.
 
+## Pinned upstream meeting check
+
+The [Virtual Lab meeting-function record](reproductions/2026-10-04-virtual-lab-meeting/REPORT.md) runs two real meetings using unchanged pinned upstream source and a DeepSeek connection adapter. Speaking order, saved files, prior-summary input and updated plans were checked. Strict output-format attempts failed; the saved outputs passed offline reassessment under an explicit Markdown/JSON adapter contract. The original failures remain public. This changed-model check does not reproduce the paper's research results or select Virtual Lab as our backend.
+
 ## License
 
 MIT. See [LICENSE](LICENSE).

@@ -1,0 +1,110 @@
+{
+  "started_at_utc": "2026-10-04T07:03:10.292351+00:00",
+  "python": "3.12.14",
+  "upstream_commit": "8a3a4fd9ccc0cd297bd523751e03bc9527c91832",
+  "upstream_source_hashes_before": {
+    "src/virtual_lab/__about__.py": "ee7c4c21871d1e18ced76102d7a10b0f8a0a3f1145aa123317cc112ddc9336bc",
+    "src/virtual_lab/__init__.py": "3f642d1467de91d3d2b73d60c336d993c3d385d8d23518ca2f04b8dfe1e9300c",
+    "src/virtual_lab/agent.py": "14d9b64e1677814eb66bdf6e55f5da27e7012461ccf7421de9ff125805d682b2",
+    "src/virtual_lab/constants.py": "180dd7f0ae76bf3855d8a28d7170be6766763b058b9cad23f1e098b24ab84128",
+    "src/virtual_lab/prompts.py": "7342e951c2b5b302c71402ab1c12b46908d6c9cff3425690dfd9eb24acd7e5fb",
+    "src/virtual_lab/run_meeting.py": "12ab88a0cf3ee06b424a90f53869b007ce21e06d29f83d9303f5a0bc3598c14c",
+    "src/virtual_lab/utils.py": "d2eb6c63ab76ceb562bf984f6489b8eebcef4f547bc63320f0927222929b3704"
+  },
+  "script_sha256": "540d7d4bfc6d2929940edd1bfb2da5e825d41d12e29f1d85a1cbe0a79af2c7a8",
+  "evidence_sha256": "a93086070fea4af906a0bfe230c2377a894b5d6f6a01ee6eedda7e6ec1769d66",
+  "request_limit": 8,
+  "max_output_tokens": 768,
+  "automatic_retries": 0,
+  "decision_source": "prewritten_test_fixture",
+  "human_confirmed": false,
+  "scope": "Changed-model upstream meeting-function validation",
+  "dependencies": [
+    "annotated-types==0.8.0",
+    "anyio==4.15.1",
+    "certifi==2026.7.22",
+    "charset-normalizer==3.5.2",
+    "h11==0.16.0",
+    "httpcore2==2.13.1",
+    "httpx2==2.13.1",
+    "idna==3.20",
+    "jiter==0.17.0",
+    "openai==3.24.0",
+    "pydantic==2.13.5",
+    "pydantic_core==2.46.5",
+    "regex==2026.9.29",
+    "requests==2.34.2",
+    "sniffio==1.3.1",
+    "tiktoken==0.14.0",
+    "tqdm==4.70.1",
+    "truststore==0.10.4",
+    "typing-inspection==0.4.4",
+    "typing_extensions==4.16.0",
+    "urllib3==2.8.0"
+  ],
+  "reassessment_source": "logs/virtual-lab-meeting-01",
+  "original_script_sha256": "36c34569aa35480e84e433f42c68d0c06c31e2b88bc71c53639c29a6eae0f8fe",
+  "meeting_checks": [
+    {
+      "meeting": "meeting-1",
+      "passed": true,
+      "agent_response_counts": {
+        "Principal Investigator": 2,
+        "Experimentalist": 1,
+        "Methodologist": 1
+      },
+      "api_calls": 4,
+      "assessment": "offline under revised format contract",
+      "validated_summary": {
+        "evidence_refs": [
+          "experiment-0001"
+        ],
+        "observed_mse": {
+          "linear": 0.17046895861013783,
+          "baseline": 12.888358499556563
+        },
+        "limitations": [
+          "Only one seed (7) observed; no variance or seed-sensitivity estimate.",
+          "Single metric (mse); no robustness or outlier checks.",
+          "Observed MSE is a measurement, not evidence of scientific quality.",
+          "No mechanism or leakage analysis available."
+        ],
+        "next_steps": [
+          "Rerun task_version 1 with outlier_fraction 0.0 and metric mse on seeds [7, 13, 21].",
+          "Report per-seed linear and baseline MSE plus mean and spread.",
+          "Reassess scientific quality only after replication; do not change metrics and seeds together."
+        ],
+        "planned_seeds": [
+          7,
+          13,
+          21
+        ],
+        "planned_metrics": [
+          "mse"
+        ],
+        "decision_ids": [
+          "decision-0001"
+        ],
+        "new_experiments_executed": false
+      }
+    }
+  ],
+  "status": "failed",
+  "failure_type": "ValueError",
+  "upstream_source_hashes_after": {
+    "src/virtual_lab/__about__.py": "ee7c4c21871d1e18ced76102d7a10b0f8a0a3f1145aa123317cc112ddc9336bc",
+    "src/virtual_lab/__init__.py": "3f642d1467de91d3d2b73d60c336d993c3d385d8d23518ca2f04b8dfe1e9300c",
+    "src/virtual_lab/agent.py": "14d9b64e1677814eb66bdf6e55f5da27e7012461ccf7421de9ff125805d682b2",
+    "src/virtual_lab/constants.py": "180dd7f0ae76bf3855d8a28d7170be6766763b058b9cad23f1e098b24ab84128",
+    "src/virtual_lab/prompts.py": "7342e951c2b5b302c71402ab1c12b46908d6c9cff3425690dfd9eb24acd7e5fb",
+    "src/virtual_lab/run_meeting.py": "12ab88a0cf3ee06b424a90f53869b007ce21e06d29f83d9303f5a0bc3598c14c",
+    "src/virtual_lab/utils.py": "d2eb6c63ab76ceb562bf984f6489b8eebcef4f547bc63320f0927222929b3704"
+  },
+  "source_unchanged": true,
+  "api_calls": 8,
+  "usage": {
+    "prompt_tokens": 9976,
+    "completion_tokens": 1778,
+    "total_tokens": 11754
+  }
+}
