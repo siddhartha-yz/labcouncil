@@ -23,6 +23,9 @@ build/
 data/
 workspaces/
 artifacts/
+# Audited synthetic evidence for this recorded validation, intentionally public.
+!reproductions/2026-10-04-deepseek-workflow/runs/*/artifacts/
+!reproductions/2026-10-04-deepseek-workflow/runs/*/artifacts/**
 logs/
 *.log
 *.sqlite
