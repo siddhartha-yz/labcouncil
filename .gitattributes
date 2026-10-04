@@ -1,0 +1,2 @@
+# Preserve upstream-generated meeting records byte for byte, including final blank lines.
+reproductions/2026-10-04-virtual-lab-meeting/runs/**/*.md -text whitespace=-blank-at-eof
