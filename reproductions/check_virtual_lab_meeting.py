@@ -11,6 +11,8 @@ import math
 import os
 from pathlib import Path
 import platform
+import re
+import shutil
 import subprocess
 import sys
 import time
@@ -36,7 +38,13 @@ def source_hashes(root):
 
 
 def validate_summary(summary, evidence, second):
-    report = json.loads(summary)
+    try:
+        report = json.loads(summary)
+    except json.JSONDecodeError:
+        blocks = re.findall(r"```json\s*\n(.*?)\n```", summary, flags=re.DOTALL)
+        if len(blocks) != 1:
+            raise ValueError("Summary must contain exactly one unambiguous JSON block") from None
+        report = json.loads(blocks[0])
     if report.get("evidence_refs") != [evidence["evidence_id"]]:
         raise ValueError("Summary evidence mismatch")
     for model in ("linear", "baseline"):
@@ -98,6 +106,8 @@ def main():
     parser.add_argument("--upstream", type=Path, required=True)
     parser.add_argument("--evidence", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument("--resume-first", type=Path,
+                        help="Explicitly reassess a saved first meeting and run only the second")
     args = parser.parse_args()
     config = load_config(Path(".env"))
     if config["DEEPSEEK_MODEL"] != "deepseek-flash":
@@ -108,7 +118,17 @@ def main():
     if commit != COMMIT:
         print("Upstream commit does not match protocol; no request sent.")
         return 2
-    args.output_dir.mkdir(parents=True, exist_ok=False)
+    previous = None
+    if args.resume_first is not None:
+        previous = json.loads((args.resume_first / "metadata.json").read_text())
+        if (previous.get("api_calls") != 4 or previous.get("failure_type") != "JSONDecodeError"
+                or previous.get("upstream_commit") != COMMIT or not previous.get("source_unchanged")):
+            print("Unsupported first-meeting checkpoint; no request sent.")
+            return 2
+        shutil.copytree(args.resume_first, args.output_dir)
+        shutil.copyfile(args.output_dir / "metadata.json", args.output_dir / "original-metadata.json")
+    else:
+        args.output_dir.mkdir(parents=True, exist_ok=False)
     source_before = source_hashes(upstream)
     metadata = {"started_at_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
                 "python": platform.python_version(), "upstream_commit": commit,
@@ -131,6 +151,10 @@ def main():
         client = OpenAI(api_key=config["DEEPSEEK_API_KEY"], base_url="https://api.deepseek.com",
                         timeout=45, max_retries=0)
         recorder = RecordedCompletions(client, args.output_dir, config["DEEPSEEK_API_KEY"], NOT_GIVEN)
+        if previous is not None:
+            recorder.calls, recorder.usage = previous["api_calls"], dict(previous["usage"])
+            metadata["reassessment_source"] = str(args.resume_first)
+            metadata["original_script_sha256"] = previous["script_sha256"]
         module.OpenAI = lambda: SimpleNamespace(chat=SimpleNamespace(completions=recorder))
         agents = [Agent(title, expertise, goal, role, "deepseek-flash") for title, expertise, goal, role in (
             ("Principal Investigator", "experimental design", "summarize evidence and bounded next steps", "chair the meeting"),
@@ -146,7 +170,17 @@ def main():
             "decision_ids (string array), new_experiments_executed (false). Copy observed MSE faithfully.",
         )
         metadata["meeting_checks"] = []
-        for number in (1, 2):
+        if previous is not None:
+            transcript = json.loads((args.output_dir / "meeting-1.json").read_text())
+            counts = {agent.title: sum(turn["agent"] == agent.title and bool(turn["message"])
+                      for turn in transcript) for agent in agents}
+            if counts != {agents[0].title: 2, agents[1].title: 1, agents[2].title: 1}:
+                raise ValueError("Saved first meeting has unexpected speaker count")
+            parsed = validate_summary(transcript[-1]["message"], evidence, False)
+            metadata["meeting_checks"].append({"meeting": "meeting-1", "passed": True,
+                "agent_response_counts": counts, "api_calls": 4, "assessment": "offline under revised format contract",
+                "validated_summary": parsed})
+        for number in ((2,) if previous is not None else (1, 2)):
             name = f"meeting-{number}"
             recorder.meeting = name
             before = recorder.calls
