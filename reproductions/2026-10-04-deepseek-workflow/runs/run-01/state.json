@@ -1,0 +1,112 @@
+{
+  "status": "failed",
+  "model": "deepseek-flash",
+  "python": "3.14.4",
+  "started_at_utc": "2026-10-03T18:53:02.565024+00:00",
+  "script_sha256": "6f02ac99b856eae3f5862209d65fe0898d7fa2b07026051a7ffdc49bcfd88fbd",
+  "config_loader_sha256": "26c5572bee4cb85a30f0835521eefdcc76282c740acf16d8c5efd44a36c3dc7d",
+  "api_calls": 3,
+  "tool_calls": 1,
+  "artifacts": [
+    {
+      "evidence_id": "experiment-0001",
+      "parameters": {
+        "task_version": 1,
+        "seeds": [
+          7
+        ],
+        "outlier_fraction": 0.0,
+        "metrics": [
+          "mse"
+        ]
+      },
+      "results": [
+        {
+          "seed": 7,
+          "metrics": {
+            "mse": {
+              "linear": 0.17046895861013783,
+              "baseline": 12.888358499556563
+            }
+          }
+        }
+      ],
+      "files": [
+        {
+          "seed": 7,
+          "path": "artifacts/experiment-0001/seed-7.csv",
+          "sha256": "e4290b5282bc234e71995130f77dcadaf353169324fe07ef70de87618e8e1e49"
+        }
+      ]
+    }
+  ],
+  "manifests": {
+    "experiment-0001": {
+      "path": "artifacts/experiment-0001/experiment.json",
+      "sha256": "a93086070fea4af906a0bfe230c2377a894b5d6f6a01ee6eedda7e6ec1769d66"
+    }
+  },
+  "reports": {
+    "round-1-executor": {
+      "task_version": 1,
+      "evidence_refs": [
+        "experiment-0001"
+      ],
+      "observations": [
+        {
+          "seed": 7,
+          "metric": "mse",
+          "linear": 0.17046895861013783,
+          "baseline": 12.888358499556563
+        }
+      ],
+      "conclusion": "For task version 1 with seed 7 and outlier_fraction 0.0, the linear model achieved MSE 0.17046895861013783 versus baseline MSE 12.888358499556563, indicating substantially lower error for the linear model on this single run.",
+      "limitations": [
+        "Only one seed (7) was executed, so no variance or uncertainty estimate across seeds is available.",
+        "Only the mse metric was evaluated; other metrics and robustness to outliers (outlier_fraction 0.0) were not tested.",
+        "This is a synthetic workflow test, not evidence of scientific quality or generalizable performance."
+      ]
+    }
+  },
+  "usage": {
+    "prompt_tokens": 1832,
+    "completion_tokens": 412,
+    "total_tokens": 2244
+  },
+  "executor_history": [
+    {
+      "role": "system",
+      "content": "You are the experiment executor. You must use the provided tool, then return only a JSON report: task_version (integer), evidence_refs (array of experiment IDs), observations (one object per seed/metric with seed, metric, linear, baseline), conclusion (string), limitations (nonempty array of strings). Copy numeric results faithfully. This is a synthetic workflow test, not proof of scientific quality."
+    },
+    {
+      "role": "user",
+      "content": "Execute task version 1 using exactly these tool parameters: {\"task_version\": 1, \"seeds\": [7], \"outlier_fraction\": 0.0, \"metrics\": [\"mse\"]}"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "index": 0,
+          "id": "call_00_B6uG9Z9cq7xaCgex0npI1018",
+          "type": "function",
+          "function": {
+            "name": "run_regression_experiment",
+            "arguments": "{\"task_version\": 1, \"seeds\": [7], \"outlier_fraction\": 0.0, \"metrics\": [\"mse\"]}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_00_B6uG9Z9cq7xaCgex0npI1018",
+      "content": "{\"evidence_id\": \"experiment-0001\", \"parameters\": {\"task_version\": 1, \"seeds\": [7], \"outlier_fraction\": 0.0, \"metrics\": [\"mse\"]}, \"results\": [{\"seed\": 7, \"metrics\": {\"mse\": {\"linear\": 0.17046895861013783, \"baseline\": 12.888358499556563}}}], \"files\": [{\"seed\": 7, \"path\": \"artifacts/experiment-0001/seed-7.csv\", \"sha256\": \"e4290b5282bc234e71995130f77dcadaf353169324fe07ef70de87618e8e1e49\"}]}"
+    },
+    {
+      "role": "assistant",
+      "content": "{\"task_version\": 1, \"evidence_refs\": [\"experiment-0001\"], \"observations\": [{\"seed\": 7, \"metric\": \"mse\", \"linear\": 0.17046895861013783, \"baseline\": 12.888358499556563}], \"conclusion\": \"For task version 1 with seed 7 and outlier_fraction 0.0, the linear model achieved MSE 0.17046895861013783 versus baseline MSE 12.888358499556563, indicating substantially lower error for the linear model on this single run.\", \"limitations\": [\"Only one seed (7) was executed, so no variance or uncertainty estimate across seeds is available.\", \"Only the mse metric was evaluated; other metrics and robustness to outliers (outlier_fraction 0.0) were not tested.\", \"This is a synthetic workflow test, not evidence of scientific quality or generalizable performance.\"]}"
+    }
+  ],
+  "failure_type": "ValueError",
+  "failure_message": "Model returned a report without executing the required tool"
+}

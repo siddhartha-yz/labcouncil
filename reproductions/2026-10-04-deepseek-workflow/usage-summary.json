@@ -1,0 +1,10 @@
+{
+  "total_client_request_attempts": 12,
+  "successful_responses": 11,
+  "transport_failures": 1,
+  "usage_from_received_responses": {
+    "prompt_tokens": 9940,
+    "completion_tokens": 2070,
+    "total_tokens": 12010
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "task_version": 2,
+  "evidence_refs": [
+    "experiment-0002"
+  ],
+  "verified": true,
+  "limitations": [
+    "Only experiment-0002 was independently verified; experiment-0001 (round 1, clean data, seed 7) was not submitted for verification and its preservation claim is unconfirmed.",
+    "Verification covers hash, split-size, training-fit, prediction and metric recomputation checks only; a passing arithmetic check does not establish scientific usefulness or independent model judgment.",
+    "Only three seeds (7, 19, 31) were run, so variance estimates are coarse and no formal significance testing was performed.",
+    "Outliers were injected only into test labels at a single fraction (0.1) and magnitude (10); other fractions, magnitudes, and training-label contamination were not explored.",
+    "Results cover a single task version and model family (linear vs baseline); no hyperparameter tuning or alternative models were evaluated.",
+    "Round 1 and round 2 use different data conditions (clean vs 10% test-label outliers), so their metric values are not directly comparable.",
+    "This is a synthetic workflow test fixture, not a real human meeting decision, and it does not establish scientific quality or generalizability."
+  ]
+}

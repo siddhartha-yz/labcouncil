@@ -4,7 +4,7 @@
 
 LabCouncil is a planned, open-source platform for personal research groups made up of AI agents and a human researcher. Submit an idea, let agents investigate and produce evidence, meet on a schedule to review their reports, and turn your decisions into the next round of work.
 
-**Status: planning stage.** This repository currently contains the project plan and research references. There is no runnable application yet.
+**Status: planning and bounded validation.** This repository contains the project plan, research references, and runnable verification scripts. There is no platform application yet.
 
 ## The research loop
 
@@ -66,7 +66,18 @@ Subsequent validation will use `deepseek-flash` at the user's request. Both the 
 python3 reproductions/check_deepseek_connectivity.py --output logs/deepseek-check-01.json
 ```
 
-This makes one potentially billable request with thinking disabled and no automatic retries. Use a new output filename for each attempt. Agent behavior has not been tested yet; this provider choice does not establish a quality advantage or validate any upstream paper.
+This makes one potentially billable request with thinking disabled and no automatic retries. Use a new output filename for each attempt. This connectivity check alone does not test agent behavior, establish a quality advantage, or validate any upstream paper.
+
+## Bounded real-model workflow validation
+
+The [two-round workflow record](reproductions/2026-10-04-deepseek-workflow/REPORT.md) includes real DeepSeek Flash tool calls, saved CSV evidence, numerical report validation, and a prewritten review fixture that changes the next experiment. The original reviewer skipped verification; the revised harness forces tool execution. All failures and protocol changes are retained. This is our own functional harness, not an upstream framework or paper reproduction, and not a real human meeting.
+
+```bash
+python3 reproductions/check_deepseek_workflow.py first --output-dir logs/my-workflow
+python3 reproductions/check_deepseek_workflow.py continue --output-dir logs/my-workflow
+```
+
+Use a fresh directory and configure the local `.env`. Each experiment has a shared limit of 12 API request attempts; requests may be billable. No platform UI, scheduler, arbitrary code execution, or general recovery is implemented.
 
 ## License
 

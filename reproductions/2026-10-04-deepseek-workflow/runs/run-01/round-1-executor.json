@@ -1,0 +1,20 @@
+{
+  "task_version": 1,
+  "evidence_refs": [
+    "experiment-0001"
+  ],
+  "observations": [
+    {
+      "seed": 7,
+      "metric": "mse",
+      "linear": 0.17046895861013783,
+      "baseline": 12.888358499556563
+    }
+  ],
+  "conclusion": "For task version 1 with seed 7 and outlier_fraction 0.0, the linear model achieved MSE 0.17046895861013783 versus baseline MSE 12.888358499556563, indicating substantially lower error for the linear model on this single run.",
+  "limitations": [
+    "Only one seed (7) was executed, so no variance or uncertainty estimate across seeds is available.",
+    "Only the mse metric was evaluated; other metrics and robustness to outliers (outlier_fraction 0.0) were not tested.",
+    "This is a synthetic workflow test, not evidence of scientific quality or generalizable performance."
+  ]
+}

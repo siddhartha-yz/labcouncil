@@ -1,0 +1,71 @@
+{
+  "task_version": 2,
+  "evidence_refs": [
+    "experiment-0001",
+    "experiment-0002"
+  ],
+  "observations": [
+    {
+      "seed": 7,
+      "metric": "mse",
+      "linear": 10.155670419036328,
+      "baseline": 23.951894598705938
+    },
+    {
+      "seed": 7,
+      "metric": "mae",
+      "linear": 1.2783887001074266,
+      "baseline": 3.8665886155030527
+    },
+    {
+      "seed": 7,
+      "metric": "median_absolute_error",
+      "linear": 0.27113820719993514,
+      "baseline": 3.5262360242088477
+    },
+    {
+      "seed": 19,
+      "metric": "mse",
+      "linear": 10.27158831684568,
+      "baseline": 19.705700590219237
+    },
+    {
+      "seed": 19,
+      "metric": "mae",
+      "linear": 1.2825354090234893,
+      "baseline": 3.584747074220866
+    },
+    {
+      "seed": 19,
+      "metric": "median_absolute_error",
+      "linear": 0.28179888127093056,
+      "baseline": 3.0843445557618776
+    },
+    {
+      "seed": 31,
+      "metric": "mse",
+      "linear": 10.212571668611693,
+      "baseline": 20.613764804342175
+    },
+    {
+      "seed": 31,
+      "metric": "mae",
+      "linear": 1.2471163775439722,
+      "baseline": 3.571814067026869
+    },
+    {
+      "seed": 31,
+      "metric": "median_absolute_error",
+      "linear": 0.21018718335695674,
+      "baseline": 3.0392012138461078
+    }
+  ],
+  "conclusion": "Round 2 (task version 2) ran seeds 7, 19 and 31 with 10% test-label outliers of magnitude 10 and unchanged training data. Across all three seeds the linear model showed lower error than the baseline on mse, mae and median_absolute_error; the gap between linear and baseline was largest for median_absolute_error (linear ~0.21-0.28 vs baseline ~3.04-3.53) and mse (linear ~10.16-10.27 vs baseline ~19.71-23.95), while mae differences were smaller (linear ~1.25-1.28 vs baseline ~3.57-3.87). Round 1 evidence (experiment-0001, clean data, seed 7 only) is preserved and not overwritten; round 2 evidence is experiment-0002 with fresh per-seed CSVs. This synthetic exercise does not establish scientific quality.",
+  "limitations": [
+    "This is a synthetic workflow test fixture, not a real human meeting decision, and it does not establish scientific quality or generalizability.",
+    "Only three seeds (7, 19, 31) were run, so variance estimates are coarse and no formal significance testing was performed.",
+    "Outliers were injected only into test labels at a single fraction (0.1) and magnitude (10); other fractions, magnitudes, and training-label contamination were not explored.",
+    "Results are reported for a single task version and model family (linear vs baseline); no hyperparameter tuning or alternative models were evaluated.",
+    "Round 1 and round 2 use different data conditions (clean vs 10% test-label outliers), so their metric values are not directly comparable."
+  ]
+}

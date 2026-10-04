@@ -1,0 +1,14 @@
+{
+  "task_version": 1,
+  "evidence_refs": [
+    "experiment-0001"
+  ],
+  "verified": true,
+  "limitations": [
+    "Only one seed (7) was executed, so no variance or uncertainty estimate across seeds is available.",
+    "Only the mse metric was evaluated; other metrics were not measured.",
+    "Outlier_fraction was fixed at 0.0, so robustness to outliers was not tested.",
+    "This is a synthetic workflow test and the result does not constitute proof of scientific quality or generalizability.",
+    "Verification confirms hash integrity and arithmetic consistency of the saved metrics (recomputed mse 0.1704689586101377 vs reported 0.17046895861013783, a floating-point rounding difference), but a passing arithmetic check does not establish scientific usefulness or independent model judgment."
+  ]
+}

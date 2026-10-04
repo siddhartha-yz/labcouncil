@@ -1,0 +1,14 @@
+{
+  "seed": 7,
+  "training_rows_unchanged": true,
+  "test_x_unchanged": true,
+  "changed_test_labels": 10,
+  "total_test_labels": 100,
+  "change_magnitude": 10,
+  "duplicate_completion": {
+    "status": "already_completed",
+    "new_api_calls": 0,
+    "new_tool_calls": 0
+  },
+  "offline_integrity_tests_observed_passed": 9
+}

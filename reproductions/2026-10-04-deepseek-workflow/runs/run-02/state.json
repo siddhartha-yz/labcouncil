@@ -1,0 +1,225 @@
+{
+  "status": "failed",
+  "model": "deepseek-flash",
+  "python": "3.14.4",
+  "started_at_utc": "2026-10-03T18:55:41.186560+00:00",
+  "script_sha256": "51d6ad6d8749cf9d85c0c46ddb259d8589d9e5a1fb1b4e60647217ef46ca554e",
+  "config_loader_sha256": "26c5572bee4cb85a30f0835521eefdcc76282c740acf16d8c5efd44a36c3dc7d",
+  "api_calls": 6,
+  "prior_api_calls": 3,
+  "tool_calls": 3,
+  "artifacts": [
+    {
+      "evidence_id": "experiment-0001",
+      "parameters": {
+        "task_version": 1,
+        "seeds": [
+          7
+        ],
+        "outlier_fraction": 0.0,
+        "metrics": [
+          "mse"
+        ]
+      },
+      "results": [
+        {
+          "seed": 7,
+          "metrics": {
+            "mse": {
+              "linear": 0.17046895861013783,
+              "baseline": 12.888358499556563
+            }
+          }
+        }
+      ],
+      "files": [
+        {
+          "seed": 7,
+          "path": "artifacts/experiment-0001/seed-7.csv",
+          "sha256": "e4290b5282bc234e71995130f77dcadaf353169324fe07ef70de87618e8e1e49"
+        }
+      ]
+    },
+    {
+      "evidence_id": "experiment-0002",
+      "parameters": {
+        "task_version": 2,
+        "seeds": [
+          7,
+          19,
+          31
+        ],
+        "outlier_fraction": 0.1,
+        "metrics": [
+          "mse",
+          "mae",
+          "median_absolute_error"
+        ]
+      },
+      "results": [
+        {
+          "seed": 7,
+          "metrics": {
+            "mse": {
+              "linear": 10.155670419036328,
+              "baseline": 23.951894598705938
+            },
+            "mae": {
+              "linear": 1.2783887001074266,
+              "baseline": 3.8665886155030527
+            },
+            "median_absolute_error": {
+              "linear": 0.27113820719993514,
+              "baseline": 3.5262360242088477
+            }
+          }
+        },
+        {
+          "seed": 19,
+          "metrics": {
+            "mse": {
+              "linear": 10.27158831684568,
+              "baseline": 19.705700590219237
+            },
+            "mae": {
+              "linear": 1.2825354090234893,
+              "baseline": 3.584747074220866
+            },
+            "median_absolute_error": {
+              "linear": 0.28179888127093056,
+              "baseline": 3.0843445557618776
+            }
+          }
+        },
+        {
+          "seed": 31,
+          "metrics": {
+            "mse": {
+              "linear": 10.212571668611693,
+              "baseline": 20.613764804342175
+            },
+            "mae": {
+              "linear": 1.2471163775439722,
+              "baseline": 3.571814067026869
+            },
+            "median_absolute_error": {
+              "linear": 0.21018718335695674,
+              "baseline": 3.0392012138461078
+            }
+          }
+        }
+      ],
+      "files": [
+        {
+          "seed": 7,
+          "path": "artifacts/experiment-0002/seed-7.csv",
+          "sha256": "e1d3c7b6106ba7bc20da301c191403776ab7047d3f6269d7a2f274321412da1b"
+        },
+        {
+          "seed": 19,
+          "path": "artifacts/experiment-0002/seed-19.csv",
+          "sha256": "84feae1845ae61d3239e1c7ae86f93e6b4d606145f46f926169d7930fcb70297"
+        },
+        {
+          "seed": 31,
+          "path": "artifacts/experiment-0002/seed-31.csv",
+          "sha256": "6bc751036b156e54eb4644ac856b2881409ee8eb630ed63747b1185cdf797a9b"
+        }
+      ]
+    }
+  ],
+  "manifests": {
+    "experiment-0001": {
+      "path": "artifacts/experiment-0001/experiment.json",
+      "sha256": "a93086070fea4af906a0bfe230c2377a894b5d6f6a01ee6eedda7e6ec1769d66"
+    },
+    "experiment-0002": {
+      "path": "artifacts/experiment-0002/experiment.json",
+      "sha256": "a65a9d39e9eb6684f6889aad1a6e949b8c542b1f6d42e65882dff0e34cfabc3d"
+    }
+  },
+  "reports": {
+    "round-1-executor": {
+      "task_version": 1,
+      "evidence_refs": [
+        "experiment-0001"
+      ],
+      "observations": [
+        {
+          "seed": 7,
+          "metric": "mse",
+          "linear": 0.17046895861013783,
+          "baseline": 12.888358499556563
+        }
+      ],
+      "conclusion": "For task version 1 with seed 7 and outlier_fraction 0.0, the linear model achieved MSE 0.17046895861013783 versus baseline MSE 12.888358499556563, indicating substantially lower error for the linear model on this single run.",
+      "limitations": [
+        "Only one seed (7) was executed, so no variance or uncertainty estimate across seeds is available.",
+        "Only the mse metric was evaluated; other metrics were not measured.",
+        "Outlier_fraction was fixed at 0.0, so robustness to outliers was not tested.",
+        "This is a synthetic workflow test and the result does not constitute proof of scientific quality or generalizability."
+      ]
+    },
+    "round-1-reviewer": {
+      "task_version": 1,
+      "evidence_refs": [
+        "experiment-0001"
+      ],
+      "verified": true,
+      "limitations": [
+        "Only one seed (7) was executed, so no variance or uncertainty estimate across seeds is available.",
+        "Only the mse metric was evaluated; other metrics were not measured.",
+        "Outlier_fraction was fixed at 0.0, so robustness to outliers was not tested.",
+        "This is a synthetic workflow test and the result does not constitute proof of scientific quality or generalizability.",
+        "Verification confirms hash integrity and arithmetic consistency of the saved metrics (recomputed mse 0.1704689586101377 vs reported 0.17046895861013783, a floating-point rounding difference), but a passing arithmetic check does not establish scientific usefulness or independent model judgment."
+      ]
+    }
+  },
+  "usage": {
+    "prompt_tokens": 5431,
+    "completion_tokens": 1370,
+    "total_tokens": 6801
+  },
+  "executor_history": [
+    {
+      "role": "system",
+      "content": "You are the experiment executor. You must use the provided tool, then return only a JSON report: task_version (integer), evidence_refs (array of experiment IDs), observations (one object per seed/metric with seed, metric, linear, baseline), conclusion (string), limitations (nonempty array of strings). Copy numeric results faithfully. This is a synthetic workflow test, not proof of scientific quality."
+    },
+    {
+      "role": "user",
+      "content": "Execute task version 1 using exactly these tool parameters: {\"task_version\": 1, \"seeds\": [7], \"outlier_fraction\": 0.0, \"metrics\": [\"mse\"]}"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "index": 0,
+          "id": "call_00_TmnObaLOp3abkiXpDTjT6926",
+          "type": "function",
+          "function": {
+            "name": "run_regression_experiment",
+            "arguments": "{\"task_version\": 1, \"seeds\": [7], \"outlier_fraction\": 0.0, \"metrics\": [\"mse\"]}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_00_TmnObaLOp3abkiXpDTjT6926",
+      "content": "{\"evidence_id\": \"experiment-0001\", \"parameters\": {\"task_version\": 1, \"seeds\": [7], \"outlier_fraction\": 0.0, \"metrics\": [\"mse\"]}, \"results\": [{\"seed\": 7, \"metrics\": {\"mse\": {\"linear\": 0.17046895861013783, \"baseline\": 12.888358499556563}}}], \"files\": [{\"seed\": 7, \"path\": \"artifacts/experiment-0001/seed-7.csv\", \"sha256\": \"e4290b5282bc234e71995130f77dcadaf353169324fe07ef70de87618e8e1e49\"}]}"
+    },
+    {
+      "role": "assistant",
+      "content": "{\"task_version\": 1, \"evidence_refs\": [\"experiment-0001\"], \"observations\": [{\"seed\": 7, \"metric\": \"mse\", \"linear\": 0.17046895861013783, \"baseline\": 12.888358499556563}], \"conclusion\": \"For task version 1 with seed 7 and outlier_fraction 0.0, the linear model achieved MSE 0.17046895861013783 versus baseline MSE 12.888358499556563, indicating substantially lower error for the linear model on this single run.\", \"limitations\": [\"Only one seed (7) was executed, so no variance or uncertainty estimate across seeds is available.\", \"Only the mse metric was evaluated; other metrics were not measured.\", \"Outlier_fraction was fixed at 0.0, so robustness to outliers was not tested.\", \"This is a synthetic workflow test and the result does not constitute proof of scientific quality or generalizability.\"]}"
+    }
+  ],
+  "decision": {
+    "decision_source": "prewritten_test_fixture",
+    "human_confirmed": false,
+    "task_version": 2,
+    "content": "TEST REVIEW FIXTURE, not a real human meeting decision. Task version 2: A single clean-data run is insufficient. Run seeds 7, 19, 31, with 10% test-label outliers of magnitude 10, keeping training data unchanged. Report mse, mae and median_absolute_error. Create fresh evidence and preserve round 1. Do not claim this synthetic exercise establishes scientific quality."
+  },
+  "failure_type": "ValueError",
+  "failure_message": "Report evidence references mismatch"
+}

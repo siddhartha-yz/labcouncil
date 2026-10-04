@@ -122,6 +122,7 @@ Agent Runtime Adapter 提供运行、事件读取、干预、取消和恢复接�
 
 - [x] 建立分层证据、运行记录和采用规则，见 [REPRODUCTION.md](REPRODUCTION.md)。
 - [x] 固定 Virtual Lab 与 freephdlabor 的代码 commit，记录环境预检与失败尝试。
+- [x] 使用 DeepSeek Flash 完成自有受控工具工作流验证，记录真实模型失败、程序修订和固定评审输入的影响；见 [工作流记录](../reproductions/2026-10-04-deepseek-workflow/REPORT.md)。这不代替下列上游最小示例或科研结果复现。
 - [ ] 核对论文对应的代码、模型与数据版本，登记可检验的主张。
 - [ ] 运行官方最小示例，检查会议、干预、证据保存和恢复。
 - [ ] 在相同条件的小规模任务上比较基线，记录重复运行、人工时间和费用。
