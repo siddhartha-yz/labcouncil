@@ -1,2 +1,7 @@
 # Preserve upstream-generated meeting records byte for byte, including final blank lines.
 reproductions/2026-10-04-virtual-lab-meeting/runs/**/*.md -text whitespace=-blank-at-eof
+# Preserve raw upstream stdout, including final blank lines.
+reproductions/2026-10-04-freephdlabor-agent/run-*/*/*stdout.txt -text whitespace=-blank-at-eof
+reproductions/2026-10-04-source-mapping/official-example-*/discussions/**/*.md -text whitespace=-blank-at-eof
+# CSV writer's CRLF is part of the hashed raw synthetic evidence.
+reproductions/2026-10-05-comparison/runs/*/artifacts/**/*.csv -text whitespace=cr-at-eol

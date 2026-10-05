@@ -1,0 +1,20 @@
+{
+  "evidence_refs": [
+    "evidence-1"
+  ],
+  "observations": [
+    {
+      "seed": 7,
+      "metric": "mse",
+      "linear": 0.17046895861013783,
+      "baseline": 12.888358499556563
+    }
+  ],
+  "conclusion": "On clean labels (outlier_fraction 0.0) at seed 7, OLS achieved lower MSE (0.17046895861013783) than the matched training-mean predictor (12.888358499556563), so OLS outperformed the baseline on this single seed and metric.",
+  "limitations": [
+    "Only seed 7 and mse were run; seeds 19 and 31 and mae/median_absolute_error were not executed.",
+    "Single-seed, single-metric result; no variance or significance assessment.",
+    "No claim of general scientific value is made."
+  ],
+  "verification_refs": []
+}

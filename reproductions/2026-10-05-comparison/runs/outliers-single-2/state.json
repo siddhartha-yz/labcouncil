@@ -1,0 +1,285 @@
+{
+  "task": "outliers",
+  "arm": "single",
+  "repeat": 2,
+  "status": "completed",
+  "python": "3.14.4",
+  "script_sha256": "6fc1402a504c5b85e9335a4c9b985b4ea56f745bf731482cab61a7b8869b6d92",
+  "experiment_tool_sha256": "0ec79d5841a964cf7d1c4d0584544849fbdeef24e66fd42e408cd61be4d15e0e",
+  "started_at_utc": "2026-10-05T12:42:49.530903+00:00",
+  "api_calls": 6,
+  "usage": {
+    "prompt_tokens": 6218,
+    "completion_tokens": 1511,
+    "total_tokens": 7729
+  },
+  "artifacts": [
+    {
+      "evidence_id": "evidence-1",
+      "parameters": {
+        "task_version": 1,
+        "seeds": [
+          7
+        ],
+        "outlier_fraction": 0.1,
+        "metrics": [
+          "mse"
+        ]
+      },
+      "results": [
+        {
+          "seed": 7,
+          "metrics": {
+            "mse": {
+              "linear": 10.155670419036328,
+              "baseline": 23.951894598705938
+            }
+          }
+        }
+      ],
+      "files": [
+        {
+          "seed": 7,
+          "path": "artifacts/evidence-1/seed-7.csv",
+          "sha256": "e1d3c7b6106ba7bc20da301c191403776ab7047d3f6269d7a2f274321412da1b"
+        }
+      ]
+    },
+    {
+      "evidence_id": "evidence-2",
+      "parameters": {
+        "task_version": 1,
+        "seeds": [
+          7,
+          19,
+          31
+        ],
+        "outlier_fraction": 0.1,
+        "metrics": [
+          "mae",
+          "median_absolute_error",
+          "mse"
+        ]
+      },
+      "results": [
+        {
+          "seed": 7,
+          "metrics": {
+            "mae": {
+              "linear": 1.2783887001074266,
+              "baseline": 3.8665886155030527
+            },
+            "median_absolute_error": {
+              "linear": 0.27113820719993514,
+              "baseline": 3.5262360242088477
+            },
+            "mse": {
+              "linear": 10.155670419036328,
+              "baseline": 23.951894598705938
+            }
+          }
+        },
+        {
+          "seed": 19,
+          "metrics": {
+            "mae": {
+              "linear": 1.2825354090234893,
+              "baseline": 3.584747074220866
+            },
+            "median_absolute_error": {
+              "linear": 0.28179888127093056,
+              "baseline": 3.0843445557618776
+            },
+            "mse": {
+              "linear": 10.27158831684568,
+              "baseline": 19.705700590219237
+            }
+          }
+        },
+        {
+          "seed": 31,
+          "metrics": {
+            "mae": {
+              "linear": 1.2471163775439722,
+              "baseline": 3.571814067026869
+            },
+            "median_absolute_error": {
+              "linear": 0.21018718335695674,
+              "baseline": 3.0392012138461078
+            },
+            "mse": {
+              "linear": 10.212571668611693,
+              "baseline": 20.613764804342175
+            }
+          }
+        }
+      ],
+      "files": [
+        {
+          "seed": 7,
+          "path": "artifacts/evidence-2/seed-7.csv",
+          "sha256": "e1d3c7b6106ba7bc20da301c191403776ab7047d3f6269d7a2f274321412da1b"
+        },
+        {
+          "seed": 19,
+          "path": "artifacts/evidence-2/seed-19.csv",
+          "sha256": "84feae1845ae61d3239e1c7ae86f93e6b4d606145f46f926169d7930fcb70297"
+        },
+        {
+          "seed": 31,
+          "path": "artifacts/evidence-2/seed-31.csv",
+          "sha256": "6bc751036b156e54eb4644ac856b2881409ee8eb630ed63747b1185cdf797a9b"
+        }
+      ]
+    }
+  ],
+  "manifests": {
+    "evidence-1": {
+      "path": "artifacts/evidence-1/experiment.json",
+      "sha256": "c67fe195eca17cd3f940c10871604b83445966fca8c8c7bd60e037799a068e53"
+    },
+    "evidence-2": {
+      "path": "artifacts/evidence-2/experiment.json",
+      "sha256": "e74ebae285e2bad57ef19ed697c2412997f5ad70a1da14fe0a03ea10e814cd93"
+    }
+  },
+  "verified": [
+    "evidence-1"
+  ],
+  "verify_calls": 1,
+  "seed_units": 4,
+  "draft": {
+    "evidence_refs": [
+      "evidence-1"
+    ],
+    "observations": [
+      {
+        "seed": 7,
+        "metric": "mse",
+        "linear": 10.155670419036328,
+        "baseline": 23.951894598705938
+      }
+    ],
+    "conclusion": "Preliminary single-seed result (seed 7, mse only): OLS linear model achieved lower MSE (10.155670419036328) than the matched training-mean baseline (23.951894598705938) on 10% test-label outliers of magnitude 10 with clean training data. This is a preliminary report from one seed and one metric; no broader claim is made.",
+    "limitations": [
+      "Only seed 7 was run; seeds 19 and 31 and metrics mae and median_absolute_error were not executed in this preliminary stage.",
+      "Single metric (mse) and single seed provide no estimate of variability across seeds.",
+      "Results are specific to this synthetic setup (10% test-label outliers, magnitude 10, clean training data) and do not establish general scientific value.",
+      "No verification of the evidence artifact was performed beyond the returned evidence ID."
+    ],
+    "verification_refs": []
+  },
+  "history": [
+    {
+      "role": "system",
+      "content": "You are the executor for a bounded synthetic regression study. Return only JSON with evidence_refs (array of real IDs), observations (array of {seed,metric,linear,baseline}), conclusion (string), limitations (string array), verification_refs (array of actually verified IDs). Copy numbers; do not claim experiments or verification you did not execute."
+    },
+    {
+      "role": "user",
+      "content": "Task outliers: Does OLS outperform a matched training-mean predictor on 10% test-label outliers of magnitude 10 with clean training data? Begin with seed 7 and mse only; produce a preliminary report. Full budget allows seeds 7,19,31 and mse,mae,median_absolute_error. Do not claim general scientific value."
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "index": 0,
+          "id": "call_00_dIrhvaFqmWbCnLfmxsOa4302",
+          "type": "function",
+          "function": {
+            "name": "experiment",
+            "arguments": "{\"seeds\": [7], \"metrics\": [\"mse\"]}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_00_dIrhvaFqmWbCnLfmxsOa4302",
+      "content": "{\"evidence_id\": \"evidence-1\", \"parameters\": {\"task_version\": 1, \"seeds\": [7], \"outlier_fraction\": 0.1, \"metrics\": [\"mse\"]}, \"results\": [{\"seed\": 7, \"metrics\": {\"mse\": {\"linear\": 10.155670419036328, \"baseline\": 23.951894598705938}}}], \"files\": [{\"seed\": 7, \"path\": \"artifacts/evidence-1/seed-7.csv\", \"sha256\": \"e1d3c7b6106ba7bc20da301c191403776ab7047d3f6269d7a2f274321412da1b\"}]}"
+    },
+    {
+      "role": "assistant",
+      "content": "{\"evidence_refs\": [\"evidence-1\"], \"observations\": [{\"seed\": 7, \"metric\": \"mse\", \"linear\": 10.155670419036328, \"baseline\": 23.951894598705938}], \"conclusion\": \"Preliminary single-seed result (seed 7, mse only): OLS linear model achieved lower MSE (10.155670419036328) than the matched training-mean baseline (23.951894598705938) on 10% test-label outliers of magnitude 10 with clean training data. This is a preliminary report from one seed and one metric; no broader claim is made.\", \"limitations\": [\"Only seed 7 was run; seeds 19 and 31 and metrics mae and median_absolute_error were not executed in this preliminary stage.\", \"Single metric (mse) and single seed provide no estimate of variability across seeds.\", \"Results are specific to this synthetic setup (10% test-label outliers, magnitude 10, clean training data) and do not establish general scientific value.\", \"No verification of the evidence artifact was performed beyond the returned evidence ID.\"], \"verification_refs\": []}"
+    }
+  ],
+  "final": {
+    "evidence_refs": [
+      "evidence-1",
+      "evidence-2"
+    ],
+    "observations": [
+      {
+        "seed": 7,
+        "metric": "mse",
+        "linear": 10.155670419036328,
+        "baseline": 23.951894598705938
+      },
+      {
+        "seed": 7,
+        "metric": "mae",
+        "linear": 1.2783887001074266,
+        "baseline": 3.8665886155030527
+      },
+      {
+        "seed": 7,
+        "metric": "median_absolute_error",
+        "linear": 0.27113820719993514,
+        "baseline": 3.5262360242088477
+      },
+      {
+        "seed": 19,
+        "metric": "mse",
+        "linear": 10.27158831684568,
+        "baseline": 19.705700590219237
+      },
+      {
+        "seed": 19,
+        "metric": "mae",
+        "linear": 1.2825354090234893,
+        "baseline": 3.584747074220866
+      },
+      {
+        "seed": 19,
+        "metric": "median_absolute_error",
+        "linear": 0.28179888127093056,
+        "baseline": 3.0843445557618776
+      },
+      {
+        "seed": 31,
+        "metric": "mse",
+        "linear": 10.212571668611693,
+        "baseline": 20.613764804342175
+      },
+      {
+        "seed": 31,
+        "metric": "mae",
+        "linear": 1.2471163775439722,
+        "baseline": 3.571814067026869
+      },
+      {
+        "seed": 31,
+        "metric": "median_absolute_error",
+        "linear": 0.21018718335695674,
+        "baseline": 3.0392012138461078
+      }
+    ],
+    "conclusion": "Across seeds 7, 19, and 31 and metrics mse, mae, and median_absolute_error, the OLS linear model achieved lower error than the matched training-mean baseline on 10% test-label outliers of magnitude 10 with clean training data. For mse, linear values were 10.155670419036328, 10.27158831684568, and 10.212571668611693 versus baseline values 23.951894598705938, 19.705700590219237, and 20.613764804342175. For mae, linear values were 1.2783887001074266, 1.2825354090234893, and 1.2471163775439722 versus baseline values 3.8665886155030527, 3.584747074220866, and 3.571814067026869. For median_absolute_error, linear values were 0.27113820719993514, 0.28179888127093056, and 0.21018718335695674 versus baseline values 3.5262360242088477, 3.0843445557618776, and 3.0392012138461078. This is a bounded report on this synthetic setup; no broader scientific claim is made.",
+    "limitations": [
+      "Results are specific to this synthetic setup (10% test-label outliers, magnitude 10, clean training data) and do not establish general scientific value.",
+      "Only three seeds (7, 19, 31) were run; no estimate of variability beyond these seeds is provided.",
+      "Only mse, mae, and median_absolute_error were evaluated; other metrics were not tested.",
+      "Verification was limited to evidence-1; evidence-2 was not verified in this stage."
+    ],
+    "verification_refs": [
+      "evidence-1"
+    ]
+  },
+  "checks": {
+    "valid_json_schema": true,
+    "numeric_and_refs_valid": true,
+    "three_seeds": true,
+    "three_metrics_each_seed": true,
+    "verification_claim_supported": false
+  }
+}

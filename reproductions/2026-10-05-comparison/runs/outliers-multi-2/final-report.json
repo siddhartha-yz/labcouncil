@@ -1,0 +1,70 @@
+{
+  "evidence_refs": [
+    "evidence-2"
+  ],
+  "observations": [
+    {
+      "seed": 7,
+      "metric": "mse",
+      "linear": 10.155670419036328,
+      "baseline": 23.951894598705938
+    },
+    {
+      "seed": 7,
+      "metric": "mae",
+      "linear": 1.2783887001074266,
+      "baseline": 3.8665886155030527
+    },
+    {
+      "seed": 7,
+      "metric": "median_absolute_error",
+      "linear": 0.27113820719993514,
+      "baseline": 3.5262360242088477
+    },
+    {
+      "seed": 19,
+      "metric": "mse",
+      "linear": 10.27158831684568,
+      "baseline": 19.705700590219237
+    },
+    {
+      "seed": 19,
+      "metric": "mae",
+      "linear": 1.2825354090234893,
+      "baseline": 3.584747074220866
+    },
+    {
+      "seed": 19,
+      "metric": "median_absolute_error",
+      "linear": 0.28179888127093056,
+      "baseline": 3.0843445557618776
+    },
+    {
+      "seed": 31,
+      "metric": "mse",
+      "linear": 10.212571668611693,
+      "baseline": 20.613764804342175
+    },
+    {
+      "seed": 31,
+      "metric": "mae",
+      "linear": 1.2471163775439722,
+      "baseline": 3.571814067026869
+    },
+    {
+      "seed": 31,
+      "metric": "median_absolute_error",
+      "linear": 0.21018718335695674,
+      "baseline": 3.0392012138461078
+    }
+  ],
+  "conclusion": "Across the executed seeds 7, 19, and 31 and metrics mse, mae, and median_absolute_error, OLS shows lower test error than the matched training-mean predictor under 10% test-label outliers of magnitude 10 with clean training data. The direction is consistent across all nine seed-metric cells, with OLS mse near 10.16-10.27 versus baseline mse near 19.71-23.95, and OLS mae/median_absolute_error roughly 1.25-1.28 and 0.21-0.28 versus baseline roughly 3.57-3.87 and 3.04-3.53. This is a bounded report on this specific configuration only; no general scientific value is claimed.",
+  "limitations": [
+    "Only seeds 7, 19, and 31 were executed; seed-to-seed variability is characterized by three points only.",
+    "Only the magnitude-10, 10% outlier configuration was tested; no sensitivity analysis over outlier magnitude or fraction exists.",
+    "The baseline is a matched training-mean predictor; results do not speak to other baselines or to robustness of OLS itself.",
+    "No independent verification was performed; verification_refs is empty and no verify call was made.",
+    "No claim of general scientific value is made."
+  ],
+  "verification_refs": []
+}

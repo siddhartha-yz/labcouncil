@@ -60,3 +60,7 @@ callback 返回、记忆被追加、模型执行了新任务和完整系统恢�
 [Virtual Lab 固定上游会议函数验证](../reproductions/2026-10-04-virtual-lab-meeting/REPORT.md) 使用真实源码入口和改变后的模型条件；保留格式失败和离线重新验收。其可用性证据仅限于被测会议功能，当前决定暂不直接作为平台后端。
 
 [freephdlabor 真实基础 agent、TCP 与恢复记录](../reproductions/2026-10-04-freephdlabor-agent/REPORT.md) 已补齐有限功能测试，并保留恢复类型、重复执行、输入断开负结果。Virtual Lab 一对一来源传递通过机械检查，但发现错误的跨 seed 基线建议；见其报告补充。两者仍暂不直接采用为持续平台后端。
+
+[论文与历史代码映射](../reproductions/2026-10-04-source-mapping/REPORT.md) 区分 Virtual Lab 1.1.0 Assistants 与1.2.0 Chat Completions；原接口在 DeepSeek 返回404。freephdlabor 最初公开保存/恢复与本次被测代码相同。
+
+[三种工作方式的等预算受控比较](../reproductions/2026-10-05-comparison/REPORT.md) 已完成12个真实运行，包括用户实际评审后的续跑；不把有限认可当专业纠错，也不把未知人工时间当零。结果不支持普遍科研优越性声明。

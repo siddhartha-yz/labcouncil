@@ -1,0 +1,21 @@
+{
+  "evidence_refs": [
+    "evidence-1"
+  ],
+  "observations": [
+    {
+      "seed": 7,
+      "metric": "mse",
+      "linear": 10.155670419036328,
+      "baseline": 23.951894598705938
+    }
+  ],
+  "conclusion": "Preliminary single-seed result (seed 7, mse only): OLS shows lower test MSE than the matched training-mean predictor under 10% test-label outliers of magnitude 10 with clean training data. This is a preliminary report from one seed and one metric; no broader claim is made.",
+  "limitations": [
+    "Only seed 7 was run; seeds 19 and 31 were not executed.",
+    "Only mse was computed; mae and median_absolute_error were not executed.",
+    "Single-seed, single-metric result cannot support generalization.",
+    "No claim of general scientific value is made."
+  ],
+  "verification_refs": []
+}

@@ -88,3 +88,7 @@ agent 修改训练代码，按固定五分钟训练预算执行，用验证指�
 | autoresearch | 官方仓库说明 | 原版训练环境、实验循环和性能验证 | 未决定 |
 
 出版信息提供来源线索，不是科研结论的保证。这里没有确认全部论文的勘误／撤稿状态，没有把 arXiv 收录作为同行评审证明，也没有确认所有统计比较的因果有效性。首次本地记录见 [REPORT.md](../reproductions/2026-10-04-initial-audit/REPORT.md)。
+
+## 2026-10-05 补充本地证据
+
+[历史版本审计](../reproductions/2026-10-04-source-mapping/REPORT.md)、[真实 TCP / 恢复检查](../reproductions/2026-10-04-freephdlabor-agent/REPORT.md) 与[12次等预算流程比较](../reproductions/2026-10-05-comparison/REPORT.md) 均保留原始输入、失败和限制。Virtual Lab 旧版 Assistants 接口与新版有实质差异；freephdlabor 原公开恢复实现未完整还原执行状态。多角色完成更多指标，但未核验新增证据；这些发现改变采用判断，不证明普遍优越或普遍失败。

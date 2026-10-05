@@ -1,0 +1,22 @@
+{
+  "evidence_refs": [
+    "evidence-1"
+  ],
+  "observations": [
+    {
+      "seed": 7,
+      "metric": "mse",
+      "linear": 0.17046895861013783,
+      "baseline": 12.888358499556563
+    }
+  ],
+  "conclusion": "The draft's single observation is internally consistent: for seed 7, mse, the linear model value (0.17046895861013783) is lower than the matched baseline (12.888358499556563), as recorded in evidence-1. However, this is a single seed and single metric, so it supports only a narrow, configuration-specific statement and not any general claim of scientific value. The draft's conclusion and limitations are appropriately hedged and do not overclaim.",
+  "limitations": [
+    "Only seed 7 was executed; seeds 19 and 31 were not run, so no seed-robustness evidence exists.",
+    "Only mse was computed; mae and median_absolute_error are absent, so metric-robustness is untested.",
+    "No statistical significance testing or confidence intervals were reported.",
+    "Results are tied to the specific synthetic configuration (outlier_fraction 0.0) and cannot be generalized beyond it.",
+    "I did not execute any new experiments; I only inspected the provided artifact and its recorded numbers."
+  ],
+  "verification_refs": []
+}

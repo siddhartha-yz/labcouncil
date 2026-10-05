@@ -1,0 +1,214 @@
+{
+  "scoring_script_sha256": "ca5901051ab859872b124c8c1b0a32a29249154cdb829447024b2de6b3a7f437",
+  "assessment": "Separate offline checks; original state untouched. Host verification is not credited as an agent verify event.",
+  "runs": [
+    {
+      "run": "clean-human-1",
+      "status": "awaiting_human",
+      "api_calls": 2,
+      "usage": {
+        "prompt_tokens": 940,
+        "completion_tokens": 316,
+        "total_tokens": 1256
+      },
+      "seed_units": 1,
+      "offline_all_artifacts_verified": true
+    },
+    {
+      "run": "clean-human-2",
+      "status": "awaiting_human",
+      "api_calls": 2,
+      "usage": {
+        "prompt_tokens": 940,
+        "completion_tokens": 245,
+        "total_tokens": 1185
+      },
+      "seed_units": 1,
+      "offline_all_artifacts_verified": true
+    },
+    {
+      "run": "clean-multi-1",
+      "status": "completed",
+      "api_calls": 5,
+      "usage": {
+        "prompt_tokens": 5083,
+        "completion_tokens": 1518,
+        "total_tokens": 6601
+      },
+      "seed_units": 4,
+      "offline_all_artifacts_verified": true,
+      "reassessed_checks": {
+        "valid_json_schema": true,
+        "numeric_and_refs_valid": true,
+        "three_seeds": true,
+        "three_metrics_each_seed": true,
+        "verification_claim_supported": true,
+        "all_report_evidence_verified": false
+      }
+    },
+    {
+      "run": "clean-multi-2",
+      "status": "completed",
+      "api_calls": 5,
+      "usage": {
+        "prompt_tokens": 4872,
+        "completion_tokens": 1214,
+        "total_tokens": 6086
+      },
+      "seed_units": 4,
+      "offline_all_artifacts_verified": true,
+      "reassessed_checks": {
+        "valid_json_schema": true,
+        "numeric_and_refs_valid": true,
+        "three_seeds": true,
+        "three_metrics_each_seed": true,
+        "verification_claim_supported": true,
+        "all_report_evidence_verified": false
+      }
+    },
+    {
+      "run": "clean-single-1",
+      "status": "completed",
+      "api_calls": 6,
+      "usage": {
+        "prompt_tokens": 5342,
+        "completion_tokens": 908,
+        "total_tokens": 6250
+      },
+      "seed_units": 1,
+      "offline_all_artifacts_verified": true,
+      "reassessed_checks": {
+        "valid_json_schema": true,
+        "numeric_and_refs_valid": true,
+        "three_seeds": false,
+        "three_metrics_each_seed": false,
+        "verification_claim_supported": true,
+        "all_report_evidence_verified": true
+      }
+    },
+    {
+      "run": "clean-single-2",
+      "status": "completed",
+      "api_calls": 6,
+      "usage": {
+        "prompt_tokens": 6119,
+        "completion_tokens": 1271,
+        "total_tokens": 7390
+      },
+      "seed_units": 4,
+      "offline_all_artifacts_verified": true,
+      "reassessed_checks": {
+        "valid_json_schema": true,
+        "numeric_and_refs_valid": true,
+        "three_seeds": true,
+        "three_metrics_each_seed": true,
+        "verification_claim_supported": true,
+        "all_report_evidence_verified": false
+      }
+    },
+    {
+      "run": "outliers-human-1",
+      "status": "awaiting_human",
+      "api_calls": 2,
+      "usage": {
+        "prompt_tokens": 968,
+        "completion_tokens": 289,
+        "total_tokens": 1257
+      },
+      "seed_units": 1,
+      "offline_all_artifacts_verified": true
+    },
+    {
+      "run": "outliers-human-2",
+      "status": "awaiting_human",
+      "api_calls": 2,
+      "usage": {
+        "prompt_tokens": 968,
+        "completion_tokens": 268,
+        "total_tokens": 1236
+      },
+      "seed_units": 1,
+      "offline_all_artifacts_verified": true
+    },
+    {
+      "run": "outliers-multi-1",
+      "status": "completed",
+      "api_calls": 5,
+      "usage": {
+        "prompt_tokens": 5024,
+        "completion_tokens": 1351,
+        "total_tokens": 6375
+      },
+      "seed_units": 4,
+      "offline_all_artifacts_verified": true,
+      "reassessed_checks": {
+        "valid_json_schema": true,
+        "numeric_and_refs_valid": true,
+        "three_seeds": true,
+        "three_metrics_each_seed": true,
+        "verification_claim_supported": true,
+        "all_report_evidence_verified": false
+      }
+    },
+    {
+      "run": "outliers-multi-2",
+      "status": "completed",
+      "api_calls": 5,
+      "usage": {
+        "prompt_tokens": 5008,
+        "completion_tokens": 1347,
+        "total_tokens": 6355
+      },
+      "seed_units": 4,
+      "offline_all_artifacts_verified": true,
+      "reassessed_checks": {
+        "valid_json_schema": true,
+        "numeric_and_refs_valid": true,
+        "three_seeds": true,
+        "three_metrics_each_seed": true,
+        "verification_claim_supported": true,
+        "all_report_evidence_verified": false
+      }
+    },
+    {
+      "run": "outliers-single-1",
+      "status": "completed",
+      "api_calls": 6,
+      "usage": {
+        "prompt_tokens": 5572,
+        "completion_tokens": 946,
+        "total_tokens": 6518
+      },
+      "seed_units": 1,
+      "offline_all_artifacts_verified": true,
+      "reassessed_checks": {
+        "valid_json_schema": true,
+        "numeric_and_refs_valid": true,
+        "three_seeds": false,
+        "three_metrics_each_seed": false,
+        "verification_claim_supported": true,
+        "all_report_evidence_verified": true
+      }
+    },
+    {
+      "run": "outliers-single-2",
+      "status": "completed",
+      "api_calls": 6,
+      "usage": {
+        "prompt_tokens": 6218,
+        "completion_tokens": 1511,
+        "total_tokens": 7729
+      },
+      "seed_units": 4,
+      "offline_all_artifacts_verified": true,
+      "reassessed_checks": {
+        "valid_json_schema": true,
+        "numeric_and_refs_valid": true,
+        "three_seeds": true,
+        "three_metrics_each_seed": true,
+        "verification_claim_supported": true,
+        "all_report_evidence_verified": false
+      }
+    }
+  ]
+}

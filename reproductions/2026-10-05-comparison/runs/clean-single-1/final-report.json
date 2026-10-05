@@ -1,0 +1,24 @@
+{
+  "evidence_refs": [
+    "evidence-1"
+  ],
+  "observations": [
+    {
+      "seed": 7,
+      "metric": "mse",
+      "linear": 0.17046895861013783,
+      "baseline": 12.888358499556563
+    }
+  ],
+  "conclusion": "On clean labels at seed 7, OLS achieved lower MSE (0.17046895861013783) than the matched training-mean predictor (12.888358499556563). Verification of evidence-1 passed all checks (manifest hash, csv hashes, split sizes, training fit, saved predictions, recomputed metrics), with recomputed MSE for the linear model at 0.1704689586101377. This remains a preliminary single-seed, single-metric result and does not establish general scientific value.",
+  "limitations": [
+    "Only seed 7 was run; seeds 19 and 31 were not executed.",
+    "Only mse was computed; mae and median_absolute_error were not executed.",
+    "Single-seed, single-metric result; no uncertainty estimate or significance test.",
+    "Recomputed linear MSE differs from the reported value at the ~1e-16 level (0.1704689586101377 vs 0.17046895861013783), consistent with floating-point rounding.",
+    "No claim of general scientific value is made."
+  ],
+  "verification_refs": [
+    "evidence-1"
+  ]
+}

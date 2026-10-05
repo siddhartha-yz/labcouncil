@@ -1,0 +1,21 @@
+{
+  "evidence_refs": [
+    "evidence-1"
+  ],
+  "observations": [
+    {
+      "seed": 7,
+      "metric": "mse",
+      "linear": 0.17046895861013783,
+      "baseline": 12.888358499556563
+    }
+  ],
+  "conclusion": "On clean labels at seed 7, OLS achieved lower MSE (0.17046895861013783) than the matched training-mean predictor (12.888358499556563). This is a preliminary single-seed result and does not establish general scientific value.",
+  "limitations": [
+    "Only seed 7 was run; seeds 19 and 31 were not executed.",
+    "Only mse was computed; mae and median_absolute_error were not executed.",
+    "Single-seed, single-metric preliminary result; no uncertainty estimate or significance test.",
+    "No claim of general scientific value is made."
+  ],
+  "verification_refs": []
+}

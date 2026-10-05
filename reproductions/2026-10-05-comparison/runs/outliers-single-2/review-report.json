@@ -1,0 +1,23 @@
+{
+  "evidence_refs": [
+    "evidence-1"
+  ],
+  "observations": [
+    {
+      "seed": 7,
+      "metric": "mse",
+      "linear": 10.155670419036328,
+      "baseline": 23.951894598705938
+    }
+  ],
+  "conclusion": "Preliminary single-seed result (seed 7, mse only): OLS linear model achieved lower MSE (10.155670419036328) than the matched training-mean baseline (23.951894598705938) on 10% test-label outliers of magnitude 10 with clean training data. Verification of evidence-1 passed (manifest hash, csv hashes, split sizes, training fit, saved predictions, recomputed metrics), with recomputed MSE values matching to floating-point precision (linear 10.15567041903633, baseline 23.951894598705934). This remains a preliminary report from one seed and one metric; no broader claim is made.",
+  "limitations": [
+    "Only seed 7 was run; seeds 19 and 31 and metrics mae and median_absolute_error were not executed.",
+    "Single metric (mse) and single seed provide no estimate of variability across seeds.",
+    "Results are specific to this synthetic setup (10% test-label outliers, magnitude 10, clean training data) and do not establish general scientific value.",
+    "Verification confirmed internal consistency of evidence-1 but does not extend coverage to unrun seeds or metrics."
+  ],
+  "verification_refs": [
+    "evidence-1"
+  ]
+}

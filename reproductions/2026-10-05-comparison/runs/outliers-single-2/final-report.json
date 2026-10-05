@@ -1,0 +1,72 @@
+{
+  "evidence_refs": [
+    "evidence-1",
+    "evidence-2"
+  ],
+  "observations": [
+    {
+      "seed": 7,
+      "metric": "mse",
+      "linear": 10.155670419036328,
+      "baseline": 23.951894598705938
+    },
+    {
+      "seed": 7,
+      "metric": "mae",
+      "linear": 1.2783887001074266,
+      "baseline": 3.8665886155030527
+    },
+    {
+      "seed": 7,
+      "metric": "median_absolute_error",
+      "linear": 0.27113820719993514,
+      "baseline": 3.5262360242088477
+    },
+    {
+      "seed": 19,
+      "metric": "mse",
+      "linear": 10.27158831684568,
+      "baseline": 19.705700590219237
+    },
+    {
+      "seed": 19,
+      "metric": "mae",
+      "linear": 1.2825354090234893,
+      "baseline": 3.584747074220866
+    },
+    {
+      "seed": 19,
+      "metric": "median_absolute_error",
+      "linear": 0.28179888127093056,
+      "baseline": 3.0843445557618776
+    },
+    {
+      "seed": 31,
+      "metric": "mse",
+      "linear": 10.212571668611693,
+      "baseline": 20.613764804342175
+    },
+    {
+      "seed": 31,
+      "metric": "mae",
+      "linear": 1.2471163775439722,
+      "baseline": 3.571814067026869
+    },
+    {
+      "seed": 31,
+      "metric": "median_absolute_error",
+      "linear": 0.21018718335695674,
+      "baseline": 3.0392012138461078
+    }
+  ],
+  "conclusion": "Across seeds 7, 19, and 31 and metrics mse, mae, and median_absolute_error, the OLS linear model achieved lower error than the matched training-mean baseline on 10% test-label outliers of magnitude 10 with clean training data. For mse, linear values were 10.155670419036328, 10.27158831684568, and 10.212571668611693 versus baseline values 23.951894598705938, 19.705700590219237, and 20.613764804342175. For mae, linear values were 1.2783887001074266, 1.2825354090234893, and 1.2471163775439722 versus baseline values 3.8665886155030527, 3.584747074220866, and 3.571814067026869. For median_absolute_error, linear values were 0.27113820719993514, 0.28179888127093056, and 0.21018718335695674 versus baseline values 3.5262360242088477, 3.0843445557618776, and 3.0392012138461078. This is a bounded report on this synthetic setup; no broader scientific claim is made.",
+  "limitations": [
+    "Results are specific to this synthetic setup (10% test-label outliers, magnitude 10, clean training data) and do not establish general scientific value.",
+    "Only three seeds (7, 19, 31) were run; no estimate of variability beyond these seeds is provided.",
+    "Only mse, mae, and median_absolute_error were evaluated; other metrics were not tested.",
+    "Verification was limited to evidence-1; evidence-2 was not verified in this stage."
+  ],
+  "verification_refs": [
+    "evidence-1"
+  ]
+}

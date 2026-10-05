@@ -1,0 +1,22 @@
+{
+  "evidence_refs": [
+    "evidence-1"
+  ],
+  "observations": [
+    {
+      "seed": 7,
+      "metric": "mse",
+      "linear": 10.155670419036328,
+      "baseline": 23.951894598705938
+    }
+  ],
+  "conclusion": "The draft's single observation is internally consistent with the artifact: for seed 7, mse, linear=10.155670419036328 vs baseline=23.951894598705938, so OLS (linear) is lower than the matched training-mean baseline under 10% test-label outliers of magnitude 10 with clean training data. The draft is appropriately scoped as preliminary and makes no general claim. However, the evidence base is thin: only one seed (7) and one metric (mse) are present, so no variance, robustness, or metric-agnostic conclusion can be drawn. The draft's limitations correctly disclose this. The main methodological weakness is the absence of seeds 19 and 31 and of mae/median_absolute_error, which would be needed to assess stability of the observed gap.",
+  "limitations": [
+    "Only seed 7 is present in evidence-1; seeds 19 and 31 were not executed, so no across-seed variance or robustness can be assessed.",
+    "Only mse was computed; mae and median_absolute_error were not executed, so the direction of the linear-vs-baseline gap is not established across metrics.",
+    "Single-seed, single-metric comparison; no confidence interval or significance assessment is possible.",
+    "No independent verification was executed in this review; verification_refs is empty.",
+    "The outlier magnitude (10) and clean-training-data setup are fixed; no sensitivity to these parameters is available."
+  ],
+  "verification_refs": []
+}

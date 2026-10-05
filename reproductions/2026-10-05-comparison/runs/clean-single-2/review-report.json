@@ -1,0 +1,25 @@
+{
+  "evidence_refs": [
+    "evidence-1"
+  ],
+  "observations": [
+    {
+      "seed": 7,
+      "metric": "mse",
+      "linear": 0.17046895861013783,
+      "baseline": 12.888358499556563
+    }
+  ],
+  "conclusion": "Preliminary, seed-7-only result on clean labels (outlier_fraction 0.0): OLS linear regression achieved lower MSE (0.17046895861013783) than the matched training-mean baseline (12.888358499556563). Verification of evidence-1 passed (manifest_hash, csv_hashes, split_sizes, training_fit, saved_predictions, recomputed_metrics), with recomputed MSE for seed 7 of 0.1704689586101377 for linear and 12.888358499556563 for baseline, consistent with the reported value. This remains a single-seed, single-metric preliminary report and does not establish general scientific value.",
+  "limitations": [
+    "Only seed 7 was run; seeds 19 and 31 from the full budget were not executed.",
+    "Only mse was computed; mae and median_absolute_error were not executed.",
+    "Single seed and single metric provide no variance or robustness estimate.",
+    "No statistical test or confidence interval was computed.",
+    "Results are limited to the clean-label (outlier_fraction 0.0) configuration and this task version.",
+    "No claim of general scientific value is made."
+  ],
+  "verification_refs": [
+    "evidence-1"
+  ]
+}

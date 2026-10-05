@@ -1,0 +1,22 @@
+{
+  "evidence_refs": [
+    "evidence-1"
+  ],
+  "observations": [
+    {
+      "seed": 7,
+      "metric": "mse",
+      "linear": 0.17046895861013783,
+      "baseline": 12.888358499556563
+    }
+  ],
+  "conclusion": "Preliminary (seed 7, mse only): OLS linear model achieved lower MSE than the matched training-mean baseline on clean labels (0.17046895861013783 vs 12.888358499556563). This is a single-seed, single-metric preliminary result and does not establish general scientific value.",
+  "limitations": [
+    "Only seed 7 was run; seeds 19 and 31 were not executed.",
+    "Only mse was computed; mae and median_absolute_error were not computed.",
+    "Single seed and single metric cannot support generalization claims.",
+    "No statistical significance testing was performed.",
+    "Results are specific to this synthetic task configuration (outlier_fraction 0.0) and do not imply broader scientific value."
+  ],
+  "verification_refs": []
+}

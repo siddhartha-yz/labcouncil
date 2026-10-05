@@ -1,0 +1,21 @@
+{
+  "evidence_refs": [
+    "evidence-1"
+  ],
+  "observations": [
+    {
+      "seed": 7,
+      "metric": "mse",
+      "linear": 10.155670419036328,
+      "baseline": 23.951894598705938
+    }
+  ],
+  "conclusion": "Preliminary single-seed result (seed 7, mse only): OLS linear model shows lower test MSE (10.155670419036328) than the matched training-mean baseline (23.951894598705938) under 10% test-label outliers of magnitude 10 with clean training data. This is a preliminary report only; no general scientific value is claimed.",
+  "limitations": [
+    "Only seed 7 and only the mse metric were executed; seeds 19 and 31 and mae/median_absolute_error were not run.",
+    "Single-seed result cannot establish stability or generality.",
+    "No significance testing or confidence intervals were computed.",
+    "Results are specific to this synthetic configuration (10% test-label outliers, magnitude 10, clean training data) and do not imply broader scientific value."
+  ],
+  "verification_refs": []
+}

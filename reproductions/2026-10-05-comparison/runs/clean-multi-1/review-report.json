@@ -1,0 +1,23 @@
+{
+  "evidence_refs": [
+    "evidence-1"
+  ],
+  "observations": [
+    {
+      "seed": 7,
+      "metric": "mse",
+      "linear": 0.17046895861013783,
+      "baseline": 12.888358499556563
+    }
+  ],
+  "conclusion": "The draft's single observation is internally consistent with the artifact: at seed 7, clean labels (outlier_fraction 0.0), mse linear=0.17046895861013783 vs baseline=12.888358499556563, a ~75.6x reduction. The draft is appropriately conservative, explicitly disclaiming generalization from one seed and one metric. However, the method as executed is too thin to support even the modest claim: only one of the three allowed seeds (7,19,31) and one of three allowed metrics (mse) were run, so seed-to-seed and metric-to-metric stability are entirely uncharacterized. I did not execute any new runs or verifications, so I cannot confirm the numbers beyond the artifact's own report; the sha256 is recorded but not independently checked here.",
+  "limitations": [
+    "Only seed 7 executed; seeds 19 and 31 not run, so no seed-variance estimate exists.",
+    "Only mse computed; mae and median_absolute_error not computed, so metric robustness is unknown.",
+    "No uncertainty quantification, confidence intervals, or statistical test comparing linear vs baseline.",
+    "No independent verification was performed by this reviewer; numbers are copied from the artifact.",
+    "Results are conditioned on task_version 1 and outlier_fraction 0.0 (clean labels) only.",
+    "The large baseline MSE (12.89) relative to linear (0.17) may reflect baseline construction rather than model quality; the matched-baseline definition was not inspected."
+  ],
+  "verification_refs": []
+}

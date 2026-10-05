@@ -1,0 +1,22 @@
+{
+  "evidence_refs": [
+    "evidence-1"
+  ],
+  "observations": [
+    {
+      "seed": 7,
+      "metric": "mse",
+      "linear": 10.155670419036328,
+      "baseline": 23.951894598705938
+    }
+  ],
+  "conclusion": "The draft's single-seed, single-metric claim is internally consistent with the artifact: for seed 7, mse, linear=10.155670419036328 vs baseline=23.951894598705938, so OLS has lower test MSE than the matched training-mean predictor under the stated 10% test-label outlier condition. The draft's framing is appropriately narrow and its limitations correctly flag that seeds 19 and 31 and metrics mae/median_absolute_error were not executed. However, the evidence base is too thin to support any generalization: one seed and one metric cannot distinguish a robust effect from seed-specific noise, and the outlier task is precisely the setting where a single seed is least informative. I did not execute any new experiments or verification, so no independent confirmation is claimed.",
+  "limitations": [
+    "Only seed 7 is present; seeds 19 and 31 are absent, so seed-to-seed variability is unknown.",
+    "Only mse is reported; mae and median_absolute_error are absent, so the result may be metric-dependent.",
+    "No independent verification was performed; verification_refs is empty and I did not call verify.",
+    "The magnitude-10, 10% outlier configuration is a single point in the outlier design space; no sensitivity analysis exists.",
+    "The baseline is a matched training-mean predictor, so the comparison does not speak to other baselines or to robustness of OLS itself."
+  ],
+  "verification_refs": []
+}

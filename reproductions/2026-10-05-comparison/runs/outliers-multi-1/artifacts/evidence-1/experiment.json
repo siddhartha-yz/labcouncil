@@ -1,0 +1,31 @@
+{
+  "evidence_id": "evidence-1",
+  "parameters": {
+    "task_version": 1,
+    "seeds": [
+      7
+    ],
+    "outlier_fraction": 0.1,
+    "metrics": [
+      "mse"
+    ]
+  },
+  "results": [
+    {
+      "seed": 7,
+      "metrics": {
+        "mse": {
+          "linear": 10.155670419036328,
+          "baseline": 23.951894598705938
+        }
+      }
+    }
+  ],
+  "files": [
+    {
+      "seed": 7,
+      "path": "artifacts/evidence-1/seed-7.csv",
+      "sha256": "e1d3c7b6106ba7bc20da301c191403776ab7047d3f6269d7a2f274321412da1b"
+    }
+  ]
+}

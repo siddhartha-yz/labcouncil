@@ -39,3 +39,8 @@ logs/
 .vscode/
 .DS_Store
 Thumbs.db
+# Public audited synthetic comparison artifacts.
+!reproductions/2026-10-05-comparison/runs/*/artifacts/
+!reproductions/2026-10-05-comparison/runs/*/artifacts/**
+# Regenerable tokenizer caches are not experiment evidence.
+tokenizer-cache/

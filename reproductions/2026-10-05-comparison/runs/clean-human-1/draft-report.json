@@ -1,0 +1,22 @@
+{
+  "evidence_refs": [
+    "evidence-1"
+  ],
+  "observations": [
+    {
+      "seed": 7,
+      "metric": "mse",
+      "linear": 0.17046895861013783,
+      "baseline": 12.888358499556563
+    }
+  ],
+  "conclusion": "Preliminary result at seed 7 on clean labels (outlier_fraction 0.0): OLS achieves lower MSE (0.17046895861013783) than the matched training-mean baseline (12.888358499556563). This is a single-seed, single-metric preliminary observation only; the full budget (seeds 7,19,31; mse,mae,median_absolute_error) has not been run, so no general claim is made.",
+  "limitations": [
+    "Only seed 7 was executed; seeds 19 and 31 were not run.",
+    "Only mse was computed; mae and median_absolute_error were not computed.",
+    "Single seed and single metric preclude any general or scientific conclusion.",
+    "No statistical testing or uncertainty quantification was performed.",
+    "Results are specific to this task configuration (clean labels, outlier_fraction 0.0) and do not extend to other settings."
+  ],
+  "verification_refs": []
+}

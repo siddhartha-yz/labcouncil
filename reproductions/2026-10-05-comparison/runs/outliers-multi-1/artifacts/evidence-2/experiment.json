@@ -1,0 +1,87 @@
+{
+  "evidence_id": "evidence-2",
+  "parameters": {
+    "task_version": 1,
+    "seeds": [
+      7,
+      19,
+      31
+    ],
+    "outlier_fraction": 0.1,
+    "metrics": [
+      "mae",
+      "median_absolute_error",
+      "mse"
+    ]
+  },
+  "results": [
+    {
+      "seed": 7,
+      "metrics": {
+        "mae": {
+          "linear": 1.2783887001074266,
+          "baseline": 3.8665886155030527
+        },
+        "median_absolute_error": {
+          "linear": 0.27113820719993514,
+          "baseline": 3.5262360242088477
+        },
+        "mse": {
+          "linear": 10.155670419036328,
+          "baseline": 23.951894598705938
+        }
+      }
+    },
+    {
+      "seed": 19,
+      "metrics": {
+        "mae": {
+          "linear": 1.2825354090234893,
+          "baseline": 3.584747074220866
+        },
+        "median_absolute_error": {
+          "linear": 0.28179888127093056,
+          "baseline": 3.0843445557618776
+        },
+        "mse": {
+          "linear": 10.27158831684568,
+          "baseline": 19.705700590219237
+        }
+      }
+    },
+    {
+      "seed": 31,
+      "metrics": {
+        "mae": {
+          "linear": 1.2471163775439722,
+          "baseline": 3.571814067026869
+        },
+        "median_absolute_error": {
+          "linear": 0.21018718335695674,
+          "baseline": 3.0392012138461078
+        },
+        "mse": {
+          "linear": 10.212571668611693,
+          "baseline": 20.613764804342175
+        }
+      }
+    }
+  ],
+  "files": [
+    {
+      "seed": 7,
+      "path": "artifacts/evidence-2/seed-7.csv",
+      "sha256": "e1d3c7b6106ba7bc20da301c191403776ab7047d3f6269d7a2f274321412da1b"
+    },
+    {
+      "seed": 19,
+      "path": "artifacts/evidence-2/seed-19.csv",
+      "sha256": "84feae1845ae61d3239e1c7ae86f93e6b4d606145f46f926169d7930fcb70297"
+    },
+    {
+      "seed": 31,
+      "path": "artifacts/evidence-2/seed-31.csv",
+      "sha256": "6bc751036b156e54eb4644ac856b2881409ee8eb630ed63747b1185cdf797a9b"
+    }
+  ]
+}
