@@ -1,0 +1,21 @@
+{
+  "url": "https://api.github.com/repos/ltjed/freephdlabor/contents/freephdlabor/interaction/callback_tools.py?ref=e95ce84ffbf9c4c234e616cdf20b3854ea0273b5",
+  "commit": "e95ce84ffbf9c4c234e616cdf20b3854ea0273b5",
+  "date_utc": "2026-10-05T12:54:49.922370+00:00",
+  "git_blob_sha": "21ebdd516b157df4033b7ae3b246860efca6ceab",
+  "sha256": "09b85650a21d0bbc9e03c60467084c3002891faa8f79e871e3a71cb28de40ba6",
+  "selected_function_hashes": {
+    "_read_until_double_enter": "f034d0cd3a1e8cde78c716524367779ceb33319a1294762e103e6807b7209b93",
+    "callback": "b4319dceeeab729130db29b3c61032e3073d36bb98acee99ebd85920261a8507"
+  },
+  "selected_function_lines": {
+    "_read_until_double_enter": [
+      88,
+      108
+    ],
+    "callback": [
+      110,
+      157
+    ]
+  }
+}

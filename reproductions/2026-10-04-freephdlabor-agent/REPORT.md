@@ -48,3 +48,7 @@ python reproductions/check_freephdlabor_recovery.py --upstream /path/to/pinned/f
 ```
 
 固定小样本只支持这些被测条件。后续可以借鉴步骤边界干预、共享工作区和增量日志；若集成，需要独立实现带类型的检查点、原子保存、任务版本与幂等工具 ID、断开/超时处理。没有证据支持目前直接承诺长期无人值守、精确恢复或科研效果提升。
+
+## 原核心与完整 pip 环境复查
+
+[历史版本报告](../2026-10-04-source-mapping/REPORT.md) 补充最初源码、Python3.11.10和448项作者pip清单的安装/零请求复查；恢复变量缺失与完整序列化错误仍出现。新增真实 PlanningStep 测试保留计划原文但未恢复执行变量；2次Flash请求、1525 token，与本目录20次统计分开。原 launcher 帮助入口已启动，但指定 deepseek-flash 在原参数列表被拒绝。源码未为迎合这些结果而修改。

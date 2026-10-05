@@ -1,0 +1,8 @@
+{
+  "status": "environment_precheck_failed",
+  "error_type": "PermissionError",
+  "message": "Socket creation rejected by local sandbox before restore check",
+  "api_requests": 0,
+  "cause": "Offline helper unnecessarily creates TCP socket",
+  "not_algorithm_failure": true
+}

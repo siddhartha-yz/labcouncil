@@ -1,0 +1,319 @@
+{
+  "url": "https://api.github.com/repos/ltjed/freephdlabor/commits?per_page=100",
+  "retrieved_at_utc": "2026-10-05T12:43:13.452916+00:00",
+  "meaning": "Official archive metadata or last chronological candidate; date does not prove paper version.",
+  "commits": [
+    {
+      "sha": "9102d18a161037294d3d963b2799351aa724c58b",
+      "html_url": "https://github.com/ltjed/freephdlabor/commit/9102d18a161037294d3d963b2799351aa724c58b",
+      "commit": {
+        "date": "2026-09-03T18:28:56Z",
+        "message": "Update defaults to current GPT-5.6 and Claude 5.x models",
+        "tree": {
+          "sha": "39f6400683c5a499aca30ee5021217d168159379",
+          "url": "https://api.github.com/repos/ltjed/freephdlabor/git/trees/39f6400683c5a499aca30ee5021217d168159379"
+        }
+      }
+    },
+    {
+      "sha": "b8a9ab1a54db8c0502dc3a61dcc3c1fd13c65d5a",
+      "html_url": "https://github.com/ltjed/freephdlabor/commit/b8a9ab1a54db8c0502dc3a61dcc3c1fd13c65d5a",
+      "commit": {
+        "date": "2026-05-14T22:20:30Z",
+        "message": "updated to support latest models",
+        "tree": {
+          "sha": "50b7ace358faa6eef165b2afd2012ccc1aa23d96",
+          "url": "https://api.github.com/repos/ltjed/freephdlabor/git/trees/50b7ace358faa6eef165b2afd2012ccc1aa23d96"
+        }
+      }
+    },
+    {
+      "sha": "fbe22f4a718bb1428a763dfb1a94c880bfcda0f2",
+      "html_url": "https://github.com/ltjed/freephdlabor/commit/fbe22f4a718bb1428a763dfb1a94c880bfcda0f2",
+      "commit": {
+        "date": "2026-05-14T22:17:26Z",
+        "message": "updated to support latest models",
+        "tree": {
+          "sha": "eae7f612b6849a250c22711325e2c0460b0d23f0",
+          "url": "https://api.github.com/repos/ltjed/freephdlabor/git/trees/eae7f612b6849a250c22711325e2c0460b0d23f0"
+        }
+      }
+    },
+    {
+      "sha": "341d5502a7d22e09329ca135bd34d698a5e946c1",
+      "html_url": "https://github.com/ltjed/freephdlabor/commit/341d5502a7d22e09329ca135bd34d698a5e946c1",
+      "commit": {
+        "date": "2026-05-14T22:14:57Z",
+        "message": "updated to support latest models",
+        "tree": {
+          "sha": "875cec389e959579a2a468938d8ae4f15e9c64d4",
+          "url": "https://api.github.com/repos/ltjed/freephdlabor/git/trees/875cec389e959579a2a468938d8ae4f15e9c64d4"
+        }
+      }
+    },
+    {
+      "sha": "ed50e3fbbb47f9e53e5608beb1cf426269c56d84",
+      "html_url": "https://github.com/ltjed/freephdlabor/commit/ed50e3fbbb47f9e53e5608beb1cf426269c56d84",
+      "commit": {
+        "date": "2026-05-14T18:09:15Z",
+        "message": "Update README example and writeup script defaults to current models\n\nBring README's example .llm_config.yaml in line with the active\nconfig (claude-opus-4-7 + gpt-5.5). Update the --model default in\nthe README arg list. Replace bedrock claude-3-5-sonnet defaults in\nperform_writeup.py / perform_icbinb_writeup.py citation argparse\ndefaults with bedrock/anthropic.claude-sonnet-4-6 so they match the\nupdated AVAILABLE_LLMS choices.\n\nCo-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>",
+        "tree": {
+          "sha": "7712d54620e9e45c68e64afdedc6ffc9ccd315a3",
+          "url": "https://api.github.com/repos/ltjed/freephdlabor/git/trees/7712d54620e9e45c68e64afdedc6ffc9ccd315a3"
+        }
+      }
+    },
+    {
+      "sha": "e39a4e437ad3843092e84f18bafd32d662231cdc",
+      "html_url": "https://github.com/ltjed/freephdlabor/commit/e39a4e437ad3843092e84f18bafd32d662231cdc",
+      "commit": {
+        "date": "2026-05-14T18:06:42Z",
+        "message": "Drop DeepSeek model support\n\nRemove DeepSeek model IDs (deepseek-chat, deepseek-coder,\ndeepseek-reasoner, deepseek-coder-v2-0724, deepseek/deepseek-r1:nitro)\nfrom AVAILABLE_MODELS / AVAILABLE_LLMS / MODEL_CONTEXT_LIMITS, and\nremove the corresponding code branches from utils.py::create_model\nand llm.py::{create_client, get_response_from_llm,\nget_batch_responses_from_llm}.\n\nCo-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>",
+        "tree": {
+          "sha": "83e79140b3a78c4c6d18560c1881d7379b299235",
+          "url": "https://api.github.com/repos/ltjed/freephdlabor/git/trees/83e79140b3a78c4c6d18560c1881d7379b299235"
+        }
+      }
+    },
+    {
+      "sha": "e72afbb4b4412a48374c943c057794a0d74ae87c",
+      "html_url": "https://github.com/ltjed/freephdlabor/commit/e72afbb4b4412a48374c943c057794a0d74ae87c",
+      "commit": {
+        "date": "2026-05-14T18:00:28Z",
+        "message": "Add Gemini 3.x preview models, retire Gemini 2.0 / 1.5\n\nPer LiteLLM model registry, gemini-2.0-flash-001 and\ngemini-2.0-flash-lite-001 deprecate June 1 2026; gemini-1.5-* are\nalready retired. Drop them from supported lists and from\nOpenDeepSearch defaults; replace with gemini-2.5-flash[-lite].\n\nAdd Gemini 3 preview lineup (gemini-3.1-pro-preview,\ngemini-3.1-flash-lite-preview, gemini-3-flash-preview) and stable\ngemini-2.5-* to AVAILABLE_MODELS / MODEL_CONTEXT_LIMITS. Extend\nthinking_budget to all gemini-3.x and gemini-2.5-pro models in\ncreate_model.\n\nCo-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>",
+        "tree": {
+          "sha": "b4cffe4b7338fadf9183aa78415926f7acb018f5",
+          "url": "https://api.github.com/repos/ltjed/freephdlabor/git/trees/b4cffe4b7338fadf9183aa78415926f7acb018f5"
+        }
+      }
+    },
+    {
+      "sha": "92c77da3704477a30b03e859a4026f369ec552dc",
+      "html_url": "https://github.com/ltjed/freephdlabor/commit/92c77da3704477a30b03e859a4026f369ec552dc",
+      "commit": {
+        "date": "2026-05-14T17:57:40Z",
+        "message": "Migrate OpenAI defaults to GPT-5.5 (released April 2026)\n\nGPT-5.5 is the current OpenAI flagship per LiteLLM's model registry\n(1M context, released 2026-04-23). Update defaults across all entry\npoints and config files; expand AVAILABLE_MODELS / AVAILABLE_LLMS to\ncover the gpt-5.x family (5.1, 5.2, 5.3, 5.4 mini/nano, 5.5, 5.5-pro).\n\nReplace hardcoded gpt-4o-2024-05-13 / o1-2024-12-17 / o3-mini-2025-01-31\ndefaults in launch_scientist_bfts.py, perform_writeup.py,\nperform_icbinb_writeup.py, perform_plotting.py, perform_ideation_temp_free.py,\nbfts_config.yaml, run_experiment_tool.py, vlm_document_analysis_tool.py,\nvisual_qa.py, and the .claude/commands/*.md examples.\n\nCo-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>",
+        "tree": {
+          "sha": "ea8f62a520f58ce7fa37dc0c886065e22d63c765",
+          "url": "https://api.github.com/repos/ltjed/freephdlabor/git/trees/ea8f62a520f58ce7fa37dc0c886065e22d63c765"
+        }
+      }
+    },
+    {
+      "sha": "799e7e8c193476f3696decb771660f83af0d905f",
+      "html_url": "https://github.com/ltjed/freephdlabor/commit/799e7e8c193476f3696decb771660f83af0d905f",
+      "commit": {
+        "date": "2026-05-14T17:49:16Z",
+        "message": "Migrate Anthropic model IDs to Claude 4.6/4.7 generation\n\nRetired Claude 3.x and pre-4.5 IDs (3-5-sonnet-*, 3-7-sonnet-*,\n3-haiku-*, 3-opus-*, 4-20250514) have been removed from the API\nsince Oct 2025–Apr 2026. Replace with current generation:\nclaude-opus-4-7 (flagship, 1M ctx), claude-sonnet-4-6, and\nclaude-haiku-4-5. Default model in .llm_config.yaml is now\nclaude-opus-4-7.\n\nCo-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>",
+        "tree": {
+          "sha": "66ac31d61bc66408715c18aac1f3d1bbded6a9f8",
+          "url": "https://api.github.com/repos/ltjed/freephdlabor/git/trees/66ac31d61bc66408715c18aac1f3d1bbded6a9f8"
+        }
+      }
+    },
+    {
+      "sha": "6515438948b4a5a01f1ed4b6bb8c1dda562254ce",
+      "html_url": "https://github.com/ltjed/freephdlabor/commit/6515438948b4a5a01f1ed4b6bb8c1dda562254ce",
+      "commit": {
+        "date": "2025-10-22T01:40:41Z",
+        "message": "updated readme",
+        "tree": {
+          "sha": "cd81a3eb4f34b4fa2bdfd3c2655231bc79deb447",
+          "url": "https://api.github.com/repos/ltjed/freephdlabor/git/trees/cd81a3eb4f34b4fa2bdfd3c2655231bc79deb447"
+        }
+      }
+    },
+    {
+      "sha": "eeec71e30665e6eb581ff6b73df55c8b8d740810",
+      "html_url": "https://github.com/ltjed/freephdlabor/commit/eeec71e30665e6eb581ff6b73df55c8b8d740810",
+      "commit": {
+        "date": "2025-10-22T01:34:15Z",
+        "message": "updated readme",
+        "tree": {
+          "sha": "8c5bdec6ea37f29a0b600cbc549e4a6e87d0a7d5",
+          "url": "https://api.github.com/repos/ltjed/freephdlabor/git/trees/8c5bdec6ea37f29a0b600cbc549e4a6e87d0a7d5"
+        }
+      }
+    },
+    {
+      "sha": "4cd0bec29ad8f3bddcd089a939422523c5c0be95",
+      "html_url": "https://github.com/ltjed/freephdlabor/commit/4cd0bec29ad8f3bddcd089a939422523c5c0be95",
+      "commit": {
+        "date": "2025-10-20T18:44:34Z",
+        "message": "updated link to smolagents in readme",
+        "tree": {
+          "sha": "23019255544912c2e88cb45149a3607093c987ae",
+          "url": "https://api.github.com/repos/ltjed/freephdlabor/git/trees/23019255544912c2e88cb45149a3607093c987ae"
+        }
+      }
+    },
+    {
+      "sha": "395b16e63cc0a09c5666470ba8c12f72f0cf753b",
+      "html_url": "https://github.com/ltjed/freephdlabor/commit/395b16e63cc0a09c5666470ba8c12f72f0cf753b",
+      "commit": {
+        "date": "2025-10-20T17:53:52Z",
+        "message": "updated readme",
+        "tree": {
+          "sha": "784ab47dab822389c670dba0afe644bfdaf30aa3",
+          "url": "https://api.github.com/repos/ltjed/freephdlabor/git/trees/784ab47dab822389c670dba0afe644bfdaf30aa3"
+        }
+      }
+    },
+    {
+      "sha": "4e9b3dc8883c17d9c2deb29b199001d3d877b980",
+      "html_url": "https://github.com/ltjed/freephdlabor/commit/4e9b3dc8883c17d9c2deb29b199001d3d877b980",
+      "commit": {
+        "date": "2025-10-20T17:45:07Z",
+        "message": "added generated example paper",
+        "tree": {
+          "sha": "e96b4aba2eabfbe79b8b4e5eec444f12d068232f",
+          "url": "https://api.github.com/repos/ltjed/freephdlabor/git/trees/e96b4aba2eabfbe79b8b4e5eec444f12d068232f"
+        }
+      }
+    },
+    {
+      "sha": "fcefaaa45d9afeea6852be015bc905d47bff4a37",
+      "html_url": "https://github.com/ltjed/freephdlabor/commit/fcefaaa45d9afeea6852be015bc905d47bff4a37",
+      "commit": {
+        "date": "2025-10-20T17:42:36Z",
+        "message": "updated readme",
+        "tree": {
+          "sha": "15199138feaad5168113a5f343c68e770a65cf66",
+          "url": "https://api.github.com/repos/ltjed/freephdlabor/git/trees/15199138feaad5168113a5f343c68e770a65cf66"
+        }
+      }
+    },
+    {
+      "sha": "d1f6cfa84a8bd0f465428f3bdf0551d4200194e3",
+      "html_url": "https://github.com/ltjed/freephdlabor/commit/d1f6cfa84a8bd0f465428f3bdf0551d4200194e3",
+      "commit": {
+        "date": "2025-10-20T08:29:51Z",
+        "message": "fixed links and bibtex in readme",
+        "tree": {
+          "sha": "0de2585c2a8d459d16996ea8cd58841c011455ba",
+          "url": "https://api.github.com/repos/ltjed/freephdlabor/git/trees/0de2585c2a8d459d16996ea8cd58841c011455ba"
+        }
+      }
+    },
+    {
+      "sha": "1af5a31060eac7fbccf630173748981c94c53538",
+      "html_url": "https://github.com/ltjed/freephdlabor/commit/1af5a31060eac7fbccf630173748981c94c53538",
+      "commit": {
+        "date": "2025-10-20T08:25:59Z",
+        "message": "embeded short video demo in readme",
+        "tree": {
+          "sha": "2d74ad4e5adc471669015f04e5cbbeb4262e595f",
+          "url": "https://api.github.com/repos/ltjed/freephdlabor/git/trees/2d74ad4e5adc471669015f04e5cbbeb4262e595f"
+        }
+      }
+    },
+    {
+      "sha": "8d52947128d7cc9a68e5fbe9208cc61d1ed45bf7",
+      "html_url": "https://github.com/ltjed/freephdlabor/commit/8d52947128d7cc9a68e5fbe9208cc61d1ed45bf7",
+      "commit": {
+        "date": "2025-10-20T05:52:13Z",
+        "message": "added link to paper in readme",
+        "tree": {
+          "sha": "99f2c9e79f757b5ae68f48d2082c788c0c72173c",
+          "url": "https://api.github.com/repos/ltjed/freephdlabor/git/trees/99f2c9e79f757b5ae68f48d2082c788c0c72173c"
+        }
+      }
+    },
+    {
+      "sha": "e43d0203b38e40f18df588d36f35c1951e9673b9",
+      "html_url": "https://github.com/ltjed/freephdlabor/commit/e43d0203b38e40f18df588d36f35c1951e9673b9",
+      "commit": {
+        "date": "2025-10-20T04:59:51Z",
+        "message": "fixing video demo in readme",
+        "tree": {
+          "sha": "20d9dd9afe8aa20625d8cae3e31ffd09f48c070f",
+          "url": "https://api.github.com/repos/ltjed/freephdlabor/git/trees/20d9dd9afe8aa20625d8cae3e31ffd09f48c070f"
+        }
+      }
+    },
+    {
+      "sha": "b0736ab4c0fe5332d3c51e6a71c0cd27f528727f",
+      "html_url": "https://github.com/ltjed/freephdlabor/commit/b0736ab4c0fe5332d3c51e6a71c0cd27f528727f",
+      "commit": {
+        "date": "2025-10-20T04:52:11Z",
+        "message": "fixing video demo in readme",
+        "tree": {
+          "sha": "d06badf8fab64d6a5830b7c3477135bf9c416edd",
+          "url": "https://api.github.com/repos/ltjed/freephdlabor/git/trees/d06badf8fab64d6a5830b7c3477135bf9c416edd"
+        }
+      }
+    },
+    {
+      "sha": "1e79fd9002eefcffe7b6f68997b2b616db12992a",
+      "html_url": "https://github.com/ltjed/freephdlabor/commit/1e79fd9002eefcffe7b6f68997b2b616db12992a",
+      "commit": {
+        "date": "2025-10-20T04:27:30Z",
+        "message": "fixing video demo in readme",
+        "tree": {
+          "sha": "061b483dcf35dfecfdfbb8998718964abb554417",
+          "url": "https://api.github.com/repos/ltjed/freephdlabor/git/trees/061b483dcf35dfecfdfbb8998718964abb554417"
+        }
+      }
+    },
+    {
+      "sha": "192ad9cf09dd93c10c1c05d13795dc48c8b47013",
+      "html_url": "https://github.com/ltjed/freephdlabor/commit/192ad9cf09dd93c10c1c05d13795dc48c8b47013",
+      "commit": {
+        "date": "2025-10-20T04:22:23Z",
+        "message": "fixed video demo in",
+        "tree": {
+          "sha": "b6faee2d505afc91271ef0c9ac1b81a91edf9135",
+          "url": "https://api.github.com/repos/ltjed/freephdlabor/git/trees/b6faee2d505afc91271ef0c9ac1b81a91edf9135"
+        }
+      }
+    },
+    {
+      "sha": "a938ec881528f49148bf72ffb7375766c022e3bb",
+      "html_url": "https://github.com/ltjed/freephdlabor/commit/a938ec881528f49148bf72ffb7375766c022e3bb",
+      "commit": {
+        "date": "2025-10-20T02:47:37Z",
+        "message": "updated readme",
+        "tree": {
+          "sha": "a2b6ec68290eea90b7089913876056b552c92322",
+          "url": "https://api.github.com/repos/ltjed/freephdlabor/git/trees/a2b6ec68290eea90b7089913876056b552c92322"
+        }
+      }
+    },
+    {
+      "sha": "0f8f66f891f343c4b4fbe3ac4f13c082f4926688",
+      "html_url": "https://github.com/ltjed/freephdlabor/commit/0f8f66f891f343c4b4fbe3ac4f13c082f4926688",
+      "commit": {
+        "date": "2025-10-20T02:12:23Z",
+        "message": "updated README",
+        "tree": {
+          "sha": "77d4764ef925d6abb657d38cb5c7c0b53e9d4744",
+          "url": "https://api.github.com/repos/ltjed/freephdlabor/git/trees/77d4764ef925d6abb657d38cb5c7c0b53e9d4744"
+        }
+      }
+    },
+    {
+      "sha": "fd1da68acf9e40e0fd47652719e8281c8a3461ee",
+      "html_url": "https://github.com/ltjed/freephdlabor/commit/fd1da68acf9e40e0fd47652719e8281c8a3461ee",
+      "commit": {
+        "date": "2025-10-20T02:02:28Z",
+        "message": "Update .gitignore to include .env, logs, and results; fix video display in README",
+        "tree": {
+          "sha": "dbae99007aefb8652751a88443dce8893233d693",
+          "url": "https://api.github.com/repos/ltjed/freephdlabor/git/trees/dbae99007aefb8652751a88443dce8893233d693"
+        }
+      }
+    },
+    {
+      "sha": "e95ce84ffbf9c4c234e616cdf20b3854ea0273b5",
+      "html_url": "https://github.com/ltjed/freephdlabor/commit/e95ce84ffbf9c4c234e616cdf20b3854ea0273b5",
+      "commit": {
+        "date": "2025-10-20T01:58:59Z",
+        "message": "Initial commit",
+        "tree": {
+          "sha": "4a2a787e48fca46b64e938d73d86b07d38389316",
+          "url": "https://api.github.com/repos/ltjed/freephdlabor/git/trees/4a2a787e48fca46b64e938d73d86b07d38389316"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "<frozen runpy>", line 291, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/upstreams/freephdlabor/launch_multiagent.py", line 13, in <module>
+    from freephdlabor.args import parse_arguments
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/upstreams/freephdlabor/freephdlabor/args.py", line 5, in <module>
+    from .utils import AVAILABLE_MODELS
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/upstreams/freephdlabor/freephdlabor/utils.py", line 203, in <module>
+    from freephdlabor.agents.manager_agent import ManagerAgent
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/upstreams/freephdlabor/freephdlabor/agents/__init__.py", line 6, in <module>
+    from .ideation_agent import IdeationAgent
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/upstreams/freephdlabor/freephdlabor/agents/ideation_agent.py", line 14, in <module>
+    from ..toolkits.general_tools.open_deep_search.ods_tool import OpenDeepSearchTool
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/upstreams/freephdlabor/freephdlabor/toolkits/general_tools/open_deep_search/__init__.py", line 1, in <module>
+    from .ods_agent import OpenDeepSearchAgent
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/upstreams/freephdlabor/freephdlabor/toolkits/general_tools/open_deep_search/ods_agent.py", line 3, in <module>
+    from .context_building.process_sources_pro import SourceProcessor
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/upstreams/freephdlabor/freephdlabor/toolkits/general_tools/open_deep_search/context_building/process_sources_pro.py", line 4, in <module>
+    from ..context_scraping.crawl4ai_scraper import WebScraper
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/upstreams/freephdlabor/freephdlabor/toolkits/general_tools/open_deep_search/context_scraping/crawl4ai_scraper.py", line 11, in <module>
+    from crawl4ai import AsyncWebCrawler, BrowserConfig, CrawlerRunConfig, CacheMode
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/freephdlabor-author-env/lib/python3.11/site-packages/crawl4ai/__init__.py", line 4, in <module>
+    from .async_webcrawler import AsyncWebCrawler, CacheMode
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/freephdlabor-author-env/lib/python3.11/site-packages/crawl4ai/async_webcrawler.py", line 20, in <module>
+    from .async_database import async_db_manager
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/freephdlabor-author-env/lib/python3.11/site-packages/crawl4ai/async_database.py", line 19, in <module>
+    os.makedirs(DB_PATH, exist_ok=True)
+  File "<frozen os>", line 225, in makedirs
+OSError: [Errno 30] Read-only file system: '/home/yang-zhi/.crawl4ai'

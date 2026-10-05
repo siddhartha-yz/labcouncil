@@ -1,0 +1,7 @@
+{
+  "url": "https://api.github.com/repos/zou-group/virtual-lab/contents/pyproject.toml?ref=2a3654b67729972b7e2a8145adad4ec06f0164af",
+  "retrieved_at_utc": "2026-10-05T12:43:12.962033+00:00",
+  "meaning": "Official archive metadata or last chronological candidate; date does not prove paper version.",
+  "failure_type": "URLError",
+  "failure": "<urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1081)>"
+}

@@ -1,0 +1,1 @@
+💥 Failed to initialize the working directory at /home/yang-zhi/.phoenix due to an error: [Errno 30] Read-only file system: '/home/yang-zhi/.phoenix'.Phoenix requires a working directory to persist data

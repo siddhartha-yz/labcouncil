@@ -1,0 +1,6 @@
+{
+  "url": "https://zenodo.org/records/15320491/export/json",
+  "time_utc": "2026-10-05T13:13:28.067258+00:00",
+  "failure_type": "URLError",
+  "failure": "<urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1081)>"
+}

@@ -1,0 +1,6 @@
+{
+  "url": "https://api.datacite.org/dois/10.5281/zenodo.15320491",
+  "time_utc": "2026-10-05T13:13:28.566198+00:00",
+  "failure_type": "URLError",
+  "failure": "<urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1081)>"
+}

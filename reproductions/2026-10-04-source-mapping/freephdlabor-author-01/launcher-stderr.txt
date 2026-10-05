@@ -1,0 +1,21 @@
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "<frozen runpy>", line 291, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/upstreams/freephdlabor/launch_multiagent.py", line 9, in <module>
+    from phoenix.otel import register
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/freephdlabor-author-env/lib/python3.11/site-packages/phoenix/__init__.py", line 7, in <module>
+    from .inferences.fixtures import ExampleInferences, load_example
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/freephdlabor-author-env/lib/python3.11/site-packages/phoenix/inferences/fixtures.py", line 13, in <module>
+    from phoenix.config import INFERENCES_DIR
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/freephdlabor-author-env/lib/python3.11/site-packages/phoenix/config.py", line 1234, in <module>
+    ensure_working_dir_if_needed()
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/freephdlabor-author-env/lib/python3.11/site-packages/phoenix/config.py", line 1223, in ensure_working_dir_if_needed
+    path.mkdir(parents=True, exist_ok=True)
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/freephdlabor-author-env/lib/python3.11/site-packages/phoenix/config.py", line 1149, in wrapped_attr
+    result = attr(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yang-zhi/.local/share/uv/python/cpython-3.11.10-linux-x86_64-gnu/lib/python3.11/pathlib.py", line 1116, in mkdir
+    os.mkdir(self, mode)
+OSError: [Errno 30] Read-only file system: '/home/yang-zhi/.phoenix'

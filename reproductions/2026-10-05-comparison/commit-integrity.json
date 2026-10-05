@@ -1,0 +1,7 @@
+{
+  "commit": "29052db618efe5c617aacc1ac92206910441b93a",
+  "csv_blobs_checked": 42,
+  "all_committed_csv_hashes_match_recorded_artifacts": true,
+  "raw_CRLF_preserved": true,
+  "check_method": "git show HEAD:path bytes independently SHA256-compared against each saved manifest"
+}

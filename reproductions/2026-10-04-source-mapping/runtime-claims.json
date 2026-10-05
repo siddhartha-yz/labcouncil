@@ -1,0 +1,24 @@
+{
+  "source_commit": "e95ce84ffbf9c4c234e616cdf20b3854ea0273b5",
+  "claims": [
+    {
+      "claim": "Resume exactly at previous research position",
+      "paper": "https://arxiv.org/html/2510.15624v1",
+      "local_verdict": "Not supported by the tested source path: execution variables and task field absent, full memory serialization broken; message continuation still possible.",
+      "scope": "BaseResearchAgent, changed model/dependencies; initial source identical."
+    },
+    {
+      "claim": "Real-time human modification affects agent behavior",
+      "local_verdict": "Supported in one bounded real model/TCP modify and new-task case each; incomplete disconnected input blocked."
+    },
+    {
+      "claim": "Multi-agent or human feedback increases research quality",
+      "local_verdict": "Not established. n=2 synthetic pipelines cannot evaluate broad research quality; actual user feedback was limited acceptance and readability request."
+    },
+    {
+      "claim": "Paper-era Virtual Lab runnable using current DeepSeek key",
+      "local_verdict": "Changed provider original Assistants route returned404; newer Chat Completions version works; original GPT-4o conditions untested."
+    }
+  ],
+  "manual_semantic_review_actor": "Codex; actual human review separately recorded in comparison/human-feedback.json"
+}

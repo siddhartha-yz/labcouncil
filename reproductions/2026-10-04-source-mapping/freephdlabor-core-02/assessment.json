@@ -1,0 +1,74 @@
+{
+  "upstream_commit": "e95ce84ffbf9c4c234e616cdf20b3854ea0273b5",
+  "python": "3.11.16",
+  "author_python_pin": "3.11.10; actual patch differs",
+  "dependencies": {
+    "httpx": "0.28.1",
+    "charset-normalizer": "3.5.2",
+    "jiter": "0.17.0",
+    "typing-inspection": "0.4.4",
+    "mdurl": "0.1.2",
+    "httpcore": "1.0.9",
+    "tqdm": "4.70.1",
+    "anyio": "4.15.1",
+    "Jinja2": "3.1.6",
+    "openai": "1.60.2",
+    "h11": "0.16.0",
+    "huggingface_hub": "2.1.1",
+    "PyYAML": "6.0.3",
+    "distro": "1.9.0",
+    "smolagents": "1.20.0",
+    "idna": "3.20",
+    "pydantic": "2.11.7",
+    "packaging": "26.3",
+    "hf-xet": "1.6.0",
+    "Pygments": "2.21.0",
+    "typing_extensions": "4.16.0",
+    "fsspec": "2026.9.0",
+    "truststore": "0.10.4",
+    "markdown-it-py": "4.2.0",
+    "python-dotenv": "1.2.4",
+    "rich": "15.0.0",
+    "sniffio": "1.3.1",
+    "pillow": "12.3.0",
+    "certifi": "2026.7.22",
+    "httpx2": "2.13.1",
+    "click": "8.5.0",
+    "MarkupSafe": "3.0.4",
+    "filelock": "4.0.11",
+    "requests": "2.34.2",
+    "pydantic_core": "2.33.2",
+    "urllib3": "2.8.0",
+    "httpcore2": "2.13.1",
+    "annotated-types": "0.8.0"
+  },
+  "scope": "Offline saved-file restoration; dependency core only, not full author conda environment or live initial agent loop.",
+  "api_requests": 0,
+  "restore": {
+    "task": null,
+    "executor_variables": [
+      "__name__"
+    ],
+    "step_types": [
+      "TaskStep",
+      "ActionStep",
+      "ActionStep",
+      "ActionStep"
+    ],
+    "full_steps": {
+      "usable": false,
+      "error_type": "AttributeError",
+      "message": "'dict' object has no attribute 'dict'"
+    },
+    "messages": {
+      "usable": true,
+      "count": 11
+    }
+  },
+  "restore_stdout": "",
+  "memory_sha256": "3156695f62b66716c9abb428e7ebc6d63e6d568cbaac707b719fd81857c64eb2",
+  "launcher": {
+    "command": "Original launch_multiagent.py --help; sanitized environment; dotenv disabled",
+    "exit_code": 1
+  }
+}

@@ -1,0 +1,11 @@
+usage: launch_multiagent.py [-h]
+                            [--model {gpt-5,gpt-5-mini,gpt-5-nano,gpt-4o,gpt-4.1-mini-2025-04-14,o4-mini-2025-04-16,o3-2025-04-16,o3-pro-2025-06-10,claude-opus-4-20250514,claude-sonnet-4-20250514,claude-sonnet-4-5,claude-sonnet-4-5-20250929,deepseek-chat,deepseek-coder,grok-4-0709,gemini-2.5-pro,gemini-2.5-flash}]
+                            [--interpreter INTERPRETER] [--debug]
+                            [--reasoning-effort {minimal,low,medium,high}]
+                            [--verbosity {low,medium,high}]
+                            [--callback_host CALLBACK_HOST]
+                            [--callback_port CALLBACK_PORT]
+                            [--enable-planning]
+                            [--planning-interval PLANNING_INTERVAL]
+                            [--resume RESUME] [--task TASK]
+launch_multiagent.py: error: argument --model: invalid choice: 'deepseek-flash' (choose from 'gpt-5', 'gpt-5-mini', 'gpt-5-nano', 'gpt-4o', 'gpt-4.1-mini-2025-04-14', 'o4-mini-2025-04-16', 'o3-2025-04-16', 'o3-pro-2025-06-10', 'claude-opus-4-20250514', 'claude-sonnet-4-20250514', 'claude-sonnet-4-5', 'claude-sonnet-4-5-20250929', 'deepseek-chat', 'deepseek-coder', 'grok-4-0709', 'gemini-2.5-pro', 'gemini-2.5-flash')

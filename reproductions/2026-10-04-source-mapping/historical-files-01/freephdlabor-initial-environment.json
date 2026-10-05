@@ -1,0 +1,22 @@
+{
+  "url": "https://api.github.com/repos/ltjed/freephdlabor/contents/environment.yml?ref=e95ce84ffbf9c4c234e616cdf20b3854ea0273b5",
+  "commit": "e95ce84ffbf9c4c234e616cdf20b3854ea0273b5",
+  "date_utc": "2026-10-05T12:46:07.309231+00:00",
+  "git_blob_sha": "01b80f02e1b95a3e224e5837b25889837d4d74c1",
+  "sha256": "ab0f45b4f6fbac8398c02d36ecd3e8051355076afae9794ff1c703ac6d6b9e56",
+  "pinned_runtime_lines": [
+    "  - python=3.11.10=hc5c86c4_3_cpython",
+    "      - dnspython==2.7.0",
+    "      - ffmpeg-python==0.2.0",
+    "      - gitpython==3.1.44",
+    "      - ipython==8.31.0",
+    "      - jsonpath-python==1.0.6",
+    "      - litellm==1.59.8",
+    "      - openai==1.60.2",
+    "      - opencv-python==4.11.0.86",
+    "      - openinference-instrumentation-smolagents==0.1.14",
+    "      - smolagents==1.20.0",
+    "      - torch==2.5.1",
+    "      - tree-sitter-python==0.23.6"
+  ]
+}

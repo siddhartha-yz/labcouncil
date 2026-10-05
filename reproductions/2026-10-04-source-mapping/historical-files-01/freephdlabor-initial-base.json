@@ -1,0 +1,21 @@
+{
+  "url": "https://api.github.com/repos/ltjed/freephdlabor/contents/freephdlabor/agents/base_research_agent.py?ref=e95ce84ffbf9c4c234e616cdf20b3854ea0273b5",
+  "commit": "e95ce84ffbf9c4c234e616cdf20b3854ea0273b5",
+  "date_utc": "2026-10-05T12:46:05.777779+00:00",
+  "git_blob_sha": "8e88c1151eb426650bab1a4a7a2136a6891b1be1",
+  "sha256": "6fb5a654c6f027b7613b053075411abec58d189f82638cafc4311bd7b2d7b027",
+  "selected_function_hashes": {
+    "save_memory": "af0851faeb9151044acb3e2e027cbd6f1ab41f7d2c31baae118b046aa04e6017",
+    "resume_memory": "17faf9e4034d71ab4c038820037359e07c14ae608268fb4510e08f736c02762c"
+  },
+  "selected_function_lines": {
+    "save_memory": [
+      140,
+      188
+    ],
+    "resume_memory": [
+      191,
+      331
+    ]
+  }
+}

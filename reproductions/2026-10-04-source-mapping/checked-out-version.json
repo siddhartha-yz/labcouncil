@@ -1,0 +1,15 @@
+{
+  "commit": "2a3654b67729972b7e2a8145adad4ec06f0164af",
+  "files": {
+    "pyproject.toml": "a998875941854b884e36e943f4593fa285cc8358ee808f0d70f00dc371a958d0",
+    "src/virtual_lab/__about__.py": "ca53000adb3303905d49622330c29f2872586829985fd6e1a0363b712e8d3e1d",
+    "src/virtual_lab/constants.py": "f47f2bba2f3c0aa1a151dc9571a313d98257ac5af0c5eaf6929d3e3527887374",
+    "nanobody_design/nanobody_constants.py": "80035ca9ad6864d5938d4a2535cd62623660e003afb69e06f2b7ec9c95e2fd58",
+    "nanobody_design/run_nanobody_design.ipynb": "926cf0a109091dd1cae4c13b0f20ddf05a2d0bfd37f925e93051c1136a063d91"
+  },
+  "package_version": "1.1.0",
+  "default_model": "gpt-4o-2024-08-06",
+  "official_num_iterations": 5,
+  "official_num_rounds": 3,
+  "source": "Clean checked-out official repository; not asserting Zenodo archive hash equivalence."
+}

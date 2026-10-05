@@ -1,0 +1,14 @@
+{
+  "original_commit": "e95ce84ffbf9c4c234e616cdf20b3854ea0273b5",
+  "python": "3.11.10",
+  "author_pip_requirements": 448,
+  "resolved_packages_installed": 459,
+  "install_exit_code": 0,
+  "whole_conda_system_libraries_reproduced": false,
+  "source_clean_after_checks": true,
+  "gpu_driver_precheck": "nvidia-smi exit9; execution environment could not communicate with NVIDIA driver; not a laptop hardware diagnosis",
+  "launcher_help_exit_code": 0,
+  "launcher_deepseek_flash_choice_exit_code": 2,
+  "resume_full_serialization_error_repeated_under_author_python_and_pip": "AttributeError: dict has no attribute dict",
+  "core_changed_environment_and_full_pip_results_kept_separate": true
+}

@@ -1,0 +1,49 @@
+usage: launch_multiagent.py [-h]
+                            [--model {gpt-5,gpt-5-mini,gpt-5-nano,gpt-4o,gpt-4.1-mini-2025-04-14,o4-mini-2025-04-16,o3-2025-04-16,o3-pro-2025-06-10,claude-opus-4-20250514,claude-sonnet-4-20250514,claude-sonnet-4-5,claude-sonnet-4-5-20250929,deepseek-chat,deepseek-coder,grok-4-0709,gemini-2.5-pro,gemini-2.5-flash}]
+                            [--interpreter INTERPRETER] [--debug]
+                            [--reasoning-effort {minimal,low,medium,high}]
+                            [--verbosity {low,medium,high}]
+                            [--callback_host CALLBACK_HOST]
+                            [--callback_port CALLBACK_PORT]
+                            [--enable-planning]
+                            [--planning-interval PLANNING_INTERVAL]
+                            [--resume RESUME] [--task TASK]
+
+Smolagents Research System - Multi-Agent AI Research Automation
+
+options:
+  -h, --help            show this help message and exit
+  --model {gpt-5,gpt-5-mini,gpt-5-nano,gpt-4o,gpt-4.1-mini-2025-04-14,o4-mini-2025-04-16,o3-2025-04-16,o3-pro-2025-06-10,claude-opus-4-20250514,claude-sonnet-4-20250514,claude-sonnet-4-5,claude-sonnet-4-5-20250929,deepseek-chat,deepseek-coder,grok-4-0709,gemini-2.5-pro,gemini-2.5-flash}
+                        LLM model to use for all agents
+  --interpreter INTERPRETER
+                        Python interpreter path for experiment execution
+  --debug               Enable debug logging
+  --reasoning-effort {minimal,low,medium,high}
+                        GPT-5 reasoning effort level (controls thinking depth)
+  --verbosity {low,medium,high}
+                        GPT-5 verbosity level (controls response detail)
+  --callback_host CALLBACK_HOST
+                        Host for the callback server
+  --callback_port CALLBACK_PORT
+                        Port for the callback server
+  --enable-planning     Enable planning feature for research agents (creates
+                        systematic step-by-step plans)
+  --planning-interval PLANNING_INTERVAL
+                        Interval for planning steps (e.g., 3 = replan every 3
+                        steps). Only used if --enable-planning is set.
+  --resume RESUME       Resume from an existing workspace directory (e.g.,
+                        results/20250128_143022_task_name/). If specified,
+                        will continue from the existing workspace instead of
+                        creating a new one.
+  --task TASK           The research task description to be carried out by the
+                        multiagent system. Can be used with --resume to tell
+                        the system to continue working on a previous task.
+
+Examples:
+  # Create new workspace (uses default: gpt-5 with high reasoning effort)
+  python launch_multiagent.py --task "Research transformer attention mechanisms"
+
+  # Resume from existing workspace
+  python launch_multiagent.py --resume results/freephdlabor_20250929_143022/ --model claude-sonnet-4-5
+  python launch_multiagent.py --resume results/freephdlabor_20250929_143022/ --task "Continue writing the conclusion section"
+        

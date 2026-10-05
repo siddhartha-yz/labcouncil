@@ -1,0 +1,13 @@
+{
+  "plan_generated": true,
+  "plan_text_restored": true,
+  "restore_exit_code": 0,
+  "artifact_sha256": "cf2329b9a0086aaf70f27fb97aed0d87ceb3508699cddf568371c98ad4d7b2e5",
+  "api_calls": 2,
+  "scope": "One real planning step; not planning quality or full ManagerAgent.",
+  "usage": {
+    "prompt_tokens": 968,
+    "completion_tokens": 557,
+    "total_tokens": 1525
+  }
+}

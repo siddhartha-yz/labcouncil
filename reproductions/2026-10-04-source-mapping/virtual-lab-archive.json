@@ -1,0 +1,6 @@
+{
+  "url": "https://zenodo.org/api/records/15320491",
+  "meaning": "Archive metadata, or latest available commit by publication timestamp; chronological proximity does not prove paper version.",
+  "failure_type": "URLError",
+  "failure": "<urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1081)>"
+}
