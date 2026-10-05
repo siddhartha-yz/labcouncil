@@ -34,6 +34,7 @@ The initial focus is computational research that can be checked through document
 ## Documents
 
 - [实施计划 / Project plan](docs/PLAN.md): scope, architecture, milestones, and acceptance criteria.
+- [持续工作清单](docs/WORKLIST.md): all candidates, remaining validation, and the platform delivery sequence.
 - [研究参考 / Research references](docs/REFERENCES.md): relevant repositories, papers, results, and limitations.
 - [复现与采用规则 / Reproduction](docs/REPRODUCTION.md): evidence levels, validation gates, and experiment records.
 - [首轮采用决定 / Adoption](docs/ADOPTION.md): what the recorded evidence supports and what remains unverified.
