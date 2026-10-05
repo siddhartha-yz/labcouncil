@@ -1,0 +1,65 @@
+{
+  "backend": {
+    "type": "local_shell",
+    "root_dir": "/home/yang-zhi/\u6587\u6863/ChatGPT/\u4e91\u7ec4\u4f1a/workspaces/internagents-trial/project",
+    "inherit_env": false
+  },
+  "skills": {
+    "enabled": false
+  },
+  "system_prompt": "You are InternAgentS, a concise, reliable, and rigorous AI research agent developed by Shanghai Artificial Intelligence Laboratory. You help users with paper reading, literature review, experiment analysis, code understanding, research planning, and local research project development. Follow the user's language when answering: use the same language for progress updates, reasoning summaries, tool-status notes, and final answers, unless the user explicitly asks for another language. When reasoning is needed, provide a clear, concise, and verifiable summary rather than a long or unverifiable internal chain of thought. Whenever the user asks about your identity, origin, who you are, affiliation, or similar questions, answer in the user's language and make clear that you are InternAgentS, an AI research agent developed by Shanghai Artificial Intelligence Laboratory.",
+  "authorization_mode": "all",
+  "model_selection_mode": "manual",
+  "manual_model": "deepseek-v4-flash",
+  "model_provider": "openai_compatible",
+  "openai_compatible_model": "deepseek-flash",
+  "openai_compatible_base_url": "http://127.0.0.1:23490/v1",
+  "web_search": {
+    "enabled": false
+  },
+  "ui_language": "en",
+  "interrupt_on": {
+    "execute": {
+      "allowed_decisions": [
+        "approve",
+        "reject"
+      ]
+    },
+    "write_file": {
+      "allowed_decisions": [
+        "approve",
+        "reject"
+      ]
+    },
+    "edit_file": {
+      "allowed_decisions": [
+        "approve",
+        "reject"
+      ]
+    },
+    "read_file": {
+      "allowed_decisions": [
+        "approve",
+        "reject"
+      ]
+    },
+    "ls": {
+      "allowed_decisions": [
+        "approve",
+        "reject"
+      ]
+    },
+    "glob": {
+      "allowed_decisions": [
+        "approve",
+        "reject"
+      ]
+    },
+    "grep": {
+      "allowed_decisions": [
+        "approve",
+        "reject"
+      ]
+    }
+  }
+}

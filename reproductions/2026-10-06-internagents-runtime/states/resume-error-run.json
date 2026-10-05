@@ -1,0 +1,75 @@
+{
+  "run_id": "01a10e07-c79f-7d02-89e1-29c71d9ba671",
+  "thread_id": "01a10e05-c279-7453-96d0-fe1aef80e4a2",
+  "assistant_id": "f6506f75-a235-5263-a597-20e7a960d835",
+  "metadata": {
+    "created_by": "system",
+    "trial": "labcouncil",
+    "internagents_workspace_path": "/home/yang-zhi/\u6587\u6863/ChatGPT/\u4e91\u7ec4\u4f1a/workspaces/internagents-trial/project",
+    "graph_id": "agent_local",
+    "assistant_id": "f6506f75-a235-5263-a597-20e7a960d835"
+  },
+  "status": "error",
+  "kwargs": {
+    "input": null,
+    "command": {
+      "resume": {
+        "decisions": [
+          {
+            "type": "approve"
+          },
+          {
+            "type": "approve"
+          }
+        ]
+      }
+    },
+    "config": {
+      "recursion_limit": 35,
+      "configurable": {
+        "langgraph_auth_user": null,
+        "langgraph_auth_user_id": "",
+        "langgraph_auth_permissions": [],
+        "langgraph_request_id": "fa9fe77f-bdfe-4f52-9fb6-ad507220bfe4",
+        "__request_start_time_ms__": 1791236753311,
+        "__after_seconds__": 0,
+        "run_id": "01a10e07-c79f-7d02-89e1-29c71d9ba671",
+        "thread_id": "01a10e05-c279-7453-96d0-fe1aef80e4a2",
+        "graph_id": "agent_local",
+        "assistant_id": "f6506f75-a235-5263-a597-20e7a960d835",
+        "user_id": "",
+        "__pregel_node_finished": null
+      },
+      "metadata": {
+        "created_by": "system",
+        "trial": "labcouncil",
+        "internagents_workspace_path": "/home/yang-zhi/\u6587\u6863/ChatGPT/\u4e91\u7ec4\u4f1a/workspaces/internagents-trial/project",
+        "graph_id": "agent_local",
+        "assistant_id": "f6506f75-a235-5263-a597-20e7a960d835",
+        "run_attempt": 1,
+        "langgraph_version": "1.2.13",
+        "langgraph_api_version": "0.15.1",
+        "langgraph_plan": "enterprise",
+        "langgraph_host": "self-hosted",
+        "langgraph_api_url": "http://127.0.0.1:23491"
+      }
+    },
+    "context": {},
+    "stream_mode": [
+      "values"
+    ],
+    "interrupt_before": null,
+    "interrupt_after": null,
+    "webhook": null,
+    "feedback_keys": null,
+    "temporary": false,
+    "subgraphs": false,
+    "resumable": false,
+    "checkpoint_during": true,
+    "durability": "sync"
+  },
+  "multitask_strategy": "enqueue",
+  "created_at": "2026-10-05T21:45:53.311805+00:00",
+  "updated_at": "2026-10-05T21:45:56.757206+00:00",
+  "langsmith_session_name": null
+}

@@ -1,0 +1,16 @@
+{
+  "expected": {
+    "linear_mse": 0.0,
+    "mean_mse": 8.0,
+    "n": 5
+  },
+  "actual": {
+    "linear_mse": 0.0,
+    "mean_mse": 8.0,
+    "n": 5
+  },
+  "passed": true,
+  "data_sha256": "e0a94626d78e8adf6299de20b10c118b0c03fbbe2b1c472c2897159c32e75338",
+  "result_sha256": "35e0a7a3972427b24db2abaf7084ca113833f98782bed2d89dac9ca5189fc861",
+  "method": "Independent host calculation from original CSV, without executing model-generated script"
+}

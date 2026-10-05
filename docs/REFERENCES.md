@@ -94,3 +94,7 @@ agent 修改训练代码，按固定五分钟训练预算执行，用验证指�
 ## 2026-10-05 补充本地证据
 
 [历史版本审计](../reproductions/2026-10-04-source-mapping/REPORT.md)、[真实 TCP / 恢复检查](../reproductions/2026-10-04-freephdlabor-agent/REPORT.md) 与[12次等预算流程比较](../reproductions/2026-10-05-comparison/REPORT.md) 均保留原始输入、失败和限制。Virtual Lab 旧版 Assistants 接口与新版有实质差异；freephdlabor 原公开恢复实现未完整还原执行状态。多角色完成更多指标，但未核验新增证据；这些发现改变采用判断，不证明普遍优越或普遍失败。
+
+## 2026-10-06 InternAgentS 实际试用
+
+[固定源码试用记录](../reproductions/2026-10-06-internagents-runtime/REPORT.md)：原最新依赖启动失败，固定 DeepAgents 0.5.7 后服务启动；8 次 DeepSeek Flash 请求确认小计算及普通退出恢复，同时发现连续审批转发异常和预算未计量/停止。直接 runtime 路径完成不算整套工作台通过；真实浏览器交互与论文结果仍未验证。暂不直接采用。

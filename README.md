@@ -37,6 +37,7 @@ The initial focus is computational research that can be checked through document
 - [研究参考 / Research references](docs/REFERENCES.md): relevant repositories, papers, results, and limitations.
 - [复现与采用规则 / Reproduction](docs/REPRODUCTION.md): evidence levels, validation gates, and experiment records.
 - [首轮采用决定 / Adoption](docs/ADOPTION.md): what the recorded evidence supports and what remains unverified.
+- [InternAgentS 实际试用](reproductions/2026-10-06-internagents-runtime/REPORT.md): real DeepSeek Flash computation, restart persistence, approval-forwarding failure, and budget limits.
 - [开发协作 / Contributing](CONTRIBUTING.md): how to contribute while the design is being established.
 
 ## 中文简介

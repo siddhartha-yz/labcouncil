@@ -1,0 +1,155 @@
+{
+  "pending_checkpoint_equal": true,
+  "pending_tasks_equal": true,
+  "completed_runtime_checkpoint_equal": true,
+  "completed_runtime_messages_equal": true,
+  "artifacts_after_restart_equal": true,
+  "budget_goal": {
+    "id": "0984e94d-fd4a-4349-9840-dc48cc48afae",
+    "threadId": "01a10e0c-8a01-7c62-9717-01afdeaba47e",
+    "objective": "预算边界验收固定状态",
+    "status": "active",
+    "tokenBudget": 1,
+    "tokensUsed": 0,
+    "timeUsedSeconds": 0,
+    "createdAt": 1791237065,
+    "updatedAt": 1791237065
+  },
+  "budget_continuation_turns": 2,
+  "requests": [
+    {
+      "number": 1,
+      "status": 200,
+      "model": "deepseek-flash",
+      "usage": {
+        "prompt_tokens": 8683,
+        "completion_tokens": 78,
+        "total_tokens": 8761,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 8683
+      },
+      "elapsed_seconds": 0.91
+    },
+    {
+      "number": 2,
+      "status": 200,
+      "model": "deepseek-flash",
+      "usage": {
+        "prompt_tokens": 8825,
+        "completion_tokens": 325,
+        "total_tokens": 9150,
+        "prompt_tokens_details": {
+          "cached_tokens": 2304
+        },
+        "prompt_cache_hit_tokens": 2304,
+        "prompt_cache_miss_tokens": 6521
+      },
+      "elapsed_seconds": 1.413
+    },
+    {
+      "number": 3,
+      "status": 200,
+      "model": "deepseek-flash",
+      "usage": {
+        "prompt_tokens": 9167,
+        "completion_tokens": 39,
+        "total_tokens": 9206,
+        "prompt_tokens_details": {
+          "cached_tokens": 2304
+        },
+        "prompt_cache_hit_tokens": 2304,
+        "prompt_cache_miss_tokens": 6863
+      },
+      "elapsed_seconds": 0.538
+    },
+    {
+      "number": 4,
+      "status": 200,
+      "model": "deepseek-flash",
+      "usage": {
+        "prompt_tokens": 9268,
+        "completion_tokens": 40,
+        "total_tokens": 9308,
+        "prompt_tokens_details": {
+          "cached_tokens": 2304
+        },
+        "prompt_cache_hit_tokens": 2304,
+        "prompt_cache_miss_tokens": 6964
+      },
+      "elapsed_seconds": 0.74
+    },
+    {
+      "number": 5,
+      "status": 200,
+      "model": "deepseek-flash",
+      "usage": {
+        "prompt_tokens": 9362,
+        "completion_tokens": 193,
+        "total_tokens": 9555,
+        "prompt_tokens_details": {
+          "cached_tokens": 2304
+        },
+        "prompt_cache_hit_tokens": 2304,
+        "prompt_cache_miss_tokens": 7058
+      },
+      "elapsed_seconds": 1.963
+    },
+    {
+      "number": 6,
+      "status": 200,
+      "model": "deepseek-flash",
+      "usage": {
+        "prompt_tokens": 9572,
+        "completion_tokens": 238,
+        "total_tokens": 9810,
+        "prompt_tokens_details": {
+          "cached_tokens": 2304
+        },
+        "prompt_cache_hit_tokens": 2304,
+        "prompt_cache_miss_tokens": 7268
+      },
+      "elapsed_seconds": 1.709
+    },
+    {
+      "number": 7,
+      "status": 200,
+      "model": "deepseek-flash",
+      "usage": {
+        "prompt_tokens": 8768,
+        "completion_tokens": 1,
+        "total_tokens": 8769,
+        "prompt_tokens_details": {
+          "cached_tokens": 2304
+        },
+        "prompt_cache_hit_tokens": 2304,
+        "prompt_cache_miss_tokens": 6464
+      },
+      "elapsed_seconds": 0.559
+    },
+    {
+      "number": 8,
+      "status": 200,
+      "model": "deepseek-flash",
+      "usage": {
+        "prompt_tokens": 8772,
+        "completion_tokens": 12,
+        "total_tokens": 8784,
+        "prompt_tokens_details": {
+          "cached_tokens": 2304
+        },
+        "prompt_cache_hit_tokens": 2304,
+        "prompt_cache_miss_tokens": 6468
+      },
+      "elapsed_seconds": 1.303
+    }
+  ],
+  "total_tokens": 73343,
+  "completion_tokens": 926,
+  "browser_ui_validation": "Not completed: three CUA/CDP navigation/focus timeouts; frontend HTTP 200 only",
+  "upstream_worktree_clean": true,
+  "report_non_whitespace_characters": 196,
+  "report_contains_misused_classification_term": true
+}

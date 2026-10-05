@@ -1,0 +1,109 @@
+{
+  "payload": {
+    "assistant_id": "agent_local",
+    "input": {
+      "messages": [
+        {
+          "type": "human",
+          "content": "这是合成预算验收。请仅回复收到，不调用任何工具，不改变目标状态；保持 active，以便检查宿主是否按预算停止下一轮。"
+        }
+      ],
+      "goal": {
+        "id": "0984e94d-fd4a-4349-9840-dc48cc48afae",
+        "threadId": "01a10e0c-8a01-7c62-9717-01afdeaba47e",
+        "objective": "预算边界验收固定状态",
+        "status": "active",
+        "tokenBudget": 1,
+        "tokensUsed": 0,
+        "timeUsedSeconds": 0,
+        "createdAt": 1791237065,
+        "updatedAt": 1791237065
+      }
+    },
+    "config": {
+      "recursion_limit": 35,
+      "configurable": {
+        "internagents_workspace_path": "<workspace>/workspaces/internagents-trial/project"
+      }
+    },
+    "durability": "sync"
+  },
+  "run": {
+    "run_id": "01a10e0c-8a02-75e2-a627-fea83ef69e89",
+    "thread_id": "01a10e0c-8a01-7c62-9717-01afdeaba47e",
+    "assistant_id": "f6506f75-a235-5263-a597-20e7a960d835",
+    "metadata": {
+      "created_by": "system",
+      "trial": "labcouncil",
+      "internagents_workspace_path": "<workspace>/workspaces/internagents-trial/project",
+      "graph_id": "agent_local",
+      "assistant_id": "f6506f75-a235-5263-a597-20e7a960d835"
+    },
+    "status": "pending",
+    "kwargs": {
+      "input": {
+        "messages": [
+          {
+            "type": "human",
+            "content": "这是合成预算验收。请仅回复收到，不调用任何工具，不改变目标状态；保持 active，以便检查宿主是否按预算停止下一轮。"
+          }
+        ],
+        "goal": {
+          "id": "0984e94d-fd4a-4349-9840-dc48cc48afae",
+          "threadId": "01a10e0c-8a01-7c62-9717-01afdeaba47e",
+          "objective": "预算边界验收固定状态",
+          "status": "active",
+          "tokenBudget": 1,
+          "tokensUsed": 0,
+          "timeUsedSeconds": 0,
+          "createdAt": 1791237065,
+          "updatedAt": 1791237065
+        }
+      },
+      "command": null,
+      "config": {
+        "recursion_limit": 35,
+        "configurable": {
+          "internagents_workspace_path": "<workspace>/workspaces/internagents-trial/project",
+          "langgraph_auth_user": null,
+          "langgraph_auth_user_id": "",
+          "langgraph_auth_permissions": [],
+          "langgraph_request_id": "bce47c6f-ad9b-425f-84a3-07b0c5f6ab11",
+          "__request_start_time_ms__": 1791237065218,
+          "__after_seconds__": 0,
+          "run_id": "01a10e0c-8a02-75e2-a627-fea83ef69e89",
+          "thread_id": "01a10e0c-8a01-7c62-9717-01afdeaba47e",
+          "graph_id": "agent_local",
+          "assistant_id": "f6506f75-a235-5263-a597-20e7a960d835",
+          "user_id": ""
+        },
+        "metadata": {
+          "created_by": "system",
+          "trial": "labcouncil",
+          "internagents_workspace_path": "<workspace>/workspaces/internagents-trial/project",
+          "graph_id": "agent_local",
+          "assistant_id": "f6506f75-a235-5263-a597-20e7a960d835"
+        }
+      },
+      "context": {
+        "internagents_workspace_path": "<workspace>/workspaces/internagents-trial/project"
+      },
+      "stream_mode": [
+        "values"
+      ],
+      "interrupt_before": null,
+      "interrupt_after": null,
+      "webhook": null,
+      "feedback_keys": null,
+      "temporary": false,
+      "subgraphs": false,
+      "resumable": false,
+      "checkpoint_during": true,
+      "durability": "sync"
+    },
+    "multitask_strategy": "enqueue",
+    "created_at": "2026-10-05T21:51:05.218902+00:00",
+    "updated_at": "2026-10-05T21:51:05.218905+00:00",
+    "langsmith_session_name": null
+  }
+}

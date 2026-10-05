@@ -44,3 +44,9 @@ Thumbs.db
 !reproductions/2026-10-05-comparison/runs/*/artifacts/**
 # Regenerable tokenizer caches are not experiment evidence.
 tokenizer-cache/
+# Audited synthetic InternAgentS trial files and sanitized diagnostic logs.
+!reproductions/2026-10-06-internagents-runtime/artifacts/
+!reproductions/2026-10-06-internagents-runtime/artifacts/**
+!reproductions/2026-10-06-internagents-runtime/logs/
+!reproductions/2026-10-06-internagents-runtime/logs/*.log
+!reproductions/2026-10-06-internagents-runtime/attempt-01-startup.log

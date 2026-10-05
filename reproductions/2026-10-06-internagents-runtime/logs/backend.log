@@ -1,0 +1,57 @@
+INFO:langgraph_api.cli:
+
+        Welcome to
+
+╦  ┌─┐┌┐┌┌─┐╔═╗┬─┐┌─┐┌─┐┬ ┬
+║  ├─┤││││ ┬║ ╦├┬┘├─┤├─┘├─┤
+╩═╝┴ ┴┘└┘└─┘╚═╝┴└─┴ ┴┴  ┴ ┴
+
+- 🚀 API: http://127.0.0.1:23491
+- 🎨 Studio UI: https://smith.langchain.com/studio/?baseUrl=http://127.0.0.1:23491
+- 📚 API Docs: http://127.0.0.1:23491/docs
+
+This in-memory server is designed for development and testing.
+For production use, please use LangSmith Deployment.
+
+
+2026-10-05T21:50:39.697776Z [info     ] Starting dev persistence flush loop [langgraph_runtime_inmem._persistence] api_variant=local_dev langgraph_api_version=0.15.1 thread_name=MainThread
+2026-10-05T21:50:39.713038Z [info     ] Using langgraph_runtime_inmem  [langgraph_runtime] api_variant=local_dev langgraph_api_version=0.15.1 thread_name=MainThread
+2026-10-05T21:50:39.741211Z [info     ] Using auth of type=noop        [langgraph_api.auth.middleware] api_variant=local_dev langgraph_api_version=0.15.1 thread_name=MainThread
+2026-10-05T21:50:39.747107Z [info     ] Starting In-Memory runtime with langgraph-api=0.15.1 and in-memory runtime=0.35.1 [langgraph_runtime_inmem.lifespan] api_variant=local_dev langgraph_api_version=0.15.1 langgraph_runtime_inmem_version=0.35.1 thread_name=uvloop_0 version=0.15.1
+2026-10-05T21:50:39.760575Z [info     ] OTel metrics reporter initialized [langgraph_api.metrics_otlp] api_variant=local_dev backends=['prometheus'] langgraph_api_version=0.15.1 max_emitting_tier=2 metric_prefix=lg_api_ thread_name=MainThread
+2026-10-05T21:50:39.760974Z [info     ] Caching importlib.metadata.packages_distributions() [langgraph_api.graph] api_variant=local_dev langgraph_api_version=0.15.1 thread_name=MainThread
+2026-10-05T21:50:39.761104Z [info     ] No license key or control plane API key set, skipping metadata loop [langgraph_api.metadata] api_variant=local_dev langgraph_api_version=0.15.1 thread_name=MainThread
+2026-10-05T21:50:39.761287Z [info     ] Starting OTLP metrics collector loop [langgraph_api.metrics_collector] api_variant=local_dev interval_secs=60 langgraph_api_version=0.15.1 thread_name=uvloop_0
+2026-10-05T21:50:39.761742Z [info     ] Worker stats                   [langgraph_api.metrics_collector] active=0 api_variant=local_dev available=5 langgraph_api_version=0.15.1 max=5 thread_name=uvloop_0
+2026-10-05T21:50:40.263458Z [info     ] Importing graph profiling      [langgraph_api.timing.timer] api_variant=local_dev elapsed_seconds=0.5021758949951618 graph_id=agent langgraph_api_version=0.15.1 module=None name=_graph_from_spec path=./agent.py thread_name=uvloop_1
+2026-10-05T21:50:40.264009Z [info     ] Importing graph profiling      [langgraph_api.timing.timer] api_variant=local_dev elapsed_seconds=0.00015963999612722546 graph_id=agent_local langgraph_api_version=0.15.1 module=None name=_graph_from_spec path=./agent.py thread_name=uvloop_0
+2026-10-05T21:50:40.264433Z [info     ] Importing graph profiling      [langgraph_api.timing.timer] api_variant=local_dev elapsed_seconds=0.0001237319956999272 graph_id=agent_remote1 langgraph_api_version=0.15.1 module=None name=_graph_from_spec path=./agent.py thread_name=uvloop_1
+2026-10-05T21:50:40.264732Z [info     ] Importing graph profiling      [langgraph_api.timing.timer] api_variant=local_dev elapsed_seconds=0.0001025120000122115 graph_id=agent_remote2 langgraph_api_version=0.15.1 module=None name=_graph_from_spec path=./agent.py thread_name=uvloop_0
+2026-10-05T21:50:40.265013Z [info     ] Importing graph profiling      [langgraph_api.timing.timer] api_variant=local_dev elapsed_seconds=9.553899872116745e-05 graph_id=agent_remote3 langgraph_api_version=0.15.1 module=None name=_graph_from_spec path=./agent.py thread_name=uvloop_1
+2026-10-05T21:50:40.265264Z [info     ] Importing graph profiling      [langgraph_api.timing.timer] api_variant=local_dev elapsed_seconds=9.347499872092158e-05 graph_id=agent_remote4 langgraph_api_version=0.15.1 module=None name=_graph_from_spec path=./agent.py thread_name=uvloop_0
+2026-10-05T21:50:40.265556Z [info     ] Importing graph profiling      [langgraph_api.timing.timer] api_variant=local_dev elapsed_seconds=0.00011107799946330488 graph_id=agent_remote5 langgraph_api_version=0.15.1 module=None name=_graph_from_spec path=./agent.py thread_name=uvloop_1
+2026-10-05T21:50:40.265929Z [info     ] Importing graph profiling      [langgraph_api.timing.timer] api_variant=local_dev elapsed_seconds=0.00013959100033389404 graph_id=agent_remote6 langgraph_api_version=0.15.1 module=None name=_graph_from_spec path=./agent.py thread_name=uvloop_0
+2026-10-05T21:50:40.266364Z [info     ] Importing graph profiling      [langgraph_api.timing.timer] api_variant=local_dev elapsed_seconds=9.552900155540556e-05 graph_id=agent_remote7 langgraph_api_version=0.15.1 module=None name=_graph_from_spec path=./agent.py thread_name=uvloop_1
+2026-10-05T21:50:40.266704Z [info     ] Importing graph profiling      [langgraph_api.timing.timer] api_variant=local_dev elapsed_seconds=7.356800051638857e-05 graph_id=agent_remote8 langgraph_api_version=0.15.1 module=None name=_graph_from_spec path=./agent.py thread_name=uvloop_1
+2026-10-05T21:50:40.269738Z [info     ] Application started up in 0.785s [langgraph_api.timing.timer] api_variant=local_dev elapsed=0.785084959003143 langgraph_api_version=0.15.1 thread_name=MainThread
+2026-10-05T21:50:40.274511Z [info     ] Starting cron scheduler        [langgraph_api.cron_scheduler] api_variant=local_dev langgraph_api_version=0.15.1 thread_name=MainThread
+2026-10-05T21:50:40.274644Z [info     ] Starting queue with shared loop [langgraph_runtime_inmem.queue] api_variant=local_dev langgraph_api_version=0.15.1 thread_name=uvloop_0
+2026-10-05T21:50:40.275159Z [info     ] Starting 5 background workers  [langgraph_runtime_inmem.queue] api_variant=local_dev langgraph_api_version=0.15.1 thread_name=uvloop_1
+2026-10-05T21:50:40.275283Z [info     ] Worker stats                   [langgraph_runtime_inmem.queue] active=0 api_variant=local_dev available=5 langgraph_api_version=0.15.1 max=5 thread_name=uvloop_1
+2026-10-05T21:50:40.775700Z [info     ] Queue stats                    [langgraph_runtime_inmem.queue] api_variant=local_dev langgraph_api_version=0.15.1 n_pending=0 n_running=0 pending_runs_wait_time_max_secs=None pending_runs_wait_time_med_secs=None pending_unblocked_runs_wait_time_max_secs=None thread_name=uvloop_1
+2026-10-05T21:51:05.217539Z [info     ] Getting auth instance: None    [langgraph_api.auth.custom] api_variant=local_dev langgraph_api_version=0.15.1 langgraph_auth=None method=POST path=/threads request_id=2b1786be-8750-40b4-a3e6-8d5432865650 thread_name=MainThread
+2026-10-05T21:51:05.218939Z [info     ] Created run                    [langgraph_api.models.run] after_seconds=0 api_variant=local_dev assistant_id=f6506f75-a235-5263-a597-20e7a960d835 checkpoint_id=None if_not_exists=reject langgraph_api_version=0.15.1 method=POST multitask_strategy=enqueue path=/threads/{thread_id}/runs request_id=bce47c6f-ad9b-425f-84a3-07b0c5f6ab11 run_create_ms=0 run_id=01a10e0c-8a02-75e2-a627-fea83ef69e89 run_put_ms=0 stream_mode=['values'] stream_resumable=False temporary=False thread_id=01a10e0c-8a01-7c62-9717-01afdeaba47e thread_name=MainThread
+2026-10-05T21:51:05.791985Z [info     ] Starting background run        [langgraph_api.worker] api_variant=local_dev assistant_id=f6506f75-a235-5263-a597-20e7a960d835 graph_id=agent_local langgraph_api_version=0.15.1 request_id=bce47c6f-ad9b-425f-84a3-07b0c5f6ab11 resumable=False run_attempt=1 run_creation_ms=0 run_id=01a10e0c-8a02-75e2-a627-fea83ef69e89 run_queue_ms=572 run_started_at=2026-10-05T21:51:05.791666+00:00 run_stream_start_ms=0 temporary=False thread_id=01a10e0c-8a01-7c62-9717-01afdeaba47e thread_name=uvloop_1
+2026-10-05T21:51:05.838963Z [info     ] HTTP Request: POST http://127.0.0.1:23492/threads/01a10e0c-8a01-7c62-9717-01afdeaba47e/runs/stream "HTTP/1.1 200 OK" [httpx] api_variant=local_dev assistant_id=f6506f75-a235-5263-a597-20e7a960d835 graph_id=agent_local langgraph_api_version=0.15.1 langgraph_node=remote_runtime request_id=bce47c6f-ad9b-425f-84a3-07b0c5f6ab11 run_attempt=1 run_id=01a10e0c-8a02-75e2-a627-fea83ef69e89 thread_id=01a10e0c-8a01-7c62-9717-01afdeaba47e thread_name=MainThread
+2026-10-05T21:51:07.206774Z [info     ] HTTP Request: POST http://127.0.0.1:23492/threads/01a10e0c-8a01-7c62-9717-01afdeaba47e/runs/stream "HTTP/1.1 200 OK" [httpx] api_variant=local_dev assistant_id=f6506f75-a235-5263-a597-20e7a960d835 graph_id=agent_local langgraph_api_version=0.15.1 langgraph_node=remote_runtime request_id=bce47c6f-ad9b-425f-84a3-07b0c5f6ab11 run_attempt=1 run_id=01a10e0c-8a02-75e2-a627-fea83ef69e89 thread_id=01a10e0c-8a01-7c62-9717-01afdeaba47e thread_name=MainThread
+2026-10-05T21:51:09.423698Z [info     ] Background run succeeded       [langgraph_api.worker] api_variant=local_dev assistant_id=f6506f75-a235-5263-a597-20e7a960d835 graph_id=agent_local langgraph_api_version=0.15.1 request_id=bce47c6f-ad9b-425f-84a3-07b0c5f6ab11 run_attempt=1 run_completed_in_ms=4205 run_created_at=2026-10-05T21:51:05.218902+00:00 run_ended_at=2026-10-05T21:51:09.423537+00:00 run_exec_ms=3631 run_id=01a10e0c-8a02-75e2-a627-fea83ef69e89 run_started_at=2026-10-05T21:51:05.791666+00:00 run_wait_time_ms=572 thread_id=01a10e0c-8a01-7c62-9717-01afdeaba47e thread_name=uvloop_0
+2026-10-05T21:51:39.762518Z [info     ] Worker stats                   [langgraph_api.metrics_collector] active=0 api_variant=local_dev available=5 langgraph_api_version=0.15.1 max=5 thread_name=uvloop_0
+2026-10-05T21:51:40.303153Z [info     ] Worker stats                   [langgraph_runtime_inmem.queue] active=0 api_variant=local_dev available=5 langgraph_api_version=0.15.1 max=5 thread_name=uvloop_0
+2026-10-05T21:51:40.804501Z [info     ] Queue stats                    [langgraph_runtime_inmem.queue] api_variant=local_dev langgraph_api_version=0.15.1 n_pending=0 n_running=0 pending_runs_wait_time_max_secs=None pending_runs_wait_time_med_secs=None pending_unblocked_runs_wait_time_max_secs=None thread_name=uvloop_0
+2026-10-05T21:52:39.762971Z [info     ] Worker stats                   [langgraph_api.metrics_collector] active=0 api_variant=local_dev available=5 langgraph_api_version=0.15.1 max=5 thread_name=uvloop_1
+2026-10-05T21:52:40.335404Z [info     ] Worker stats                   [langgraph_runtime_inmem.queue] active=0 api_variant=local_dev available=5 langgraph_api_version=0.15.1 max=5 thread_name=uvloop_0
+2026-10-05T21:52:40.836568Z [info     ] Queue stats                    [langgraph_runtime_inmem.queue] api_variant=local_dev langgraph_api_version=0.15.1 n_pending=0 n_running=0 pending_runs_wait_time_max_secs=None pending_runs_wait_time_med_secs=None pending_unblocked_runs_wait_time_max_secs=None thread_name=uvloop_0
+2026-10-05T21:52:53.614546Z [info     ] Shutting down background workers [langgraph_runtime_inmem.queue] api_variant=local_dev langgraph_api_version=0.15.1 thread_name=MainThread
+2026-10-05T21:52:53.615147Z [info     ] Shutting down remote graphs    [langgraph_api.graph] api_variant=local_dev langgraph_api_version=0.15.1 thread_name=MainThread
+2026-10-05T21:52:53.615970Z [info     ] Stopping dev persistence flush loop [langgraph_runtime_inmem._persistence] api_variant=local_dev langgraph_api_version=0.15.1 thread_name=MainThread
+2026-10-05T21:52:53.616080Z [info     ] dev persistence flush loop exiting [langgraph_runtime_inmem._persistence] api_variant=local_dev langgraph_api_version=0.15.1 thread_name=Thread-3

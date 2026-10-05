@@ -2,7 +2,7 @@
 
 日期：2026-10-05。现阶段不把 Virtual Lab 或 freephdlabor 整套接入平台。
 
-上海 AI Lab 的 InternAgentS 工作台、InternAgent 1.5 实验模块及 SCP 工具生态已加入候选。[本轮检查](../reproductions/2026-10-05-shanghai-lab/REPORT.md) 固定了两个源码版本，并运行了恢复扫描和目标续跑的局部边界检查。优先验证 InternAgentS 的 DeepSeek Flash 接入、审批、重启恢复与预算停止；尚未采用或完成端到端复现。
+上海 AI Lab 的 InternAgentS 工作台、InternAgent 1.5 实验模块及 SCP 工具生态已加入候选。[源码检查](../reproductions/2026-10-05-shanghai-lab/REPORT.md)后，[2026-10-06 实际试用](../reproductions/2026-10-06-internagents-runtime/REPORT.md)确认 DeepSeek Flash 小计算和正常停止重启持久化；连续审批经协调服务转发失败，token 预算未实际停止续跑，报告也有术语与字数自查错误。暂不整套采用；界面交互、崩溃恢复和论文科研结果仍未验证。
 
 ## 我们实际确认了什么
 

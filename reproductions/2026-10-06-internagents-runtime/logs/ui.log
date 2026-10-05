@@ -1,0 +1,12 @@
+
+> deep-agents-ui@0.1.0 dev
+> next dev --webpack --hostname 127.0.0.1 --port 23493
+
+▲ Next.js 16.2.6 (webpack)
+- Local:         http://127.0.0.1:23493
+- Network:       http://127.0.0.1:23493
+✓ Ready in 293ms
+
+○ Compiling / ...
+ GET / 200 in 27ms (next.js: 3ms, application-code: 24ms)
+[?25h

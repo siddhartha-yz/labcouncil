@@ -1,0 +1,86 @@
+[InternAgentS] Starting local agent runtime on http://127.0.0.1:23492...
+
+---- Local runtime log: <workspace>/workspaces/upstreams/internagents/.internagents/logs/local-runtime.log ----
+- 📚 API Docs: [36mhttp://127.0.0.1:23492/docs[0m
+
+This in-memory server is designed for development and testing.
+For production use, please use LangSmith Deployment.
+
+
+[2m2026-10-05T21:40:25.342508Z[0m [[32m[1minfo     [0m] [1mStarting dev persistence flush loop[0m [[0m[1m[34mlanggraph_runtime_inmem._persistence[0m][0m [36mapi_variant[0m=[35mlocal_dev[0m [36mlanggraph_api_version[0m=[35m0.15.1[0m [36mthread_name[0m=[35mMainThread[0m
+[2m2026-10-05T21:40:25.512516Z[0m [[32m[1minfo     [0m] [1mUsing langgraph_runtime_inmem [0m [[0m[1m[34mlanggraph_runtime[0m][0m [36mapi_variant[0m=[35mlocal_dev[0m [36mlanggraph_api_version[0m=[35m0.15.1[0m [36mthread_name[0m=[35mMainThread[0m
+[2m2026-10-05T21:40:25.654484Z[0m [[32m[1minfo     [0m] [1mUsing auth of type=noop       [0m [[0m[1m[34mlanggraph_api.auth.middleware[0m][0m [36mapi_variant[0m=[35mlocal_dev[0m [36mlanggraph_api_version[0m=[35m0.15.1[0m [36mthread_name[0m=[35mMainThread[0m
+[2m2026-10-05T21:40:25.685745Z[0m [[32m[1minfo     [0m] [1mStarting In-Memory runtime with langgraph-api=0.15.1 and in-memory runtime=0.35.1[0m [[0m[1m[34mlanggraph_runtime_inmem.lifespan[0m][0m [36mapi_variant[0m=[35mlocal_dev[0m [36mlanggraph_api_version[0m=[35m0.15.1[0m [36mlanggraph_runtime_inmem_version[0m=[35m0.35.1[0m [36mthread_name[0m=[35muvloop_0[0m [36mversion[0m=[35m0.15.1[0m
+[2m2026-10-05T21:40:25.762627Z[0m [[32m[1minfo     [0m] [1mOTel metrics reporter initialized[0m [[0m[1m[34mlanggraph_api.metrics_otlp[0m][0m [36mapi_variant[0m=[35mlocal_dev[0m [36mbackends[0m=[35m['prometheus'][0m [36mlanggraph_api_version[0m=[35m0.15.1[0m [36mmax_emitting_tier[0m=[35m2[0m [36mmetric_prefix[0m=[35mlg_api_[0m [36mthread_name[0m=[35mMainThread[0m
+[2m2026-10-05T21:40:25.764403Z[0m [[32m[1minfo     [0m] [1mCaching importlib.metadata.packages_distributions()[0m [[0m[1m[34mlanggraph_api.graph[0m][0m [36mapi_variant[0m=[35mlocal_dev[0m [36mlanggraph_api_version[0m=[35m0.15.1[0m [36mthread_name[0m=[35mMainThread[0m
+[2m2026-10-05T21:40:25.764696Z[0m [[32m[1minfo     [0m] [1mNo license key or control plane API key set, skipping metadata loop[0m [[0m[1m[34mlanggraph_api.metadata[0m][0m [36mapi_variant[0m=[35mlocal_dev[0m [36mlanggraph_api_version[0m=[35m0.15.1[0m [36mthread_name[0m=[35mMainThread[0m
+[2m2026-10-05T21:40:25.765078Z[0m [[32m[1minfo     [0m] [1mStarting OTLP metrics collector loop[0m [[0m[1m[34mlanggraph_api.metrics_collector[0m][0m [36mapi_variant[0m=[35mlocal_dev[0m [36minterval_secs[0m=[35m60[0m [36mlanggraph_api_version[0m=[35m0.15.1[0m [36mthread_name[0m=[35muvloop_1[0m
+[2m2026-10-05T21:40:25.765919Z[0m [[32m[1minfo     [0m] [1mWorker stats                  [0m [[0m[1m[34mlanggraph_api.metrics_collector[0m][0m [36mactive[0m=[35m0[0m [36mapi_variant[0m=[35mlocal_dev[0m [36mavailable[0m=[35m5[0m [36mlanggraph_api_version[0m=[35m0.15.1[0m [36mmax[0m=[35m5[0m [36mthread_name[0m=[35muvloop_1[0m
+[2m2026-10-05T21:40:28.284559Z[0m [[32m[1minfo     [0m] [1mImporting graph profiling     [0m [[0m[1m[34mlanggraph_api.timing.timer[0m][0m [36mapi_variant[0m=[35mlocal_dev[0m [36melapsed_seconds[0m=[35m2.519488697995257[0m [36mgraph_id[0m=[35magent[0m [36mlanggraph_api_version[0m=[35m0.15.1[0m [36mmodule[0m=[35mNone[0m [36mname[0m=[35m_graph_from_spec[0m [36mpath[0m=[35m./agent.py[0m [36mthread_name[0m=[35muvloop_0[0m
+TypeError('backend must be an initialized backend instance. Backend factories were removed in deepagents 0.7; pass StateBackend(), CompositeBackend(...), or another BackendProtocol instance instead.')
+[2m2026-10-05T21:40:28.315300Z[0m [[31m[1merror    [0m] [1mGraph 'agent' failed to load: TypeError: backend must be an initialized backend instance. Backend factories were removed in deepagents 0.7; pass StateBackend(), CompositeBackend(...), or another BackendProtocol instance instead.[0m [[0m[1m[34mlanggraph_runtime_inmem.lifespan[0m][0m [36maction[0m=[35mfix_user_graph[0m [36mapi_variant[0m=[35mlocal_dev[0m [36merror_boundary[0m=[35muser_graph[0m [36merror_message[0m=[35m'TypeError: backend must be an initialized backend instance. Backend factories were removed in deepagents 0.7; pass StateBackend(), CompositeBackend(...), or another BackendProtocol instance instead.'[0m [36merror_type[0m=[35mTypeError[0m [36mgraph_id[0m=[35magent[0m [36mlanggraph_api_version[0m=[35m0.15.1[0m [36mlocation[0m=[35m./agent.py[0m [36msummary[0m=[35m'TypeError: TypeError: backend must be an initialized backend instance. Backend factories were removed in deepagents 0.7; pass StateBackend(), CompositeBackend(...), or another BackendProtocol instance instead.'[0m [36mthread_name[0m=[35muvloop_1[0m [36muser_traceback[0m=[35m'Traceback (most recent call last):\n  File "<workspace>/workspaces/upstreams/internagents/.venv/lib/python3.12/site-packages/langgraph_api/graph.py", line 657, in collect_graphs_from_env\n    graph = await run_in_executor(None, _graph_from_spec, spec)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "<workspace>/workspaces/upstreams/internagents/.venv/lib/python3.12/site-packages/langgraph_api/utils/config.py", line 145, in run_in_executor\n    return await asyncio.get_running_loop().run_in_executor(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/home/yang-zhi/.local/share/uv/python/cpython-3.12.14-linux-x86_64-gnu/lib/python3.12/concurrent/futures/thread.py", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "<workspace>/workspaces/upstreams/internagents/.venv/lib/python3.12/site-packages/langgraph_api/utils/config.py", line 136, in wrapper\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\n  File "<workspace>/workspaces/upstreams/internagents/.venv/lib/python3.12/site-packages/langgraph_api/timing/timer.py", line 101, in wrapper\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\n  File "<workspace>/workspaces/upstreams/internagents/.venv/lib/python3.12/site-packages/langgraph_api/graph.py", line 761, in _graph_from_spec\n    modspec.loader.exec_module(module)\n  File "<frozen importlib._bootstrap_external>", line 999, in exec_module\n  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed\n  File "<workspace>/workspaces/upstreams/internagents/.internagents/langgraph-state/local-runtime/agent.py", line 8, in <module>\n    from internagents.agent_graph import *  # noqa: F401,F403\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "<workspace>/workspaces/upstreams/internagents/internagents/agent_graph.py", line 1668, in <module>\n    agent = create_runtime_agent()\n            ^^^^^^^^^^^^^^^^^^^^^^\n  File "<workspace>/workspaces/upstreams/internagents/internagents/agent_graph.py", line 1621, in create_runtime_agent\n    return create_deep_agent(\n           ^^^^^^^^^^^^^^^^^^\n  File "<workspace>/workspaces/upstreams/internagents/.venv/lib/python3.12/site-packages/deepagents/graph.py", line 708, in create_deep_agent\n    FilesystemMiddleware(\n  File "<workspace>/workspaces/upstreams/internagents/.venv/lib/python3.12/site-packages/deepagents/middleware/filesystem.py", line 1844, in __init__\n    raise TypeError(msg)\nTypeError: backend must be an initialized backend instance. Backend factories were removed in deepagents 0.7; pass StateBackend(), CompositeBackend(...), or another BackendProtocol instance instead.\n'[0m
+[2m2026-10-05T21:40:28.316651Z[0m [[32m[1minfo     [0m] [1mShutting down remote graphs   [0m [[0m[1m[34mlanggraph_api.graph[0m][0m [36mapi_variant[0m=[35mlocal_dev[0m [36mlanggraph_api_version[0m=[35m0.15.1[0m [36mthread_name[0m=[35mMainThread[0m
+[2m2026-10-05T21:40:28.362517Z[0m [[32m[1minfo     [0m] [1mStopping dev persistence flush loop[0m [[0m[1m[34mlanggraph_runtime_inmem._persistence[0m][0m [36mapi_variant[0m=[35mlocal_dev[0m [36mlanggraph_api_version[0m=[35m0.15.1[0m [36mthread_name[0m=[35mMainThread[0m
+[2m2026-10-05T21:40:28.362689Z[0m [[32m[1minfo     [0m] [1mdev persistence flush loop exiting[0m [[0m[1m[34mlanggraph_runtime_inmem._persistence[0m][0m [36mapi_variant[0m=[35mlocal_dev[0m [36mlanggraph_api_version[0m=[35m0.15.1[0m [36mthread_name[0m=[35mThread-3[0m
+[2m2026-10-05T21:40:28.365303Z[0m [[31m[1merror    [0m] [1mTraceback (most recent call last):
+  File "<workspace>/workspaces/upstreams/internagents/.venv/lib/python3.12/site-packages/langgraph_api/graph.py", line 657, in collect_graphs_from_env
+    graph = await run_in_executor(None, _graph_from_spec, spec)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<workspace>/workspaces/upstreams/internagents/.venv/lib/python3.12/site-packages/langgraph_api/utils/config.py", line 145, in run_in_executor
+    return await asyncio.get_running_loop().run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yang-zhi/.local/share/uv/python/cpython-3.12.14-linux-x86_64-gnu/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<workspace>/workspaces/upstreams/internagents/.venv/lib/python3.12/site-packages/langgraph_api/utils/config.py", line 136, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "<workspace>/workspaces/upstreams/internagents/.venv/lib/python3.12/site-packages/langgraph_api/timing/timer.py", line 101, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "<workspace>/workspaces/upstreams/internagents/.venv/lib/python3.12/site-packages/langgraph_api/graph.py", line 761, in _graph_from_spec
+    modspec.loader.exec_module(module)
+  File "<frozen importlib._bootstrap_external>", line 999, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "<workspace>/workspaces/upstreams/internagents/.internagents/langgraph-state/local-runtime/agent.py", line 8, in <module>
+    from internagents.agent_graph import *  # noqa: F401,F403
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<workspace>/workspaces/upstreams/internagents/internagents/agent_graph.py", line 1668, in <module>
+    agent = create_runtime_agent()
+            ^^^^^^^^^^^^^^^^^^^^^^
+  File "<workspace>/workspaces/upstreams/internagents/internagents/agent_graph.py", line 1621, in create_runtime_agent
+    return create_deep_agent(
+           ^^^^^^^^^^^^^^^^^^
+  File "<workspace>/workspaces/upstreams/internagents/.venv/lib/python3.12/site-packages/deepagents/graph.py", line 708, in create_deep_agent
+    FilesystemMiddleware(
+  File "<workspace>/workspaces/upstreams/internagents/.venv/lib/python3.12/site-packages/deepagents/middleware/filesystem.py", line 1844, in __init__
+    raise TypeError(msg)
+TypeError: backend must be an initialized backend instance. Backend factories were removed in deepagents 0.7; pass StateBackend(), CompositeBackend(...), or another BackendProtocol instance instead.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "<workspace>/workspaces/upstreams/internagents/.venv/lib/python3.12/site-packages/starlette/routing.py", line 654, in lifespan
+    async with self.lifespan_context(app) as maybe_state:
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yang-zhi/.local/share/uv/python/cpython-3.12.14-linux-x86_64-gnu/lib/python3.12/contextlib.py", line 210, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "<workspace>/workspaces/upstreams/internagents/.venv/lib/python3.12/site-packages/langgraph_api/timing/timer.py", line 227, in combined_lifespan
+    await stack.enter_async_context(ls(app))
+  File "/home/yang-zhi/.local/share/uv/python/cpython-3.12.14-linux-x86_64-gnu/lib/python3.12/contextlib.py", line 659, in enter_async_context
+    result = await _enter(cm)
+             ^^^^^^^^^^^^^^^^
+  File "/home/yang-zhi/.local/share/uv/python/cpython-3.12.14-linux-x86_64-gnu/lib/python3.12/contextlib.py", line 210, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "<workspace>/workspaces/upstreams/internagents/.venv/lib/python3.12/site-packages/langgraph_runtime_inmem/lifespan.py", line 134, in lifespan
+    await graph.collect_graphs_from_env(True)
+  File "<workspace>/workspaces/upstreams/internagents/.venv/lib/python3.12/site-packages/langgraph_api/graph.py", line 659, in collect_graphs_from_env
+    raise GraphLoadError(spec, exc) from exc
+langgraph_api.utils.errors.GraphLoadError: Failed to load graph 'agent' from ./agent.py: backend must be an initialized backend instance. Backend factories were removed in deepagents 0.7; pass StateBackend(), CompositeBackend(...), or another BackendProtocol instance instead.
+[0m [[0m[1m[34muvicorn.error[0m][0m [36mapi_variant[0m=[35mlocal_dev[0m [36mlanggraph_api_version[0m=[35m0.15.1[0m [36mthread_name[0m=[35mMainThread[0m
+[2m2026-10-05T21:40:28.365400Z[0m [[31m[1merror    [0m] [1mApplication startup failed. Exiting.[0m [[0m[1m[34muvicorn.error[0m][0m [36mapi_variant[0m=[35mlocal_dev[0m [36mlanggraph_api_version[0m=[35m0.15.1[0m [36mthread_name[0m=[35mMainThread[0m
+---- end log ----
+
+[InternAgentS] Error: Local runtime process exited before becoming ready.

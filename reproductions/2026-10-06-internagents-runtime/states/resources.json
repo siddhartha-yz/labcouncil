@@ -1,0 +1,14 @@
+{
+  "default_resource": "local",
+  "resources": [
+    {
+      "id": "local",
+      "label": "Trial",
+      "backend": "local_shell",
+      "workspace": "/home/yang-zhi/\u6587\u6863/ChatGPT/\u4e91\u7ec4\u4f1a/workspaces/internagents-trial/project",
+      "remote_url": "http://127.0.0.1:23492",
+      "remote_assistant_id": "agent",
+      "enabled": true
+    }
+  ]
+}

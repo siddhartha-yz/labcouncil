@@ -1,0 +1,211 @@
+{
+  "source_commit": "4a5f2ab2879ebd4f806155c796e247da94bb1625",
+  "records": [
+    {
+      "source": "workspaces/internagents-trial/submit.json",
+      "published": "states/submit.json",
+      "raw_sha256": "b63c0eaa1b4a459e37c1a28196b253bc272078f9572fd82f94325bf4d8a5799c",
+      "published_sha256": "89dce583414835652f3d947f745248f8000ecb5bbfaf021b81c4022ed5afff8a",
+      "transformation": "Redact key-like patterns and local workspace prefix; remove ANSI and trailing whitespace"
+    },
+    {
+      "source": "workspaces/internagents-trial/before-restart.json",
+      "published": "states/before-restart.json",
+      "raw_sha256": "1fa35c0d626dcbd01ed140c84faddf2d5eb2b83d9499b536345013846bd95ddf",
+      "published_sha256": "967ced1df251b08a610b9d6038613a99d7dc7ba2a5630e4022c5fb87ac8e5946",
+      "transformation": "Redact key-like patterns and local workspace prefix; remove ANSI and trailing whitespace"
+    },
+    {
+      "source": "workspaces/internagents-trial/after-pending-restart.json",
+      "published": "states/after-pending-restart.json",
+      "raw_sha256": "1fa35c0d626dcbd01ed140c84faddf2d5eb2b83d9499b536345013846bd95ddf",
+      "published_sha256": "967ced1df251b08a610b9d6038613a99d7dc7ba2a5630e4022c5fb87ac8e5946",
+      "transformation": "Redact key-like patterns and local workspace prefix; remove ANSI and trailing whitespace"
+    },
+    {
+      "source": "workspaces/internagents-trial/approve-read-decision.json",
+      "published": "states/approve-read-decision.json",
+      "raw_sha256": "1aceb8695969729e205b5b443c5ba2e310175aa1faeeeb980ba71b0f5208b2d2",
+      "published_sha256": "b048e22ce3edca761d882b62923efeab50c4ac49973146791914608e3d4917da",
+      "transformation": "Redact key-like patterns and local workspace prefix; remove ANSI and trailing whitespace"
+    },
+    {
+      "source": "workspaces/internagents-trial/resume-error-run.json",
+      "published": "states/resume-error-run.json",
+      "raw_sha256": "fcb887aeb04d50516e42410c7d0225daed9b330ab41fb1606346d4a927f49c3e",
+      "published_sha256": "fcb887aeb04d50516e42410c7d0225daed9b330ab41fb1606346d4a927f49c3e",
+      "transformation": "Redact key-like patterns and local workspace prefix; remove ANSI and trailing whitespace"
+    },
+    {
+      "source": "workspaces/internagents-trial/runtime-after-resume-error.json",
+      "published": "states/runtime-after-resume-error.json",
+      "raw_sha256": "21bf4da67eec849db90e2d62e369c3cb72be14908b7eb77c7ae7e06a30fb60bf",
+      "published_sha256": "7bc3d9d012a25e2a137444b4cfa48ebb03f171a10f68820c6109d0e8b5545ec6",
+      "transformation": "Redact key-like patterns and local workspace prefix; remove ANSI and trailing whitespace"
+    },
+    {
+      "source": "workspaces/internagents-trial/runtime-approve-write-decision.json",
+      "published": "states/runtime-approve-write-decision.json",
+      "raw_sha256": "bba0928adb9fbd580fc2da0a5f4554c0db316f361a8381d4e586d0d27a047fb1",
+      "published_sha256": "a421190d33b647754e59ddc01d9020c4b3b760fec0c6186871fb9404a56331e5",
+      "transformation": "Redact key-like patterns and local workspace prefix; remove ANSI and trailing whitespace"
+    },
+    {
+      "source": "workspaces/internagents-trial/runtime-proposed-execute.json",
+      "published": "states/runtime-proposed-execute.json",
+      "raw_sha256": "8bc2fccb4f43b4af2cb5c4f48c4452a139019a1d624763e867a96f63ea7975f2",
+      "published_sha256": "c5757502ef09d7582c43d2670b5b6ac057759921036fc19e19c43c147efa8e6b",
+      "transformation": "Redact key-like patterns and local workspace prefix; remove ANSI and trailing whitespace"
+    },
+    {
+      "source": "workspaces/internagents-trial/runtime-approve-execute-decision.json",
+      "published": "states/runtime-approve-execute-decision.json",
+      "raw_sha256": "51308a3c469950ab896a7ff46fc68038547f07cc0bd85a54d3dab2965bb27de0",
+      "published_sha256": "434a5654e723b31fd3f68aa9b9c362c40e90b572bab6b0fb505cfb416fe60f27",
+      "transformation": "Redact key-like patterns and local workspace prefix; remove ANSI and trailing whitespace"
+    },
+    {
+      "source": "workspaces/internagents-trial/runtime-proposed-report.json",
+      "published": "states/runtime-proposed-report.json",
+      "raw_sha256": "9ff00140043c060c81ded4e01b3121d985e958b5422fd68ee517a785b29bdb40",
+      "published_sha256": "818bfc87120896f16f6ac42342d54418987790fb7a1a6ba0a9eef3f7f1ac54ab",
+      "transformation": "Redact key-like patterns and local workspace prefix; remove ANSI and trailing whitespace"
+    },
+    {
+      "source": "workspaces/internagents-trial/runtime-approve-results-read-decision.json",
+      "published": "states/runtime-approve-results-read-decision.json",
+      "raw_sha256": "3d84d52e411db1ba93d7e609653330c2cd25bdb1a54c1452d9a6d1541792f18b",
+      "published_sha256": "2fd5e0b7d3553f6e0e77dc880e8f4d898207f6f15c0a6c38aaa52201d63ff0a2",
+      "transformation": "Redact key-like patterns and local workspace prefix; remove ANSI and trailing whitespace"
+    },
+    {
+      "source": "workspaces/internagents-trial/runtime-report-write.json",
+      "published": "states/runtime-report-write.json",
+      "raw_sha256": "bb049d1083e39b31373a24a167a0a6fe4da506a8009d95eebc15bd1fa43ea859",
+      "published_sha256": "3d6e963de61da5f5af34fb3d981c0210b5d5e3b90c2ac4a7d0802205b9c4f303",
+      "transformation": "Redact key-like patterns and local workspace prefix; remove ANSI and trailing whitespace"
+    },
+    {
+      "source": "workspaces/internagents-trial/runtime-approve-report-decision.json",
+      "published": "states/runtime-approve-report-decision.json",
+      "raw_sha256": "aee6695e40b9cefd6db21e7692284bfd9d0381005d6bd261ce82deb69dfc75d9",
+      "published_sha256": "6e7b26d3a1b6b5d2699b0a387849705ce2af55beadfd5139d53541556f2bb058",
+      "transformation": "Redact key-like patterns and local workspace prefix; remove ANSI and trailing whitespace"
+    },
+    {
+      "source": "workspaces/internagents-trial/runtime-complete.json",
+      "published": "states/runtime-complete.json",
+      "raw_sha256": "bac97ed29a510272fbe9c9bd60911963d85238c0da480d2b8080ad16e3aff79d",
+      "published_sha256": "93207773f4c35d0f432164c30fa6b5b109550ce60db2de2936e53906e0154082",
+      "transformation": "Redact key-like patterns and local workspace prefix; remove ANSI and trailing whitespace"
+    },
+    {
+      "source": "workspaces/internagents-trial/runtime-after-complete-restart.json",
+      "published": "states/runtime-after-complete-restart.json",
+      "raw_sha256": "bac97ed29a510272fbe9c9bd60911963d85238c0da480d2b8080ad16e3aff79d",
+      "published_sha256": "93207773f4c35d0f432164c30fa6b5b109550ce60db2de2936e53906e0154082",
+      "transformation": "Redact key-like patterns and local workspace prefix; remove ANSI and trailing whitespace"
+    },
+    {
+      "source": "workspaces/internagents-trial/budget.json",
+      "published": "states/budget.json",
+      "raw_sha256": "515d4e14b461f10e0ad4deedc331656fcc6c91c005c66021d144504fcdf820ed",
+      "published_sha256": "8860e22371edb46ef38785bd6f3f4a07d8d354e8a8d7ddc5bf515613ce07ac89",
+      "transformation": "Redact key-like patterns and local workspace prefix; remove ANSI and trailing whitespace"
+    },
+    {
+      "source": "workspaces/internagents-trial/budget-complete.json",
+      "published": "states/budget-complete.json",
+      "raw_sha256": "2723a7e0ce0532af303908d01e9f01ffce9fda9b8eaa6ac822e90ff480f76445",
+      "published_sha256": "876db508fd16cfabf58ccbea2817cf240bc019779f1833fdd176cbe055bf9615",
+      "transformation": "Redact key-like patterns and local workspace prefix; remove ANSI and trailing whitespace"
+    },
+    {
+      "source": "workspaces/internagents-trial/proxy-records.json",
+      "published": "states/proxy-records.json",
+      "raw_sha256": "78c94bd900153e202945b1904d61c82a56be2e8c733e66b08598cfcb01ef629a",
+      "published_sha256": "78c94bd900153e202945b1904d61c82a56be2e8c733e66b08598cfcb01ef629a",
+      "transformation": "Redact key-like patterns and local workspace prefix; remove ANSI and trailing whitespace"
+    },
+    {
+      "source": "workspaces/internagents-trial/config.json",
+      "published": "states/config.json",
+      "raw_sha256": "6738cca8ef0e3f7c8552ba5cc8df84f0b95620db5ed602c1aa0d428d620a6a48",
+      "published_sha256": "6738cca8ef0e3f7c8552ba5cc8df84f0b95620db5ed602c1aa0d428d620a6a48",
+      "transformation": "Redact key-like patterns and local workspace prefix; remove ANSI and trailing whitespace"
+    },
+    {
+      "source": "workspaces/internagents-trial/resources.json",
+      "published": "states/resources.json",
+      "raw_sha256": "e45ba52d237c1102208cb3b5c4a6eb5ed7ec84df78a8ab6622c4c666cff94caf",
+      "published_sha256": "e45ba52d237c1102208cb3b5c4a6eb5ed7ec84df78a8ab6622c4c666cff94caf",
+      "transformation": "Redact key-like patterns and local workspace prefix; remove ANSI and trailing whitespace"
+    },
+    {
+      "source": "workspaces/internagents-trial/completed-artifact-hashes.json",
+      "published": "states/completed-artifact-hashes.json",
+      "raw_sha256": "9db10875598890f5790c7e84eab7a80a2d3734d27d460b3a6692b9531f2f8c7f",
+      "published_sha256": "9db10875598890f5790c7e84eab7a80a2d3734d27d460b3a6692b9531f2f8c7f",
+      "transformation": "Redact key-like patterns and local workspace prefix; remove ANSI and trailing whitespace"
+    },
+    {
+      "published": "artifacts/compute.py",
+      "sha256": "075429bf1f705954555af39f8d3dd1e921a36faf6006f99a80d78d04ea94b606",
+      "transformation": "None; exact bytes"
+    },
+    {
+      "published": "artifacts/data.csv",
+      "sha256": "e0a94626d78e8adf6299de20b10c118b0c03fbbe2b1c472c2897159c32e75338",
+      "transformation": "None; exact bytes"
+    },
+    {
+      "published": "artifacts/result.json",
+      "sha256": "35e0a7a3972427b24db2abaf7084ca113833f98782bed2d89dac9ca5189fc861",
+      "transformation": "None; exact bytes"
+    },
+    {
+      "published": "artifacts/report.md",
+      "sha256": "3b8705ce2c3812b15cf39192da6d7267b716afd89e5565b84aea0d976a64c015",
+      "transformation": "None; exact bytes"
+    },
+    {
+      "source": "workspaces/upstreams/internagents/.internagents/logs/backend.log",
+      "published": "logs/backend.log",
+      "raw_sha256": "ce3898167f208c97b85b09d846fa0a7f25e97b9778c522ffd8f038b0f9e50531",
+      "published_sha256": "2e343de5f353791fc19f5679b358b2f0912e5e06046edcb737025ed6910b30fd",
+      "transformation": "Redact key-like patterns and local workspace prefix; remove ANSI and trailing whitespace"
+    },
+    {
+      "source": "workspaces/upstreams/internagents/.internagents/logs/local-runtime.log",
+      "published": "logs/local-runtime.log",
+      "raw_sha256": "1c091294a73221a31bacb961cc5800dfbe7c509d6287f9e66ca2612e5f16d9d3",
+      "published_sha256": "f62773d70dc0c873e822abc4ffc62c5f737733a4c5910ff7ea7478d4c66a6eea",
+      "transformation": "Redact key-like patterns and local workspace prefix; remove ANSI and trailing whitespace"
+    },
+    {
+      "source": "workspaces/upstreams/internagents/.internagents/logs/ui.log",
+      "published": "logs/ui.log",
+      "raw_sha256": "1a4e3571804dbdb7c0ccde32782494ce785ecd9ab4200046b1d84fa25cf19c77",
+      "published_sha256": "1a4e3571804dbdb7c0ccde32782494ce785ecd9ab4200046b1d84fa25cf19c77",
+      "transformation": "Redact key-like patterns and local workspace prefix; remove ANSI and trailing whitespace"
+    },
+    {
+      "source": "workspaces/internagents-trial/launcher.log",
+      "published": "logs/launcher.log",
+      "raw_sha256": "e50df972fd5fbd2e0ce97ce0e8b632fa68089c93fd1475f65d56f3fc0a85f525",
+      "published_sha256": "dc55b89b0f85cf1a0c2a2f0e6f52973360f2b11e521d0e5b600f7f3484f67936",
+      "transformation": "Redact key-like patterns and local workspace prefix; remove ANSI and trailing whitespace"
+    },
+    {
+      "source": "workspaces/internagents-trial/proposed-compute.json",
+      "published": "states/proposed-compute.json",
+      "raw_sha256": "cc8f867eab9d287aac2630a0a3b61bb05f533ba4d5ff7e4c72cb219903d12569",
+      "published_sha256": "c24c3fe52203f8d8c77731c675143f5566813fc632fb7a5b0aceed27de8a8a59",
+      "transformation": "Replace workspace prefix"
+    }
+  ],
+  "harness_files": {
+    "internagents_trial_host.py": "cf62487be7ff5af5db8cb6f718a1d7254d299d891a09ef93006b70e3faecc210",
+    "check_internagents_session.py": "1e8b691958614c07c4d2febf4e7296f530787647b5ca625c33ca6eac314517c3"
+  }
+}

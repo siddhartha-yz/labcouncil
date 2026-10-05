@@ -1,0 +1,154 @@
+{
+  "values": {
+    "messages": [
+      {
+        "content": "这是合成预算验收。请仅回复收到，不调用任何工具，不改变目标状态；保持 active，以便检查宿主是否按预算停止下一轮。",
+        "additional_kwargs": {},
+        "response_metadata": {},
+        "type": "human",
+        "name": null,
+        "id": "0270430b-e3fc-430d-a8ce-4db64828b22e"
+      },
+      {
+        "content": "收到",
+        "additional_kwargs": {
+          "invalid_tool_calls": [],
+          "usage_metadata": {
+            "input_tokens": 8768,
+            "output_tokens": 1,
+            "total_tokens": 8769,
+            "input_token_details": {
+              "cache_read": 2304
+            },
+            "output_token_details": {}
+          },
+          "refusal": null
+        },
+        "response_metadata": {
+          "token_usage": {
+            "completion_tokens": 1,
+            "prompt_tokens": 8768,
+            "total_tokens": 8769,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cache_write_tokens": null,
+              "cached_tokens": 2304,
+              "image_tokens": null,
+              "text_tokens": null
+            },
+            "prompt_cache_hit_tokens": 2304,
+            "prompt_cache_miss_tokens": 6464
+          },
+          "model_provider": "openai",
+          "model_name": "deepseek-flash",
+          "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+          "id": "4acdea2d-ad84-436a-bdd0-fd44dd2a6214",
+          "finish_reason": "stop",
+          "logprobs": null
+        },
+        "type": "ai",
+        "name": null,
+        "id": "lc_run--01a10e0c-8f73-7321-bf79-146dd254303b-0",
+        "tool_calls": [],
+        "invalid_tool_calls": [],
+        "usage_metadata": null
+      },
+      {
+        "content": "收到。目标状态保持 active，未调用任何工具。",
+        "additional_kwargs": {
+          "invalid_tool_calls": [],
+          "usage_metadata": {
+            "input_tokens": 8772,
+            "output_tokens": 12,
+            "total_tokens": 8784,
+            "input_token_details": {
+              "cache_read": 2304
+            },
+            "output_token_details": {}
+          },
+          "refusal": null
+        },
+        "response_metadata": {
+          "token_usage": {
+            "completion_tokens": 12,
+            "prompt_tokens": 8772,
+            "total_tokens": 8784,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cache_write_tokens": null,
+              "cached_tokens": 2304,
+              "image_tokens": null,
+              "text_tokens": null
+            },
+            "prompt_cache_hit_tokens": 2304,
+            "prompt_cache_miss_tokens": 6468
+          },
+          "model_provider": "openai",
+          "model_name": "deepseek-flash",
+          "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+          "id": "bd07d164-6079-4082-a8f5-09490ee5c6a5",
+          "finish_reason": "stop",
+          "logprobs": null
+        },
+        "type": "ai",
+        "name": null,
+        "id": "lc_run--01a10e0c-9541-74f1-8957-e6212710e08d-0",
+        "tool_calls": [],
+        "invalid_tool_calls": [],
+        "usage_metadata": null
+      }
+    ],
+    "files": {},
+    "goal": {
+      "id": "0984e94d-fd4a-4349-9840-dc48cc48afae",
+      "threadId": "01a10e0c-8a01-7c62-9717-01afdeaba47e",
+      "objective": "预算边界验收固定状态",
+      "status": "active",
+      "tokenBudget": 1,
+      "tokensUsed": 0,
+      "timeUsedSeconds": 0,
+      "createdAt": 1791237065,
+      "updatedAt": 1791237065
+    },
+    "goalContinuationTurns": 2
+  },
+  "next": [],
+  "tasks": [],
+  "metadata": {
+    "internagents_workspace_path": "<workspace>/workspaces/internagents-trial/project",
+    "graph_id": "agent_local",
+    "assistant_id": "f6506f75-a235-5263-a597-20e7a960d835",
+    "user_id": "",
+    "created_by": "system",
+    "trial": "labcouncil",
+    "run_attempt": 1,
+    "langgraph_version": "1.2.13",
+    "langgraph_api_version": "0.15.1",
+    "langgraph_plan": "enterprise",
+    "langgraph_host": "self-hosted",
+    "langgraph_api_url": "http://127.0.0.1:23491",
+    "run_id": "01a10e0c-8a02-75e2-a627-fea83ef69e89",
+    "thread_id": "01a10e0c-8a01-7c62-9717-01afdeaba47e",
+    "source": "loop",
+    "step": 2,
+    "parents": {},
+    "langgraph_auth_user_id": "",
+    "langgraph_request_id": "bce47c6f-ad9b-425f-84a3-07b0c5f6ab11"
+  },
+  "created_at": "2026-10-05T21:51:09.422834+00:00",
+  "checkpoint": {
+    "checkpoint_id": "1f1c106d-fd1c-69c7-8002-dbc0418f5c1d",
+    "thread_id": "01a10e0c-8a01-7c62-9717-01afdeaba47e",
+    "checkpoint_ns": ""
+  },
+  "parent_checkpoint": {
+    "checkpoint_id": "1f1c106d-e7f2-6f64-8001-b4f8781b4a7c",
+    "thread_id": "01a10e0c-8a01-7c62-9717-01afdeaba47e",
+    "checkpoint_ns": ""
+  },
+  "interrupts": [],
+  "checkpoint_id": "1f1c106d-fd1c-69c7-8002-dbc0418f5c1d",
+  "parent_checkpoint_id": "1f1c106d-e7f2-6f64-8001-b4f8781b4a7c"
+}
