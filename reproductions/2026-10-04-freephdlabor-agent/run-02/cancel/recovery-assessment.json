@@ -1,0 +1,26 @@
+{
+  "restore": {
+    "task": null,
+    "executor_variables": [
+      "__name__"
+    ],
+    "step_types": [
+      "TaskStep",
+      "ActionStep",
+      "ActionStep",
+      "ActionStep"
+    ],
+    "full_steps": {
+      "usable": false,
+      "error_type": "AttributeError",
+      "message": "'dict' object has no attribute 'dict'"
+    },
+    "messages": {
+      "usable": true,
+      "count": 11
+    }
+  },
+  "restore_stdout": "",
+  "api_calls": 0,
+  "incremental_backup_entries": 0
+}

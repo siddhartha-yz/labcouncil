@@ -1,0 +1,22 @@
+{
+  "restore": {
+    "task": null,
+    "executor_variables": [
+      "__name__"
+    ],
+    "step_types": [
+      "TaskStep"
+    ],
+    "full_steps": {
+      "usable": true,
+      "count": 1
+    },
+    "messages": {
+      "usable": true,
+      "count": 2
+    }
+  },
+  "restore_stdout": "",
+  "api_calls": 0,
+  "incremental_backup_entries": 1
+}

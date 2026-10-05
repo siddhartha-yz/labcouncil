@@ -1,0 +1,6 @@
+{
+  "script_sha256": "278b42f9bbe5cfca0d1819ff7369fecc58b90fed47d9f90be7795f5a42682b8f",
+  "base_runner_sha256": "f717311adea722df50dfa755febe03e9aa2988595b986caa74e1e2972da7bee2",
+  "source_initial": "reproductions/2026-10-04-freephdlabor-agent/run-01",
+  "changes": "Separate serializers; fresh-process continuation; incremental-backup crash; real TCP disconnection."
+}

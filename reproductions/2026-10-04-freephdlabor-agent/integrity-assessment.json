@@ -1,0 +1,56 @@
+{
+  "checks": [
+    {
+      "case": "no_input",
+      "file": "probe/probe_memory.jsonl",
+      "copied_memory_unchanged": true
+    },
+    {
+      "case": "no_input",
+      "file": "tool-calls.json",
+      "copied_memory_unchanged": null
+    },
+    {
+      "case": "modify",
+      "file": "probe/probe_memory.jsonl",
+      "copied_memory_unchanged": true
+    },
+    {
+      "case": "modify",
+      "file": "tool-calls.json",
+      "copied_memory_unchanged": null
+    },
+    {
+      "case": "new_task",
+      "file": "probe/probe_memory.jsonl",
+      "copied_memory_unchanged": true
+    },
+    {
+      "case": "new_task",
+      "file": "tool-calls.json",
+      "copied_memory_unchanged": null
+    },
+    {
+      "case": "cancel",
+      "file": "probe/probe_memory.jsonl",
+      "copied_memory_unchanged": true
+    },
+    {
+      "case": "cancel",
+      "file": "tool-calls.json",
+      "copied_memory_unchanged": null
+    },
+    {
+      "case": "crash",
+      "file": "probe/probe_memory.jsonl",
+      "copied_memory_unchanged": true
+    },
+    {
+      "case": "crash",
+      "file": "tool-calls.json",
+      "copied_memory_unchanged": null
+    }
+  ],
+  "configured_key_absent": true,
+  "raw_runs_preserved": true
+}

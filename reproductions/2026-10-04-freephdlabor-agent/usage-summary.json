@@ -1,0 +1,12 @@
+{
+  "attempts": 20,
+  "responses": 20,
+  "usage": {
+    "completion_tokens": 1194,
+    "prompt_tokens": 45592,
+    "total_tokens": 46786,
+    "prompt_cache_hit_tokens": 39168,
+    "prompt_cache_miss_tokens": 6424
+  },
+  "copied_initial_events_excluded": true
+}

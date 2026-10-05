@@ -1,0 +1,55 @@
+{
+  "upstream_commit": "8a3a4fd9ccc0cd297bd523751e03bc9527c91832",
+  "source_before": {
+    "src/virtual_lab/__about__.py": "ee7c4c21871d1e18ced76102d7a10b0f8a0a3f1145aa123317cc112ddc9336bc",
+    "src/virtual_lab/__init__.py": "3f642d1467de91d3d2b73d60c336d993c3d385d8d23518ca2f04b8dfe1e9300c",
+    "src/virtual_lab/agent.py": "14d9b64e1677814eb66bdf6e55f5da27e7012461ccf7421de9ff125805d682b2",
+    "src/virtual_lab/constants.py": "180dd7f0ae76bf3855d8a28d7170be6766763b058b9cad23f1e098b24ab84128",
+    "src/virtual_lab/prompts.py": "7342e951c2b5b302c71402ab1c12b46908d6c9cff3425690dfd9eb24acd7e5fb",
+    "src/virtual_lab/run_meeting.py": "12ab88a0cf3ee06b424a90f53869b007ce21e06d29f83d9303f5a0bc3598c14c",
+    "src/virtual_lab/utils.py": "d2eb6c63ab76ceb562bf984f6489b8eebcef4f547bc63320f0927222929b3704"
+  },
+  "script_sha256": "91361fc6fbf61f249c7165b87b98da4f71ecaeefeb0857afb8a2ecd63c6b6094",
+  "evidence_sha256": "a93086070fea4af906a0bfe230c2377a894b5d6f6a01ee6eedda7e6ec1769d66",
+  "human_confirmed": false,
+  "request_limit": 4,
+  "status": "mechanical_checks_passed",
+  "checks": [
+    {
+      "meeting": "individual-1",
+      "speakers": [
+        "Researcher",
+        "Scientific Critic",
+        "Researcher"
+      ],
+      "saved_summary_equal": true,
+      "critique_id_preserved": true,
+      "manual_semantic_review_required": true
+    },
+    {
+      "meeting": "individual-2",
+      "speakers": [
+        "Researcher"
+      ],
+      "saved_summary_equal": true,
+      "critique_id_preserved": true,
+      "manual_semantic_review_required": true
+    }
+  ],
+  "api_calls": 4,
+  "usage": {
+    "prompt_tokens": 2759,
+    "completion_tokens": 1009,
+    "total_tokens": 3768
+  },
+  "source_after": {
+    "src/virtual_lab/__about__.py": "ee7c4c21871d1e18ced76102d7a10b0f8a0a3f1145aa123317cc112ddc9336bc",
+    "src/virtual_lab/__init__.py": "3f642d1467de91d3d2b73d60c336d993c3d385d8d23518ca2f04b8dfe1e9300c",
+    "src/virtual_lab/agent.py": "14d9b64e1677814eb66bdf6e55f5da27e7012461ccf7421de9ff125805d682b2",
+    "src/virtual_lab/constants.py": "180dd7f0ae76bf3855d8a28d7170be6766763b058b9cad23f1e098b24ab84128",
+    "src/virtual_lab/prompts.py": "7342e951c2b5b302c71402ab1c12b46908d6c9cff3425690dfd9eb24acd7e5fb",
+    "src/virtual_lab/run_meeting.py": "12ab88a0cf3ee06b424a90f53869b007ce21e06d29f83d9303f5a0bc3598c14c",
+    "src/virtual_lab/utils.py": "d2eb6c63ab76ceb562bf984f6489b8eebcef4f547bc63320f0927222929b3704"
+  },
+  "source_unchanged": true
+}

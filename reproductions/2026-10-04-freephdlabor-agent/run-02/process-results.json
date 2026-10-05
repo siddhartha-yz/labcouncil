@@ -1,0 +1,43 @@
+[
+  {
+    "directory": "no_input",
+    "mode": "continue",
+    "exit_code": 0
+  },
+  {
+    "directory": "modify",
+    "mode": "audit",
+    "exit_code": 0
+  },
+  {
+    "directory": "new_task",
+    "mode": "audit",
+    "exit_code": 0
+  },
+  {
+    "directory": "cancel",
+    "mode": "audit",
+    "exit_code": 0
+  },
+  {
+    "directory": "crash",
+    "mode": "continue",
+    "exit_code": 0
+  },
+  {
+    "directory": "backup_crash",
+    "mode": "backup_crash",
+    "exit_code": 73
+  },
+  {
+    "directory": "backup_crash",
+    "mode": "audit",
+    "exit_code": 0
+  },
+  {
+    "directory": "disconnect",
+    "mode": "disconnect",
+    "timeout_seconds": 8,
+    "inside_callback": true
+  }
+]

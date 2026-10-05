@@ -58,3 +58,5 @@ callback 返回、记忆被追加、模型执行了新任务和完整系统恢�
 补充记录：[DeepSeek Flash 两轮自有工作流验证](../reproductions/2026-10-04-deepseek-workflow/REPORT.md)。其中的模型失败、验收实现修正、网络超时与恢复均保留；该检查不代替上游框架或论文复现。
 
 [Virtual Lab 固定上游会议函数验证](../reproductions/2026-10-04-virtual-lab-meeting/REPORT.md) 使用真实源码入口和改变后的模型条件；保留格式失败和离线重新验收。其可用性证据仅限于被测会议功能，当前决定暂不直接作为平台后端。
+
+[freephdlabor 真实基础 agent、TCP 与恢复记录](../reproductions/2026-10-04-freephdlabor-agent/REPORT.md) 已补齐有限功能测试，并保留恢复类型、重复执行、输入断开负结果。Virtual Lab 一对一来源传递通过机械检查，但发现错误的跨 seed 基线建议；见其报告补充。两者仍暂不直接采用为持续平台后端。

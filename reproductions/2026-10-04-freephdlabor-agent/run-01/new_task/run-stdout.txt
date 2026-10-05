@@ -1,0 +1,19 @@
+[Info] Awaiting user input on 127.0.0.1:42335
+[Info] Connect from another terminal:  nc 127.0.0.1 42335
+[Info] Connected: ('127.0.0.1', 37642)
+[Info] Input connection closed: ('127.0.0.1', 37642)
+
+🛑 Interrupt received — pausing for user instruction...
+
+============================================================
+📝 WAITING FOR USER INSTRUCTION
+============================================================
+--- PROVIDE INSTRUCTION (leave empty to cancel) ---
+>>> Type your instruction. Press Enter twice to finish.
+
+
+Is this a 'modification' to the current task or a 'new' task? (m/n)
+
+✅ New user task appended to memory.
+✅ Resuming...
+

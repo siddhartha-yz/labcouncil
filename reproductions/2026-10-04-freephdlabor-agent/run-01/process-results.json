@@ -1,0 +1,52 @@
+[
+  {
+    "case": "no_input",
+    "mode": "run",
+    "exit_code": 0
+  },
+  {
+    "case": "no_input",
+    "mode": "resume",
+    "exit_code": 0
+  },
+  {
+    "case": "modify",
+    "mode": "run",
+    "exit_code": 0
+  },
+  {
+    "case": "modify",
+    "mode": "resume",
+    "exit_code": 0
+  },
+  {
+    "case": "new_task",
+    "mode": "run",
+    "exit_code": 0
+  },
+  {
+    "case": "new_task",
+    "mode": "resume",
+    "exit_code": 0
+  },
+  {
+    "case": "cancel",
+    "mode": "run",
+    "exit_code": 0
+  },
+  {
+    "case": "cancel",
+    "mode": "resume",
+    "exit_code": 0
+  },
+  {
+    "case": "crash",
+    "mode": "run",
+    "exit_code": 73
+  },
+  {
+    "case": "crash",
+    "mode": "resume",
+    "exit_code": 0
+  }
+]

@@ -1,0 +1,49 @@
+{
+  "case": "no_input",
+  "calls": [
+    {
+      "call": 1,
+      "predictor": "linear",
+      "mse": 0.0,
+      "y": [
+        1,
+        3,
+        5,
+        7,
+        9
+      ],
+      "predictions": [
+        1,
+        3,
+        5,
+        7,
+        9
+      ]
+    },
+    {
+      "call": 2,
+      "predictor": "linear",
+      "mse": 0.0,
+      "y": [
+        1,
+        3,
+        5,
+        7,
+        9
+      ],
+      "predictions": [
+        1,
+        3,
+        5,
+        7,
+        9
+      ]
+    }
+  ],
+  "attempts": 3,
+  "answer": "Linear predictor MSE = 0.0 (perfect fit).",
+  "error": null,
+  "expected_next_predictor": "linear",
+  "next_tool_matches": true,
+  "checkpoint_in_executor": true
+}

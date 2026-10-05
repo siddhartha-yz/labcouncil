@@ -1,0 +1,18 @@
+{
+  "task": null,
+  "state_keys": [],
+  "executor_state_keys": [
+    "__name__"
+  ],
+  "step_types": [
+    "TaskStep",
+    "ActionStep",
+    "ActionStep",
+    "ActionStep"
+  ],
+  "memory_usable": false,
+  "memory_error": {
+    "type": "AttributeError",
+    "message": "'dict' object has no attribute 'dict'"
+  }
+}

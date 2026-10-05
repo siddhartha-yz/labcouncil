@@ -1,0 +1,46 @@
+{
+  "exit": 73,
+  "state": {
+    "task": "Set checkpoint_value = 37. Call evaluate(\"linear\") in your first separate action. Do not finish or import anything in that action.",
+    "executor_variables": [
+      "__name__",
+      "_operations_count",
+      "_print_outputs",
+      "checkpoint_value",
+      "result"
+    ],
+    "step_types": [
+      "TaskStep"
+    ],
+    "full_steps": {
+      "usable": true,
+      "count": 1
+    },
+    "messages": {
+      "usable": true,
+      "count": 2
+    }
+  },
+  "current_action_type": "ActionStep",
+  "calls": [
+    {
+      "call": 1,
+      "predictor": "linear",
+      "mse": 0.0,
+      "y": [
+        1,
+        3,
+        5,
+        7,
+        9
+      ],
+      "predictions": [
+        1,
+        3,
+        5,
+        7,
+        9
+      ]
+    }
+  ]
+}

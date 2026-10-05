@@ -1,0 +1,13 @@
+{
+  "exit": 73,
+  "step_type": "ActionStep",
+  "task": "FIXED_TASK_LINEAR: First separate action set checkpoint_value = 37 and call evaluate(\"linear\"). Do not call final_answer in that first action. On the following action, follow any additional user instruction; otherwise call evaluate(\"linear\") again. After the second evaluation return a short final_answer. Do not import anything. Keep actions separate so step callbacks can execute.",
+  "state_keys": [],
+  "executor_state_keys": [
+    "__name__",
+    "_operations_count",
+    "_print_outputs",
+    "checkpoint_value",
+    "result"
+  ]
+}

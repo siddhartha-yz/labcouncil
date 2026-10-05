@@ -1,0 +1,7 @@
+[Info] Awaiting user input on 127.0.0.1:40927
+[Info] Connect from another terminal:  nc 127.0.0.1 40927
+[Info] Awaiting user input on 127.0.0.1:46475
+[Info] Connect from another terminal:  nc 127.0.0.1 46475
+[Info] Connected: ('127.0.0.1', 36864)
+[Info] Input connection closed: ('127.0.0.1', 36864)
+TCP_DISCONNECTED_CALLBACK_STARTED

@@ -1,0 +1,17 @@
+[Info] Awaiting user input on 127.0.0.1:40373
+[Info] Connect from another terminal:  nc 127.0.0.1 40373
+[Info] Connected: ('127.0.0.1', 57200)
+[Info] Input connection closed: ('127.0.0.1', 57200)
+
+🛑 Interrupt received — pausing for user instruction...
+
+============================================================
+📝 WAITING FOR USER INSTRUCTION
+============================================================
+--- PROVIDE INSTRUCTION (leave empty to cancel) ---
+>>> Type your instruction. Press Enter twice to finish.
+
+
+ℹ️ No instruction provided. Resuming without change.
+✅ Resuming...
+

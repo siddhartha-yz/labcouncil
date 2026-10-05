@@ -1,0 +1,11 @@
+{
+  "agenda": "Critically assess the recorded evidence and specify the next validation plan.",
+  "contexts": [
+    "Source artifact reproductions/2026-10-04-deepseek-workflow/runs/run-01/artifacts/experiment-0001/experiment.json; SHA256 a93086070fea4af906a0bfe230c2377a894b5d6f6a01ee6eedda7e6ec1769d66. Source-specific critique SOURCE_CRITIQUE_SEED7: one clean seed=7 MSE does not establish robustness across seeds or outliers. Future trials are planned, not executed. Recorded evidence: {\"evidence_id\": \"experiment-0001\", \"parameters\": {\"task_version\": 1, \"seeds\": [7], \"outlier_fraction\": 0.0, \"metrics\": [\"mse\"]}, \"results\": [{\"seed\": 7, \"metrics\": {\"mse\": {\"linear\": 0.17046895861013783, \"baseline\": 12.888358499556563}}}], \"files\": [{\"seed\": 7, \"path\": \"artifacts/experiment-0001/seed-7.csv\", \"sha256\": \"e4290b5282bc234e71995130f77dcadaf353169324fe07ef70de87618e8e1e49\"}]}"
+  ],
+  "summaries": [],
+  "agenda_rules": [
+    "Keep under 180 words. Preserve source ID SOURCE_CRITIQUE_SEED7 in the final summary and next meeting. Explicitly label seeds 7,19,31 with outliers as planned, not executed. Preserve the observed MSE values. Use the upstream Markdown summary format. Do not claim human approval or new experimental results."
+  ],
+  "num_rounds": 1
+}

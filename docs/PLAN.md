@@ -124,6 +124,8 @@ Agent Runtime Adapter 提供运行、事件读取、干预、取消和恢复接�
 - [x] 固定 Virtual Lab 与 freephdlabor 的代码 commit，记录环境预检与失败尝试。
 - [x] 使用 DeepSeek Flash 完成自有受控工具工作流验证，记录真实模型失败、程序修订和固定评审输入的影响；见 [工作流记录](../reproductions/2026-10-04-deepseek-workflow/REPORT.md)。这不代替下列上游最小示例或科研结果复现。
 - [x] 使用固定上游 Virtual Lab 会议入口，验证两场会议编排、保存、摘要读入与计划变化，保留格式失败和修订；[记录与暂不采用决定](../reproductions/2026-10-04-virtual-lab-meeting/REPORT.md)。模型条件已改变，未复现论文结论。
+- [x] 运行真实 freephdlabor 基础 agent 与 TCP 干预，检查独立进程恢复、原增量备份、异常退出和重复实验；[记录与暂不采用决定](../reproductions/2026-10-04-freephdlabor-agent/REPORT.md)。未运行完整官方 launcher。
+- [x] 补齐 Virtual Lab 一对一来源质疑传递，并由 Codex 逐句复核识别不正确的跨 seed 固定基线建议；机械通过不等于科研方法正确。
 - [ ] 核对论文对应的代码、模型与数据版本，登记可检验的主张。
 - [ ] 运行官方最小示例，检查会议、干预、证据保存和恢复。
 - [ ] 在相同条件的小规模任务上比较基线，记录重复运行、人工时间和费用。

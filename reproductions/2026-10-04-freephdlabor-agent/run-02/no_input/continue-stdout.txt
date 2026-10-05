@@ -1,0 +1,2 @@
+[Info] Awaiting user input on 127.0.0.1:51251
+[Info] Connect from another terminal:  nc 127.0.0.1 51251

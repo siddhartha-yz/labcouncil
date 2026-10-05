@@ -1,0 +1,49 @@
+{
+  "case": "modify",
+  "calls": [
+    {
+      "call": 1,
+      "predictor": "linear",
+      "mse": 0.0,
+      "y": [
+        1,
+        3,
+        5,
+        7,
+        9
+      ],
+      "predictions": [
+        1,
+        3,
+        5,
+        7,
+        9
+      ]
+    },
+    {
+      "call": 2,
+      "predictor": "baseline",
+      "mse": 8.0,
+      "y": [
+        1,
+        3,
+        5,
+        7,
+        9
+      ],
+      "predictions": [
+        5,
+        5,
+        5,
+        5,
+        5
+      ]
+    }
+  ],
+  "attempts": 3,
+  "answer": "Linear MSE=0.0; baseline MSE=8.0. Linear performed better.",
+  "error": null,
+  "expected_next_predictor": "baseline",
+  "next_tool_matches": true,
+  "checkpoint_in_executor": true
+}
