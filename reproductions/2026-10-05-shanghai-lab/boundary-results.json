@@ -1,0 +1,100 @@
+{
+  "date": "2026-10-05",
+  "method": "Unchanged AST function bodies; explicit standard-library dependencies; no full framework import",
+  "pins": {
+    "internagent": "fa8c3eedfa9751d3752ea6eb49220b303ac2397d",
+    "internagents": "4a5f2ab2879ebd4f806155c796e247da94bb1625"
+  },
+  "api_calls": 0,
+  "installed_dependencies": 0,
+  "source_files": [
+    {
+      "path": "workspaces/upstreams/internagent/launch_discovery.py",
+      "sha256": "08342fb30fff3cbd4140f3d5718b4d5784a97382b2552cc560d6804aaf73e037",
+      "functions": {
+        "load_resume_state": {
+          "start": 439,
+          "end": 518
+        },
+        "_scan_completed_rounds": {
+          "start": 521,
+          "end": 561
+        }
+      }
+    },
+    {
+      "path": "workspaces/upstreams/internagents/internagents/agent_graph.py",
+      "sha256": "c5f2b125ee2ba3d1a19be92932f06365d0b80e13ded7588046a196ff379ef32f",
+      "functions": {
+        "_goal_status": {
+          "start": 1271,
+          "end": 1274
+        },
+        "_goal_continuation_turns": {
+          "start": 1277,
+          "end": 1284
+        },
+        "_should_continue_goal": {
+          "start": 1299,
+          "end": 1307
+        }
+      }
+    }
+  ],
+  "resume_probe": {
+    "fixture": "One session, two ideas, only idea_a has run_0/final_info.json; no discovery_summary.json",
+    "partial_completed_rounds": 1,
+    "no_results_completed_rounds": 0
+  },
+  "goal_probe": [
+    {
+      "input": {
+        "goal": {
+          "status": "active",
+          "tokenBudget": 100,
+          "tokensUsed": 100
+        },
+        "goalContinuationTurns": 0
+      },
+      "max_turns": 50,
+      "continue": true
+    },
+    {
+      "input": {
+        "goal": {
+          "status": "active",
+          "tokenBudget": 100,
+          "tokensUsed": 0
+        },
+        "goalContinuationTurns": 0
+      },
+      "max_turns": 50,
+      "continue": true
+    },
+    {
+      "input": {
+        "goal": {
+          "status": "complete",
+          "tokenBudget": 100,
+          "tokensUsed": 100
+        },
+        "goalContinuationTurns": 0
+      },
+      "max_turns": 50,
+      "continue": false
+    },
+    {
+      "input": {
+        "goal": {
+          "status": "active",
+          "tokenBudget": 100,
+          "tokensUsed": 100
+        },
+        "goalContinuationTurns": 50
+      },
+      "max_turns": 50,
+      "continue": false
+    }
+  ],
+  "limits": "Function-level probes only. No UI, model, GPU, SSH, SCP, process-restart or scientific-result reproduction."
+}

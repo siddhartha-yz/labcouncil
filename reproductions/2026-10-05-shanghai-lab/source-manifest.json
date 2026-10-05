@@ -1,0 +1,118 @@
+{
+  "date": "2026-10-05",
+  "git_blob_bytes_verified": true,
+  "files": [
+    {
+      "repository": "InternScience/InternAgent",
+      "commit": "fa8c3eedfa9751d3752ea6eb49220b303ac2397d",
+      "path": "README.md",
+      "sha256": "9bba3bdcc37ac1fe9abe919f4c7b29206676e32cd369cf7710cb3bae223ffc0b",
+      "url": "https://github.com/InternScience/InternAgent/blob/fa8c3eedfa9751d3752ea6eb49220b303ac2397d/README.md"
+    },
+    {
+      "repository": "InternScience/InternAgent",
+      "commit": "fa8c3eedfa9751d3752ea6eb49220b303ac2397d",
+      "path": "LICENSE",
+      "sha256": "6d6d3566c161620206afed12b511798eb003e2dbd88bcd8f434fa58de7ab017f",
+      "url": "https://github.com/InternScience/InternAgent/blob/fa8c3eedfa9751d3752ea6eb49220b303ac2397d/LICENSE"
+    },
+    {
+      "repository": "InternScience/InternAgent",
+      "commit": "fa8c3eedfa9751d3752ea6eb49220b303ac2397d",
+      "path": "config/default_config.yaml",
+      "sha256": "63afd68d6dcce84825a3b9837439e754c0ca398a63236a927e5f4dd0fb76d87f",
+      "url": "https://github.com/InternScience/InternAgent/blob/fa8c3eedfa9751d3752ea6eb49220b303ac2397d/config/default_config.yaml"
+    },
+    {
+      "repository": "InternScience/InternAgent",
+      "commit": "fa8c3eedfa9751d3752ea6eb49220b303ac2397d",
+      "path": "docs/memory_module.md",
+      "sha256": "77bfc963460ab2b506a53dcc67c533ce33cf9231e50138a7ec681820c5e444f6",
+      "url": "https://github.com/InternScience/InternAgent/blob/fa8c3eedfa9751d3752ea6eb49220b303ac2397d/docs/memory_module.md"
+    },
+    {
+      "repository": "InternScience/InternAgent",
+      "commit": "fa8c3eedfa9751d3752ea6eb49220b303ac2397d",
+      "path": "docs/openrouter.md",
+      "sha256": "0e3cdd99e518ce023c1d50a2d035557cfa114a6ce41bb1e127d0b865a3ef7b41",
+      "url": "https://github.com/InternScience/InternAgent/blob/fa8c3eedfa9751d3752ea6eb49220b303ac2397d/docs/openrouter.md"
+    },
+    {
+      "repository": "InternScience/InternAgent",
+      "commit": "fa8c3eedfa9751d3752ea6eb49220b303ac2397d",
+      "path": "launch_discovery.py",
+      "sha256": "08342fb30fff3cbd4140f3d5718b4d5784a97382b2552cc560d6804aaf73e037",
+      "url": "https://github.com/InternScience/InternAgent/blob/fa8c3eedfa9751d3752ea6eb49220b303ac2397d/launch_discovery.py"
+    },
+    {
+      "repository": "InternScience/InternAgent",
+      "commit": "fa8c3eedfa9751d3752ea6eb49220b303ac2397d",
+      "path": "internagent/mas/models/openai_model.py",
+      "sha256": "462d0dde7250525616520bd838690ee56fa2950fd82cc6f0138658656f4dc764",
+      "url": "https://github.com/InternScience/InternAgent/blob/fa8c3eedfa9751d3752ea6eb49220b303ac2397d/internagent/mas/models/openai_model.py"
+    },
+    {
+      "repository": "InternScience/InternAgent",
+      "commit": "fa8c3eedfa9751d3752ea6eb49220b303ac2397d",
+      "path": "internagent/experiments_utils_claude.py",
+      "sha256": "1acb1659ebab168b573fdcec0acc66f647b1694931186f104c22f9b1030b22f5",
+      "url": "https://github.com/InternScience/InternAgent/blob/fa8c3eedfa9751d3752ea6eb49220b303ac2397d/internagent/experiments_utils_claude.py"
+    },
+    {
+      "repository": "qzzqzzb/OpenClaudeScience",
+      "commit": "4a5f2ab2879ebd4f806155c796e247da94bb1625",
+      "path": "README.md",
+      "sha256": "0dbe792e7e35a82b902f550d886588e5f02455f428462a1f606f3a0a841935fa",
+      "url": "https://github.com/qzzqzzb/OpenClaudeScience/blob/4a5f2ab2879ebd4f806155c796e247da94bb1625/README.md"
+    },
+    {
+      "repository": "qzzqzzb/OpenClaudeScience",
+      "commit": "4a5f2ab2879ebd4f806155c796e247da94bb1625",
+      "path": "LICENSE",
+      "sha256": "f756cca8fc2a4ce8ab225636f3df3eae7f2f638f4df82447f01224d6a24a97cb",
+      "url": "https://github.com/qzzqzzb/OpenClaudeScience/blob/4a5f2ab2879ebd4f806155c796e247da94bb1625/LICENSE"
+    },
+    {
+      "repository": "qzzqzzb/OpenClaudeScience",
+      "commit": "4a5f2ab2879ebd4f806155c796e247da94bb1625",
+      "path": "AGENTS.md",
+      "sha256": "dc2f53eae87fb700879f4a151ec95884ad7b95cc625f4eb17709dc5d67c0fc7c",
+      "url": "https://github.com/qzzqzzb/OpenClaudeScience/blob/4a5f2ab2879ebd4f806155c796e247da94bb1625/AGENTS.md"
+    },
+    {
+      "repository": "qzzqzzb/OpenClaudeScience",
+      "commit": "4a5f2ab2879ebd4f806155c796e247da94bb1625",
+      "path": "pyproject.toml",
+      "sha256": "75732a93e1a19eb362911055384eb82391e1658dd65814077973d9c768c05acd",
+      "url": "https://github.com/qzzqzzb/OpenClaudeScience/blob/4a5f2ab2879ebd4f806155c796e247da94bb1625/pyproject.toml"
+    },
+    {
+      "repository": "qzzqzzb/OpenClaudeScience",
+      "commit": "4a5f2ab2879ebd4f806155c796e247da94bb1625",
+      "path": "internagents/agent_graph.py",
+      "sha256": "c5f2b125ee2ba3d1a19be92932f06365d0b80e13ded7588046a196ff379ef32f",
+      "url": "https://github.com/qzzqzzb/OpenClaudeScience/blob/4a5f2ab2879ebd4f806155c796e247da94bb1625/internagents/agent_graph.py"
+    },
+    {
+      "repository": "qzzqzzb/OpenClaudeScience",
+      "commit": "4a5f2ab2879ebd4f806155c796e247da94bb1625",
+      "path": "internagents/goal_state.py",
+      "sha256": "1a3d0d63798f5dafda8a35938d968006bc3a8349f3b012eaf6566b8040a3834b",
+      "url": "https://github.com/qzzqzzb/OpenClaudeScience/blob/4a5f2ab2879ebd4f806155c796e247da94bb1625/internagents/goal_state.py"
+    },
+    {
+      "repository": "qzzqzzb/OpenClaudeScience",
+      "commit": "4a5f2ab2879ebd4f806155c796e247da94bb1625",
+      "path": "internagents/goal_middleware.py",
+      "sha256": "a1baef41b566d07712bb4bb9b9623e145b759b82e86eb038e70d1e36c47aa846",
+      "url": "https://github.com/qzzqzzb/OpenClaudeScience/blob/4a5f2ab2879ebd4f806155c796e247da94bb1625/internagents/goal_middleware.py"
+    },
+    {
+      "repository": "qzzqzzb/OpenClaudeScience",
+      "commit": "4a5f2ab2879ebd4f806155c796e247da94bb1625",
+      "path": "ui/src/app/hooks/useChat.ts",
+      "sha256": "8b47aa7967a5024cadaad51904747f11f1c612cf6073ae09eec9c2b78dad7cc8",
+      "url": "https://github.com/qzzqzzb/OpenClaudeScience/blob/4a5f2ab2879ebd4f806155c796e247da94bb1625/ui/src/app/hooks/useChat.ts"
+    }
+  ]
+}

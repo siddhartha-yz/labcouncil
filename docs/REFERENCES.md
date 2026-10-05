@@ -68,6 +68,8 @@ agent 修改训练代码，按固定五分钟训练预算执行，用验证指�
 
 ## 本项目的候选验证顺序
 
+新增上海 AI Lab 候选：[书生·端砚 / Intern-Discovery](https://discovery-home.intern-ai.org.cn/tabs/home/index.html?embedded=1&v=20260827-home143)、[InternAgent 1.5 源码](https://github.com/InternScience/InternAgent) 与[技术报告](https://arxiv.org/abs/2602.08990)、[InternAgentS 工作台源码](https://github.com/qzzqzzb/OpenClaudeScience)、[SCP 源码](https://github.com/InternScience/scp) 与[论文](https://arxiv.org/abs/2512.24189)。[2026-10-05 检查记录](../reproductions/2026-10-05-shanghai-lab/REPORT.md) 区分云端产品、工作台、执行框架与工具协议，并保留两项零 API 的原函数边界检查。InternAgentS 优先做最小启动和审批恢复验收；其余按实际任务需要评估。本轮不是论文结果复现。
+
 1. 固定 Virtual Lab 版本，运行最小真实会议，检查讨论与产物。
 2. 固定 freephdlabor 版本，验证干预、记忆保存、重启恢复与失败处理。
 3. 在明确指标的任务上验证 autoresearch 式实验循环，并保留基线和全部失败。

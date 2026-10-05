@@ -2,6 +2,8 @@
 
 日期：2026-10-05。现阶段不把 Virtual Lab 或 freephdlabor 整套接入平台。
 
+上海 AI Lab 的 InternAgentS 工作台、InternAgent 1.5 实验模块及 SCP 工具生态已加入候选。[本轮检查](../reproductions/2026-10-05-shanghai-lab/REPORT.md) 固定了两个源码版本，并运行了恢复扫描和目标续跑的局部边界检查。优先验证 InternAgentS 的 DeepSeek Flash 接入、审批、重启恢复与预算停止；尚未采用或完成端到端复现。
+
 ## 我们实际确认了什么
 
 - 新版 Virtual Lab 能编排真实模型讨论、保存记录、读回上次摘要。它也会把错误的实验建议带到下一次讨论，不能靠“有批评角色”保证方法正确。旧版1.1.0走 Assistants 路径，当前 DeepSeek 接口返回404；新旧版本的结论分开。
