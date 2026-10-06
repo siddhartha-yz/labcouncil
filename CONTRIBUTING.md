@@ -1,6 +1,6 @@
 # Contributing
 
-LabCouncil has a standard-library local simulation prototype. Start with [the project plan](docs/PLAN.md) and [running instructions](docs/RUNNING.md).
+LabCouncil has a standard-library local meeting platform with default simulation and an opt-in real-model synthetic case. Start with [the project plan](docs/PLAN.md) and [running instructions](docs/RUNNING.md).
 
 Useful early contributions include a concrete computational research use case, an evaluation protocol, a meeting interface proposal, or a small runtime integration experiment.
 

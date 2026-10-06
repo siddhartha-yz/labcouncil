@@ -1,0 +1,46 @@
+{
+  "source": "actual loopback HTTP and actual owned-service stop/start",
+  "duplicate_confirm_same_decision": true,
+  "duplicate_confirm_new_tasks": 0,
+  "exhausted_qa_http_status": 409,
+  "exhausted_qa_error": "真实模型请求次数预算已用完；不会自动重试",
+  "extra_model_requests": 0,
+  "actual_stop": {
+    "stopped": {
+      "serve": true,
+      "worker": true
+    },
+    "database_retained": true
+  },
+  "actual_start": {
+    "url": "http://127.0.0.1:8865",
+    "default_mode": "simulation",
+    "supports_real_case": true,
+    "services": {
+      "serve": {
+        "pid": 65396,
+        "command": "serve",
+        "instance": "16318a942f634fb3bec41a3870e5d94f",
+        "database": "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/complete-case/state.sqlite3",
+        "created": 1791281792.3311102,
+        "port": 8865,
+        "running": true
+      },
+      "worker": {
+        "pid": 65401,
+        "command": "worker",
+        "instance": "75111906ccd74cc695dbd0ad2a643478",
+        "database": "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/complete-case/state.sqlite3",
+        "created": 1791281792.3831513,
+        "running": true
+      }
+    }
+  },
+  "entire_project_state_equal_after_restart": true,
+  "project_state_sha256": "503b9a165cdf5ab77cf85c132b8a8f01b550f1ecc0e8acf36f8e01a5dba8af9d",
+  "model_requests_preserved": 13,
+  "artifacts_preserved": 6,
+  "meetings_preserved": 2,
+  "tool_operation_links_verified": 3,
+  "request_links_verified": 13
+}

@@ -1,0 +1,84 @@
+{
+  "source": "offline recomputation of actual saved synthetic data",
+  "rows": [
+    {
+      "version": 1,
+      "seed": 7,
+      "metrics": {
+        "linear": {
+          "mse": 0.1704689586101377,
+          "mae": 0.31271792820150335,
+          "median_absolute_error": 0.2408423803545101
+        },
+        "baseline": {
+          "mse": 12.888358499556563,
+          "mae": 3.0910699422731613,
+          "median_absolute_error": 3.1412061139149094
+        }
+      },
+      "outlier_count": 0,
+      "recomputed": true
+    },
+    {
+      "version": 2,
+      "seed": 7,
+      "metrics": {
+        "linear": {
+          "mse": 10.15567041903633,
+          "mae": 1.2783887001074266,
+          "median_absolute_error": 0.2711382071999348
+        },
+        "baseline": {
+          "mse": 23.951894598705934,
+          "mae": 3.866588615503053,
+          "median_absolute_error": 3.5262360242088477
+        }
+      },
+      "outlier_count": 10,
+      "recomputed": true
+    },
+    {
+      "version": 2,
+      "seed": 19,
+      "metrics": {
+        "linear": {
+          "mse": 10.271588316845678,
+          "mae": 1.282535409023489,
+          "median_absolute_error": 0.2817988812709308
+        },
+        "baseline": {
+          "mse": 19.705700590219234,
+          "mae": 3.5847470742208656,
+          "median_absolute_error": 3.0843445557618776
+        }
+      },
+      "outlier_count": 10,
+      "recomputed": true
+    },
+    {
+      "version": 2,
+      "seed": 31,
+      "metrics": {
+        "linear": {
+          "mse": 10.212571668611693,
+          "mae": 1.2471163775439722,
+          "median_absolute_error": 0.21018718335695707
+        },
+        "baseline": {
+          "mse": 20.61376480434217,
+          "mae": 3.571814067026869,
+          "median_absolute_error": 3.0392012138461078
+        }
+      },
+      "outlier_count": 10,
+      "recomputed": true
+    }
+  ],
+  "seed7_training_unchanged": true,
+  "seed7_exactly_ten_test_labels_changed": true,
+  "artifact_hashes_verified": 6,
+  "actual_requests": 13,
+  "known_total_tokens": 9801,
+  "unknown_usage_requests": 0,
+  "semantic_report_validation": "FAILED: second-round executor and reviewer misdescribe outlier data as clean; manually inspected, not covered by arithmetic assertions"
+}

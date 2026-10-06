@@ -1,7 +1,8 @@
 """Linux local service lifecycle with owned-process checks and durable state.
 
 This starts two detached processes, never an OS login/startup service. No model
-credentials are inherited. The database is retained when services stop.
+credentials are inherited; opt-in case mode reads the ignored local .env.
+The database is retained when services stop.
 """
 from contextlib import contextmanager
 import fcntl
@@ -133,5 +134,5 @@ def start(database, port):
             for record in reversed(created):
                 stop_process(record)
             raise
-        return {"url":f"http://127.0.0.1:{port}","simulation":True,
+        return {"url":f"http://127.0.0.1:{port}","default_mode":"simulation","supports_real_case":True,
                 "services":{command:{**record,"running":owned(record)} for command,record in records.items()}}

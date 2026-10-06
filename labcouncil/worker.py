@@ -10,10 +10,15 @@ def step(store):
     if task is None:
         return False
     try:
-        body = execute(store, task)
+        if task["mode"]=="real_case":
+            from .case import execute as execute_case
+            body=execute_case(store,task)
+        else:
+            body = execute(store, task)
         store.complete(task, body)
     except Conflict:
         # A newer lease owns recovery. Never let this stale worker fail its task.
+        if task["mode"]=="real_case":store.fail(task,"真实任务冲突或额度用完；不自动重发，请查看调用记录")
         return True
     except Exception as error:
         store.fail(task, error)

@@ -87,6 +87,26 @@ CREATE TABLE IF NOT EXISTS events (
  id INTEGER PRIMARY KEY, project_id TEXT NOT NULL REFERENCES projects(id),
  kind TEXT NOT NULL, body TEXT NOT NULL, created REAL NOT NULL
 );
+CREATE TABLE IF NOT EXISTS project_execution (
+ project_id TEXT PRIMARY KEY REFERENCES projects(id), mode TEXT NOT NULL,
+ api_budget INTEGER NOT NULL, qa_api_budget INTEGER NOT NULL
+);
+CREATE TABLE IF NOT EXISTS model_requests (
+ id TEXT PRIMARY KEY, project_id TEXT NOT NULL REFERENCES projects(id),
+ task_id TEXT REFERENCES tasks(id), meeting_id TEXT REFERENCES meetings(id),
+ category TEXT NOT NULL, phase TEXT NOT NULL, status TEXT NOT NULL,
+ request TEXT NOT NULL, response TEXT, usage TEXT, http_status INTEGER,
+ error TEXT, elapsed REAL, created REAL NOT NULL, finished REAL
+);
+CREATE TABLE IF NOT EXISTS tool_operations (
+ id TEXT PRIMARY KEY, project_id TEXT NOT NULL REFERENCES projects(id),
+ task_id TEXT NOT NULL UNIQUE REFERENCES tasks(id), body TEXT NOT NULL,
+ sha256 TEXT NOT NULL, created REAL NOT NULL
+);
+CREATE TRIGGER IF NOT EXISTS operation_no_update BEFORE UPDATE ON tool_operations
+ BEGIN SELECT RAISE(ABORT,'Tool results are immutable'); END;
+CREATE TRIGGER IF NOT EXISTS operation_no_delete BEFORE DELETE ON tool_operations
+ BEGIN SELECT RAISE(ABORT,'Tool results are immutable'); END;
 CREATE TRIGGER IF NOT EXISTS artifact_no_update BEFORE UPDATE ON artifacts
  BEGIN SELECT RAISE(ABORT,'Evidence is immutable'); END;
 CREATE TRIGGER IF NOT EXISTS artifact_no_delete BEFORE DELETE ON artifacts
@@ -140,9 +160,13 @@ class Store:
                         (identifier, project_id, version, role, direction, selected, previous, "queued", time.time()))
             previous = identifier
 
-    def create_project(self, title, idea, selected="clean", budget=9, qa_budget=6, meeting_at=None):
+    def create_project(self, title, idea, selected="clean", budget=9, qa_budget=6, meeting_at=None,
+                       mode="simulation", api_budget=18, qa_api_budget=3):
         title, idea = text(title, "项目名称", 120), text(idea, "研究想法")
         selected, budget, qa_budget = scenario(selected), quota(budget), quota(qa_budget)
+        if mode not in ("simulation", "real_case"):
+            raise ValueError("运行模式无效")
+        api_budget, qa_api_budget = quota(api_budget), quota(qa_api_budget)
         if meeting_at is not None and (type(meeting_at) not in (int, float) or not 0 < meeting_at < 4102444800):
             raise ValueError("组会时间无效")
         identifier = uuid.uuid4().hex
@@ -150,22 +174,31 @@ class Store:
             con.execute("INSERT INTO projects(id,title,idea,version,scenario,budget,qa_budget,meeting_at,created) VALUES(?,?,?,?,?,?,?,?,?)",
                         (identifier, title, idea, 1, selected, budget, qa_budget, meeting_at, time.time()))
             self.add_round(con, identifier, 1, idea, selected)
-            self.event(con, identifier, "project_created", {"simulation": True})
+            con.execute("INSERT INTO project_execution VALUES(?,?,?,?)",(identifier,mode,api_budget if mode=="real_case" else 0,qa_api_budget if mode=="real_case" else 0))
+            self.event(con, identifier, "project_created", {"simulation": mode=="simulation"})
         return identifier
 
     def projects(self):
         with self.connection() as con:
-            return [dict(r) for r in con.execute("SELECT * FROM projects ORDER BY created DESC")]
+            return [dict(r) for r in con.execute("SELECT p.*,COALESCE(e.mode,'simulation') AS mode FROM projects p LEFT JOIN project_execution e ON e.project_id=p.id ORDER BY p.created DESC")]
 
     def project(self, identifier):
         with self.connection() as con:
             result = self.row(con, "projects", identifier)
-            for table in ("tasks", "artifacts", "meetings", "decisions", "events"):
+            for table in ("tasks", "artifacts", "meetings", "decisions", "events", "tool_operations"):
                 result[table] = [dict(r) for r in con.execute(f"SELECT * FROM {table} WHERE project_id=? ORDER BY created", (identifier,))]
             for artifact in result["artifacts"]:
                 artifact["body"] = json.loads(artifact["body"])
             for meeting in result["meetings"]:
                 meeting["snapshot"] = json.loads(meeting["snapshot"])
+            for operation in result["tool_operations"]:
+                operation["body"]=json.loads(operation["body"])
+            execution = con.execute("SELECT * FROM project_execution WHERE project_id=?",(identifier,)).fetchone()
+            result["execution"] = dict(execution) if execution else {"mode":"simulation","api_budget":0,"qa_api_budget":0}
+            result["model_requests"] = [dict(r) for r in con.execute("SELECT * FROM model_requests WHERE project_id=? ORDER BY created",(identifier,))]
+            for request in result["model_requests"]:
+                for key in ("request","response","usage"):
+                    if request[key] is not None:request[key]=json.loads(request[key])
             return result
 
     def configure(self, identifier, paused, budget, qa_budget, meeting_at=None):
@@ -187,9 +220,13 @@ class Store:
             expired = con.execute("SELECT * FROM tasks WHERE status='running' AND lease_until<=?", (now,)).fetchall()
             for old in expired:
                 p = self.row(con, "projects", old["project_id"])
-                new_status = "cancelled" if old["version"] != p["version"] else ("failed" if old["attempts"] >= 3 else "queued")
+                execution=con.execute("SELECT mode FROM project_execution WHERE project_id=?",(p["id"],)).fetchone()
+                real=execution and execution["mode"]=="real_case"
+                new_status = "cancelled" if old["version"] != p["version"] else ("failed" if real or old["attempts"] >= 3 else "queued")
                 con.execute("UPDATE tasks SET status=?,owner=NULL,lease_until=NULL,error=? WHERE id=?",
-                            (new_status, "运行中断，租约过期；仅模拟任务可安全重算", old["id"]))
+                            (new_status, "真实调用中断，结果可能未知；不会自动重发" if real else "运行中断，租约过期；仅模拟任务可安全重算", old["id"]))
+                if real:
+                    con.execute("UPDATE model_requests SET status='unknown',error='worker lease expired' WHERE task_id=? AND status='started'",(old["id"],))
                 self.event(con, p["id"], "lease_expired", {"task_id": old["id"], "status": new_status})
             rows = con.execute("""SELECT t.* FROM tasks t JOIN projects p ON p.id=t.project_id
                 LEFT JOIN tasks d ON d.id=t.dependency
@@ -200,13 +237,15 @@ class Store:
             if not rows:
                 return None
             task = dict(rows[0])
+            execution=con.execute("SELECT mode FROM project_execution WHERE project_id=?",(task["project_id"],)).fetchone()
+            mode=execution["mode"] if execution else "simulation"
             owner = uuid.uuid4().hex
             if not task["charged"]:
                 con.execute("UPDATE projects SET used=used+1 WHERE id=?", (task["project_id"],))
             con.execute("UPDATE tasks SET status='running',charged=1,attempts=attempts+1,owner=?,lease_until=?,error=NULL WHERE id=?",
-                        (owner, now+lease_seconds, task["id"]))
+                        (owner, now+(180 if mode=="real_case" else lease_seconds), task["id"]))
             self.event(con, task["project_id"], "task_started", {"task_id": task["id"], "attempt": task["attempts"]+1})
-            return self.row(con, "tasks", task["id"])
+            return {**self.row(con, "tasks", task["id"]),"mode":mode}
 
     def dependency_artifact(self, task):
         if not task["dependency"]:
@@ -265,7 +304,8 @@ class Store:
         artifacts = [dict(r) for r in con.execute("SELECT * FROM artifacts WHERE project_id=? AND version=? ORDER BY created", (project_id, p["version"]))]
         for a in artifacts:
             a["body"] = json.loads(a["body"])
-        snapshot = {"simulation": True, "cutoff": time.time(), "idea": p["idea"], "scenario": p["scenario"], "tasks": tasks, "artifacts": artifacts,
+        execution=con.execute("SELECT mode FROM project_execution WHERE project_id=?",(project_id,)).fetchone()
+        snapshot = {"simulation": not execution or execution["mode"]=="simulation", "cutoff": time.time(), "idea": p["idea"], "scenario": p["scenario"], "tasks": tasks, "artifacts": artifacts,
                     "notice": "这是开会时的固定快照。之后完成的任务请在项目最新进度中查看。"}
         identifier = uuid.uuid4().hex
         con.execute("INSERT INTO meetings VALUES(?,?,?,?,?,?)", (identifier, project_id, p["version"], encode(snapshot), "in_review", time.time()))
@@ -310,6 +350,10 @@ class Store:
 
     def ask(self, meeting_id, question):
         question = text(question, "问题", 1000)
+        meeting=self.meeting(meeting_id)
+        if not meeting["snapshot"]["simulation"]:
+            from .case import answer_meeting
+            return answer_meeting(self,meeting_id,question)
         with self.connection(write=True) as con:
             meeting = self.row(con, "meetings", meeting_id)
             if meeting["status"] == "closed":
@@ -335,6 +379,68 @@ class Store:
             con.execute("UPDATE projects SET qa_used=qa_used+1 WHERE id=?", (p["id"],))
             self.event(con, p["id"], "meeting_question", {"meeting_id": meeting_id})
             return answer
+
+    def reserve_request(self, project_id, category, phase, payload, task=None, meeting_id=None):
+        if category not in ("background","qa"):
+            raise ValueError("调用类别无效")
+        identifier=uuid.uuid4().hex
+        with self.connection(write=True) as con:
+            p=self.row(con,"projects",project_id)
+            execution=con.execute("SELECT * FROM project_execution WHERE project_id=?",(project_id,)).fetchone()
+            if not execution or execution["mode"]!="real_case":raise Conflict("模拟项目不能调用真实模型")
+            count=con.execute("SELECT COUNT(*) FROM model_requests WHERE project_id=? AND category=?",(project_id,category)).fetchone()[0]
+            if count>=execution["api_budget" if category=="background" else "qa_api_budget"]:
+                raise Conflict("真实模型请求次数预算已用完；不会自动重试")
+            if task:
+                current=self.row(con,"tasks",task["id"])
+                if current["status"]!="running" or current["owner"]!=task["owner"] or current["lease_until"]<=time.time():
+                    raise Conflict("任务已不由当前 worker 持有")
+                if current["version"]!=p["version"]:raise Conflict("计划已更新，停止旧任务后续模型请求")
+            if category=="qa":
+                m=self.row(con,"meetings",meeting_id)
+                if m["project_id"]!=project_id or m["status"]=="closed":raise Conflict("组会已经结束")
+                if p["qa_used"]>=p["qa_budget"]:raise Conflict("组会问答次数已用完")
+                con.execute("UPDATE projects SET qa_used=qa_used+1 WHERE id=?",(project_id,))
+            con.execute("INSERT INTO model_requests(id,project_id,task_id,meeting_id,category,phase,status,request,created) VALUES(?,?,?,?,?,?,'started',?,?)",
+                (identifier,project_id,task["id"] if task else None,meeting_id,category,phase,encode(payload),time.time()))
+            self.event(con,project_id,"model_request_reserved",{"request_id":identifier,"category":category})
+        return identifier
+
+    def finish_request(self, identifier, response=None, http_status=None, error=None, elapsed=None):
+        with self.connection(write=True) as con:
+            self.row(con,"model_requests",identifier)
+            usage=response.get("usage") if isinstance(response,dict) else None
+            con.execute("UPDATE model_requests SET status=?,response=?,usage=?,http_status=?,error=?,elapsed=?,finished=? WHERE id=?",
+                ("error" if error else "completed",encode(response) if response is not None else None,encode(usage) if usage is not None else None,http_status,error,elapsed,time.time(),identifier))
+
+    def request_record(self, identifier):
+        with self.connection() as con:
+            result=self.row(con,"model_requests",identifier)
+            for key in ("request","response","usage"):
+                if result[key] is not None:result[key]=json.loads(result[key])
+            return result
+
+    def save_operation(self, task, body):
+        canonical=encode(body)
+        with self.connection(write=True) as con:
+            current=self.row(con,"tasks",task["id"])
+            if current["status"]!="running" or current["owner"]!=task["owner"] or current["lease_until"]<=time.time():
+                raise Conflict("旧 worker 不能保存工具操作")
+            con.execute("INSERT INTO tool_operations VALUES(?,?,?,?,?,?)",(task["id"],task["project_id"],task["id"],canonical,hashlib.sha256(canonical.encode()).hexdigest(),time.time()))
+            self.event(con,task["project_id"],"tool_result_saved",{"operation_id":task["id"]})
+
+    def operation_record(self, identifier):
+        with self.connection() as con:
+            result=self.row(con,"tool_operations",identifier)
+            if hashlib.sha256(result["body"].encode()).hexdigest()!=result["sha256"]:raise Conflict("工具结果哈希不一致")
+            result["body"]=json.loads(result["body"])
+            return result
+
+    def append_real_answer(self, meeting_id, question, answer):
+        with self.connection(write=True) as con:
+            m=self.row(con,"meetings",meeting_id)
+            con.execute("INSERT INTO discussion VALUES(?,?,?,?,?)",(uuid.uuid4().hex,meeting_id,question,answer,time.time()))
+            self.event(con,m["project_id"],"meeting_question",{"meeting_id":meeting_id,"source":"deepseek-flash"})
 
     def confirm(self, meeting_id, expected_version, instruction, selected):
         instruction, selected = text(instruction, "下一轮方向"), scenario(selected)

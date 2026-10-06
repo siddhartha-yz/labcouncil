@@ -27,3 +27,5 @@
 新增的 [InternAgent](../reproductions/2026-10-06-internagent-autodebug/REPORT.md) 基线和后端短连接、[SCP](../reproductions/2026-10-06-scp-minimal/REPORT.md) 自有小工具调用通过。两者保持可选组件候选，不作为已经验证的整套研究后端，也不为 M1 增加不必要的依赖。
 
 详细证据：[规则](REPRODUCTION.md)、[历史版本](../reproductions/2026-10-04-source-mapping/REPORT.md)、[Virtual Lab](../reproductions/2026-10-04-virtual-lab-meeting/REPORT.md)、[freephdlabor](../reproductions/2026-10-04-freephdlabor-agent/REPORT.md)、[等预算比较](../reproductions/2026-10-05-comparison/REPORT.md)。
+
+新增 [平台完整合成案例](../reproductions/2026-10-06-complete-case/REPORT.md)：实际 Flash 与自有受控工具完成两轮及组会确认循环，数值复算通过，但计算、复核报告错误地把异常点数据称为干净数据。这支持采用明确的状态、额度和工具证据管理，不能支持“多角色复核能保证报告正确”的主张。未额外采用上游后端；报告上下文修订只经离线检查，尚待新的有预算实际验证。

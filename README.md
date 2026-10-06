@@ -4,7 +4,7 @@
 
 LabCouncil is an open-source prototype for personal research groups made up of AI agents and a human researcher. Submit an idea, let agents investigate and produce evidence, meet on a schedule to review their reports, and turn your decisions into the next round of work.
 
-**Status: M1 local simulation prototype, with separate upstream validation records.** The application now supports two-round background work, evidence, meeting questions, saved drafts and confirmed decisions. Its three roles and answers are deterministic simulations; real research tools remain M2 work.
+**Status: local meeting platform with a tested two-round synthetic case.** Default mode is a deterministic simulation. Opt-in real-case mode uses DeepSeek Flash for tool requests, reports and meeting questions, with saved data and independent arithmetic checks. General research tools remain M2 work. The actual case exposed incorrect model descriptions of the input, even when numerical verification passed; see the [complete case record](reproductions/2026-10-06-complete-case/REPORT.md).
 
 ## Try the local meeting
 
@@ -16,7 +16,7 @@ python3 -m labcouncil start
 
 Open [http://127.0.0.1:8765](http://127.0.0.1:8765). Create a project, review the three reports, ask a question and confirm the next round. No API key is needed for this simulation. It does not implement arbitrary ideas as experiments.
 
-[运行说明](docs/RUNNING.md) includes stop/restart, budgets and limitations. [M1 acceptance record](reproductions/2026-10-06-m1-prototype/REPORT.md) includes actual browser checks and durable synthetic evidence.
+[运行说明](docs/RUNNING.md) includes stop/restart, budgets and limitations. [M1 acceptance record](reproductions/2026-10-06-m1-prototype/REPORT.md) includes actual browser checks and durable synthetic evidence. Choose “真实 Flash：合成研究案例” to use the ignored local `.env` configuration. This makes potentially billable requests: defaults are 12 background attempts and 1 meeting attempt, with no retries; token and monetary hard budgets are not implemented. The [complete case record](reproductions/2026-10-06-complete-case/REPORT.md) preserves 13 actual responses, two rounds, the review fixture, restart checks and report errors.
 
 ## The research loop
 
@@ -46,7 +46,7 @@ The initial focus is computational research that can be checked through document
 ## Documents
 
 - [实施计划 / Project plan](docs/PLAN.md): scope, architecture, milestones, and acceptance criteria.
-- [本地运行 / Running](docs/RUNNING.md): start the simulation and understand its limits.
+- [本地运行 / Running](docs/RUNNING.md): start the platform, select simulation or real case, and understand its limits.
 - [持续工作清单](docs/WORKLIST.md): all candidates, remaining validation, and the platform delivery sequence.
 - [研究参考 / Research references](docs/REFERENCES.md): relevant repositories, papers, results, and limitations.
 - [复现与采用规则 / Reproduction](docs/REPRODUCTION.md): evidence levels, validation gates, and experiment records.
@@ -56,7 +56,7 @@ The initial focus is computational research that can be checked through document
 
 ## 中文简介
 
-LabCouncil 已有可运行的本地模拟组会原型，正在向个人虚拟研究组平台推进。你提供 idea；agent 团队开展调研和实验，保存结果与证据；你定期开组会、追问并评审；确认后的决定变成下一轮任务，agent 会后继续工作。
+LabCouncil 已有本地组会平台，完成了真实 Flash 参与的两轮合成案例；默认模拟模式仍可无 key 使用。正在向个人虚拟研究组平台推进。你提供 idea；agent 团队开展调研和实验，保存结果与证据；你定期开组会、追问并评审；确认后的决定变成下一轮任务，agent 会后继续工作。
 
 核心目标是验证：**人工组会能否让 agent 的下一轮工作更符合研究意图，并持续产出可检查的新证据。**
 
@@ -93,7 +93,7 @@ python3 reproductions/check_deepseek_workflow.py first --output-dir logs/my-work
 python3 reproductions/check_deepseek_workflow.py continue --output-dir logs/my-workflow
 ```
 
-Use a fresh directory and configure the local `.env`. Each experiment has a shared limit of 12 API request attempts; requests may be billable. This harness is separate from the M1 simulation UI and its limited scheduling/recovery. Arbitrary code execution and real-model platform integration are not implemented.
+Use a fresh directory and configure the local `.env`. Each experiment has a shared limit of 12 API request attempts; requests may be billable. This harness is separate from the M1 simulation UI and its limited scheduling/recovery. Arbitrary code execution is not implemented. Real-model platform integration is separately recorded in the [complete case](reproductions/2026-10-06-complete-case/REPORT.md).
 
 ## Pinned upstream meeting check
 

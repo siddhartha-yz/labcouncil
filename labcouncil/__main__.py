@@ -8,7 +8,7 @@ from .web import make_server
 
 
 def main():
-    parser = argparse.ArgumentParser(description="LabCouncil 本地模拟组会原型；不读取 API key")
+    parser = argparse.ArgumentParser(description="LabCouncil 本地组会；默认模拟，真实合成案例模式使用本地 DeepSeek key")
     parser.add_argument("command", choices=["serve", "worker", "demo", "start", "status", "stop"])
     parser.add_argument("--database", default="workspaces/labcouncil/state.sqlite3")
     parser.add_argument("--port", type=int, default=8765)
@@ -41,7 +41,7 @@ def main():
     else:
         with make_server(store, args.port, args.instance_id) as server:
             signal.signal(signal.SIGTERM, lambda *_: threading.Thread(target=server.shutdown,daemon=True).start())
-            print(f"模拟组会界面：http://127.0.0.1:{server.server_address[1]}（另开 worker 才会执行任务）", flush=True)
+            print(f"组会界面：http://127.0.0.1:{server.server_address[1]}（默认模拟；另开 worker 才会执行任务）", flush=True)
             try:
                 server.serve_forever()
             except KeyboardInterrupt:

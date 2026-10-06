@@ -33,9 +33,9 @@ def handler(store):
             path = urlsplit(self.path).path
             try:
                 if path == "/api/health":
-                    return self.send(200, {"ok": True, "simulation": True, "instance_id": self.server.instance_id})
+                    return self.send(200, {"ok": True, "default_mode":"simulation","supports_real_case":True, "instance_id": self.server.instance_id})
                 if path == "/api/projects":
-                    return self.send(200, {"projects": store.projects(), "simulation": True})
+                    return self.send(200, {"projects": store.projects(), "default_mode":"simulation"})
                 parts = path.strip("/").split("/")
                 if len(parts) == 3 and parts[:2] == ["api", "projects"]:
                     return self.send(200, store.project(parts[2]))
@@ -44,6 +44,10 @@ def handler(store):
                 if len(parts) == 3 and parts[:2] == ["api", "evidence"]:
                     a = store.artifact(parts[2])
                     return self.send(200, {**a, "body": json.loads(a["body"]), "hash_format": "UTF-8 JSON, sort_keys=True, ensure_ascii=False, separators=(',',':'), allow_nan=False"})
+                if len(parts)==3 and parts[:2]==["api","model-requests"]:
+                    return self.send(200,store.request_record(parts[2]))
+                if len(parts)==3 and parts[:2]==["api","tool-operations"]:
+                    return self.send(200,store.operation_record(parts[2]))
                 files = {"/": ("index.html", "text/html; charset=utf-8"), "/app.js": ("app.js", "text/javascript; charset=utf-8"), "/style.css": ("style.css", "text/css; charset=utf-8")}
                 if path in files:
                     filename, mime = files[path]
@@ -70,7 +74,7 @@ def handler(store):
                     raise ValueError("需要 JSON 对象")
                 path = urlsplit(self.path).path.strip("/").split("/")
                 if path == ["api", "projects"]:
-                    identifier = store.create_project(body.get("title"), body.get("idea"), body.get("scenario", "clean"), body.get("budget", 9), body.get("qa_budget", 6), body.get("meeting_at"))
+                    identifier = store.create_project(body.get("title"), body.get("idea"), body.get("scenario", "clean"), body.get("budget", 9), body.get("qa_budget", 6), body.get("meeting_at"),body.get("mode","simulation"),body.get("api_budget",18),body.get("qa_api_budget",3))
                     return self.send(201, {"id": identifier})
                 if len(path) == 4 and path[:2] == ["api", "projects"]:
                     if path[3] == "meeting":
