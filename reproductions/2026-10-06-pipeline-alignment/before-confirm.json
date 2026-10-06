@@ -1,0 +1,806 @@
+{
+  "project": {
+    "id": "bdd2290081d64e63bd3940d1d4eac0f9",
+    "title": "【工程演示】比较拟合直线与只猜均值，检查异常点对误差的影响。",
+    "idea": "【工程演示】比较拟合直线与只猜均值，检查异常点对误差的影响。",
+    "version": 1,
+    "scenario": "clean",
+    "budget": 9,
+    "used": 3,
+    "qa_budget": 6,
+    "qa_used": 1,
+    "paused": 0,
+    "meeting_at": null,
+    "created": 1791283529.6923325,
+    "tasks": [
+      {
+        "id": "ea34558be25640428322a4bc3eba01a4",
+        "project_id": "bdd2290081d64e63bd3940d1d4eac0f9",
+        "version": 1,
+        "role": "researcher",
+        "instruction": "【工程演示】比较拟合直线与只猜均值，检查异常点对误差的影响。",
+        "scenario": "clean",
+        "dependency": null,
+        "status": "completed",
+        "attempts": 1,
+        "charged": 1,
+        "owner": null,
+        "lease_until": null,
+        "created": 1791283529.6928308,
+        "finished": 1791283530.3286107,
+        "error": null
+      },
+      {
+        "id": "f0d5024740b345b8a6227da428a805d5",
+        "project_id": "bdd2290081d64e63bd3940d1d4eac0f9",
+        "version": 1,
+        "role": "executor",
+        "instruction": "【工程演示】比较拟合直线与只猜均值，检查异常点对误差的影响。",
+        "scenario": "clean",
+        "dependency": "ea34558be25640428322a4bc3eba01a4",
+        "status": "completed",
+        "attempts": 1,
+        "charged": 1,
+        "owner": null,
+        "lease_until": null,
+        "created": 1791283529.6928678,
+        "finished": 1791283530.3332424,
+        "error": null
+      },
+      {
+        "id": "3795026185a94efaaebc9d914df28527",
+        "project_id": "bdd2290081d64e63bd3940d1d4eac0f9",
+        "version": 1,
+        "role": "reviewer",
+        "instruction": "【工程演示】比较拟合直线与只猜均值，检查异常点对误差的影响。",
+        "scenario": "clean",
+        "dependency": "f0d5024740b345b8a6227da428a805d5",
+        "status": "completed",
+        "attempts": 1,
+        "charged": 1,
+        "owner": null,
+        "lease_until": null,
+        "created": 1791283529.6928751,
+        "finished": 1791283530.3380888,
+        "error": null
+      }
+    ],
+    "artifacts": [
+      {
+        "id": "6409891d98cd489fb0a67421d66b8255",
+        "task_id": "ea34558be25640428322a4bc3eba01a4",
+        "project_id": "bdd2290081d64e63bd3940d1d4eac0f9",
+        "version": 1,
+        "role": "researcher",
+        "body": {
+          "dataset": {
+            "x": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ],
+            "y": [
+              1,
+              3,
+              5,
+              7,
+              9
+            ]
+          },
+          "direction": "【工程演示】比较拟合直线与只猜均值，检查异常点对误差的影响。",
+          "limitation": "角色为固定程序，未调用语言模型或检索论文。只处理 5 个合成数据点；自由文字方向只保存，不会自动编写新实验。",
+          "plan_version": 1,
+          "role": "researcher",
+          "scenario": "clean",
+          "simulation": true,
+          "source": "LabCouncil 自有固定合成数据；没有文献来源",
+          "summary": "准备了 5 个可复算的数据点，用来演示组会如何改变下一轮输入。",
+          "task_id": "ea34558be25640428322a4bc3eba01a4"
+        },
+        "sha256": "c79c9b1e87c73f0ec0af2ad2fd01cea3519edcd777dbedfb5cb561182d610467",
+        "created": 1791283530.328588
+      },
+      {
+        "id": "55547145f97142179d334f56a18d32c9",
+        "task_id": "f0d5024740b345b8a6227da428a805d5",
+        "project_id": "bdd2290081d64e63bd3940d1d4eac0f9",
+        "version": 1,
+        "role": "executor",
+        "body": {
+          "baseline": {
+            "mae": 2.4,
+            "mse": 8.0
+          },
+          "dataset_id": "6409891d98cd489fb0a67421d66b8255",
+          "dataset_sha256": "c79c9b1e87c73f0ec0af2ad2fd01cea3519edcd777dbedfb5cb561182d610467",
+          "direction": "【工程演示】比较拟合直线与只猜均值，检查异常点对误差的影响。",
+          "intercept": 1.0,
+          "limitation": "角色为固定程序，未调用语言模型或检索论文。只处理 5 个合成数据点；自由文字方向只保存，不会自动编写新实验。",
+          "method": "普通最小二乘；在同一批样本上拟合和评分，只用于流程演示",
+          "metrics": {
+            "mae": 0.0,
+            "mse": 0.0
+          },
+          "plan_version": 1,
+          "prediction": [
+            1.0,
+            3.0,
+            5.0,
+            7.0,
+            9.0
+          ],
+          "role": "executor",
+          "simulation": true,
+          "slope": 2.0,
+          "summary": "在这 5 个点上，拟合直线的平均平方误差是 0；只猜平均值是 8。这不是独立测试集表现。",
+          "task_id": "f0d5024740b345b8a6227da428a805d5"
+        },
+        "sha256": "4316164247e9a10a38f469561e5f211bda38052a4da35e3bb1c7d5718890d603",
+        "created": 1791283530.333222
+      },
+      {
+        "id": "b76eb762608045afab2bd4d812308ca7",
+        "task_id": "3795026185a94efaaebc9d914df28527",
+        "project_id": "bdd2290081d64e63bd3940d1d4eac0f9",
+        "version": 1,
+        "role": "reviewer",
+        "body": {
+          "checks": {
+            "baseline": true,
+            "coefficients": true,
+            "dataset_hash": true,
+            "mae": true,
+            "mse": true,
+            "predictions": true
+          },
+          "dataset_id": "6409891d98cd489fb0a67421d66b8255",
+          "direction": "【工程演示】比较拟合直线与只猜均值，检查异常点对误差的影响。",
+          "executor_artifact_id": "55547145f97142179d334f56a18d32c9",
+          "executor_sha256": "4316164247e9a10a38f469561e5f211bda38052a4da35e3bb1c7d5718890d603",
+          "independent_result": {
+            "baseline_mse": 8.0,
+            "intercept": 1.0,
+            "mae": 0.0,
+            "mse": 0.0,
+            "slope": 2.0
+          },
+          "limitation": "角色为固定程序，未调用语言模型或检索论文。只处理 5 个合成数据点；自由文字方向只保存，不会自动编写新实验。",
+          "plan_version": 1,
+          "role": "reviewer",
+          "simulation": true,
+          "summary": "复算对上了这批数据、系数和误差。这只核对算术，不能说明方法能推广到真实问题。",
+          "task_id": "3795026185a94efaaebc9d914df28527",
+          "verified": true
+        },
+        "sha256": "e7ac76c8f08f5501cf9e4a66bd57de42b36fed3a7b2cf21fd99b7c0815600936",
+        "created": 1791283530.3380678
+      }
+    ],
+    "meetings": [
+      {
+        "id": "2b68f88e82ef43ff9b60cccbdb8a10ae",
+        "project_id": "bdd2290081d64e63bd3940d1d4eac0f9",
+        "version": 1,
+        "snapshot": {
+          "artifacts": [
+            {
+              "body": {
+                "dataset": {
+                  "x": [
+                    0,
+                    1,
+                    2,
+                    3,
+                    4
+                  ],
+                  "y": [
+                    1,
+                    3,
+                    5,
+                    7,
+                    9
+                  ]
+                },
+                "direction": "【工程演示】比较拟合直线与只猜均值，检查异常点对误差的影响。",
+                "limitation": "角色为固定程序，未调用语言模型或检索论文。只处理 5 个合成数据点；自由文字方向只保存，不会自动编写新实验。",
+                "plan_version": 1,
+                "role": "researcher",
+                "scenario": "clean",
+                "simulation": true,
+                "source": "LabCouncil 自有固定合成数据；没有文献来源",
+                "summary": "准备了 5 个可复算的数据点，用来演示组会如何改变下一轮输入。",
+                "task_id": "ea34558be25640428322a4bc3eba01a4"
+              },
+              "created": 1791283530.328588,
+              "id": "6409891d98cd489fb0a67421d66b8255",
+              "project_id": "bdd2290081d64e63bd3940d1d4eac0f9",
+              "role": "researcher",
+              "sha256": "c79c9b1e87c73f0ec0af2ad2fd01cea3519edcd777dbedfb5cb561182d610467",
+              "task_id": "ea34558be25640428322a4bc3eba01a4",
+              "version": 1
+            },
+            {
+              "body": {
+                "baseline": {
+                  "mae": 2.4,
+                  "mse": 8.0
+                },
+                "dataset_id": "6409891d98cd489fb0a67421d66b8255",
+                "dataset_sha256": "c79c9b1e87c73f0ec0af2ad2fd01cea3519edcd777dbedfb5cb561182d610467",
+                "direction": "【工程演示】比较拟合直线与只猜均值，检查异常点对误差的影响。",
+                "intercept": 1.0,
+                "limitation": "角色为固定程序，未调用语言模型或检索论文。只处理 5 个合成数据点；自由文字方向只保存，不会自动编写新实验。",
+                "method": "普通最小二乘；在同一批样本上拟合和评分，只用于流程演示",
+                "metrics": {
+                  "mae": 0.0,
+                  "mse": 0.0
+                },
+                "plan_version": 1,
+                "prediction": [
+                  1.0,
+                  3.0,
+                  5.0,
+                  7.0,
+                  9.0
+                ],
+                "role": "executor",
+                "simulation": true,
+                "slope": 2.0,
+                "summary": "在这 5 个点上，拟合直线的平均平方误差是 0；只猜平均值是 8。这不是独立测试集表现。",
+                "task_id": "f0d5024740b345b8a6227da428a805d5"
+              },
+              "created": 1791283530.333222,
+              "id": "55547145f97142179d334f56a18d32c9",
+              "project_id": "bdd2290081d64e63bd3940d1d4eac0f9",
+              "role": "executor",
+              "sha256": "4316164247e9a10a38f469561e5f211bda38052a4da35e3bb1c7d5718890d603",
+              "task_id": "f0d5024740b345b8a6227da428a805d5",
+              "version": 1
+            },
+            {
+              "body": {
+                "checks": {
+                  "baseline": true,
+                  "coefficients": true,
+                  "dataset_hash": true,
+                  "mae": true,
+                  "mse": true,
+                  "predictions": true
+                },
+                "dataset_id": "6409891d98cd489fb0a67421d66b8255",
+                "direction": "【工程演示】比较拟合直线与只猜均值，检查异常点对误差的影响。",
+                "executor_artifact_id": "55547145f97142179d334f56a18d32c9",
+                "executor_sha256": "4316164247e9a10a38f469561e5f211bda38052a4da35e3bb1c7d5718890d603",
+                "independent_result": {
+                  "baseline_mse": 8.0,
+                  "intercept": 1.0,
+                  "mae": 0.0,
+                  "mse": 0.0,
+                  "slope": 2.0
+                },
+                "limitation": "角色为固定程序，未调用语言模型或检索论文。只处理 5 个合成数据点；自由文字方向只保存，不会自动编写新实验。",
+                "plan_version": 1,
+                "role": "reviewer",
+                "simulation": true,
+                "summary": "复算对上了这批数据、系数和误差。这只核对算术，不能说明方法能推广到真实问题。",
+                "task_id": "3795026185a94efaaebc9d914df28527",
+                "verified": true
+              },
+              "created": 1791283530.3380678,
+              "id": "b76eb762608045afab2bd4d812308ca7",
+              "project_id": "bdd2290081d64e63bd3940d1d4eac0f9",
+              "role": "reviewer",
+              "sha256": "e7ac76c8f08f5501cf9e4a66bd57de42b36fed3a7b2cf21fd99b7c0815600936",
+              "task_id": "3795026185a94efaaebc9d914df28527",
+              "version": 1
+            }
+          ],
+          "cutoff": 1791283613.25096,
+          "idea": "【工程演示】比较拟合直线与只猜均值，检查异常点对误差的影响。",
+          "inputs": {
+            "body": {
+              "idea": "【工程演示】比较拟合直线与只猜均值，检查异常点对误差的影响。",
+              "permissions": {
+                "local_compute": true,
+                "model_calls": false,
+                "public_research": false
+              },
+              "requirements": "先复算，保留失败和历史；报告用大白话。此输入仅为 Codex 工程验收。",
+              "resources": "本机短计算；自有五点合成数据；不调用真实模型。",
+              "work_time": {
+                "all_day": false,
+                "end": "23:59",
+                "start": "09:00",
+                "timezone": "Asia/Shanghai"
+              }
+            },
+            "created": 1791283529.6927686,
+            "legacy": false,
+            "plan": {
+              "executor": "固定程序流程演示",
+              "granularity": "一次只启动一个可核验的短任务；按依赖顺序准备输入、计算、复算",
+              "objective": "【工程演示】比较拟合直线与只猜均值，检查异常点对误差的影响。",
+              "requirements": "先复算，保留失败和历史；报告用大白话。此输入仅为 Codex 工程验收。",
+              "resources": "本机短计算；自有五点合成数据；不调用真实模型。",
+              "source": "platform bounded plan",
+              "steps": [
+                "准备本轮输入与数据",
+                "执行计算，保存实验数据和指标",
+                "独立复算，整理报告，等待组会"
+              ],
+              "unavailable": [
+                "论文和仓库自动探索",
+                "任意实验代码生成",
+                "根据剩余资源自主规划并持续研究"
+              ],
+              "work_window": "每天09:00–23:59（Asia/Shanghai）"
+            },
+            "project_id": "bdd2290081d64e63bd3940d1d4eac0f9",
+            "version": 1
+          },
+          "notice": "这是开会时的固定快照。之后完成的任务请在项目最新进度中查看。",
+          "scenario": "clean",
+          "simulation": true,
+          "tasks": [
+            {
+              "error": null,
+              "id": "ea34558be25640428322a4bc3eba01a4",
+              "role": "researcher",
+              "status": "completed",
+              "version": 1
+            },
+            {
+              "error": null,
+              "id": "f0d5024740b345b8a6227da428a805d5",
+              "role": "executor",
+              "status": "completed",
+              "version": 1
+            },
+            {
+              "error": null,
+              "id": "3795026185a94efaaebc9d914df28527",
+              "role": "reviewer",
+              "status": "completed",
+              "version": 1
+            }
+          ]
+        },
+        "status": "in_review",
+        "created": 1791283613.2513049
+      }
+    ],
+    "decisions": [],
+    "events": [
+      {
+        "id": 1,
+        "project_id": "bdd2290081d64e63bd3940d1d4eac0f9",
+        "kind": "project_created",
+        "body": "{\"simulation\":true}",
+        "created": 1791283529.6928995
+      },
+      {
+        "id": 2,
+        "project_id": "bdd2290081d64e63bd3940d1d4eac0f9",
+        "kind": "task_started",
+        "body": "{\"attempt\":1,\"task_id\":\"ea34558be25640428322a4bc3eba01a4\"}",
+        "created": 1791283530.2914824
+      },
+      {
+        "id": 3,
+        "project_id": "bdd2290081d64e63bd3940d1d4eac0f9",
+        "kind": "task_completed",
+        "body": "{\"task_id\":\"ea34558be25640428322a4bc3eba01a4\",\"version\":1}",
+        "created": 1791283530.3286338
+      },
+      {
+        "id": 4,
+        "project_id": "bdd2290081d64e63bd3940d1d4eac0f9",
+        "kind": "task_started",
+        "body": "{\"attempt\":1,\"task_id\":\"f0d5024740b345b8a6227da428a805d5\"}",
+        "created": 1791283530.331003
+      },
+      {
+        "id": 5,
+        "project_id": "bdd2290081d64e63bd3940d1d4eac0f9",
+        "kind": "task_completed",
+        "body": "{\"task_id\":\"f0d5024740b345b8a6227da428a805d5\",\"version\":1}",
+        "created": 1791283530.333264
+      },
+      {
+        "id": 6,
+        "project_id": "bdd2290081d64e63bd3940d1d4eac0f9",
+        "kind": "task_started",
+        "body": "{\"attempt\":1,\"task_id\":\"3795026185a94efaaebc9d914df28527\"}",
+        "created": 1791283530.3353722
+      },
+      {
+        "id": 7,
+        "project_id": "bdd2290081d64e63bd3940d1d4eac0f9",
+        "kind": "task_completed",
+        "body": "{\"task_id\":\"3795026185a94efaaebc9d914df28527\",\"version\":1}",
+        "created": 1791283530.3381107
+      },
+      {
+        "id": 8,
+        "project_id": "bdd2290081d64e63bd3940d1d4eac0f9",
+        "kind": "meeting_opened",
+        "body": "{\"meeting_id\":\"2b68f88e82ef43ff9b60cccbdb8a10ae\",\"version\":1}",
+        "created": 1791283613.2513819
+      },
+      {
+        "id": 9,
+        "project_id": "bdd2290081d64e63bd3940d1d4eac0f9",
+        "kind": "meeting_question",
+        "body": "{\"meeting_id\":\"2b68f88e82ef43ff9b60cccbdb8a10ae\"}",
+        "created": 1791283618.4259121
+      },
+      {
+        "id": 10,
+        "project_id": "bdd2290081d64e63bd3940d1d4eac0f9",
+        "kind": "draft_saved",
+        "body": "{\"edited\":1791283657.5845041,\"instruction\":\"【Codex工程评审】沿用第一轮数据，加入异常点后比较误差，不重复第一轮。\",\"meeting_id\":\"2b68f88e82ef43ff9b60cccbdb8a10ae\",\"revision\":1,\"scenario\":\"outlier\"}",
+        "created": 1791283657.5845351
+      }
+    ],
+    "tool_operations": [],
+    "execution": {
+      "project_id": "bdd2290081d64e63bd3940d1d4eac0f9",
+      "mode": "simulation",
+      "api_budget": 0,
+      "qa_api_budget": 0
+    },
+    "current_inputs": {
+      "project_id": "bdd2290081d64e63bd3940d1d4eac0f9",
+      "version": 1,
+      "body": {
+        "idea": "【工程演示】比较拟合直线与只猜均值，检查异常点对误差的影响。",
+        "permissions": {
+          "local_compute": true,
+          "model_calls": false,
+          "public_research": false
+        },
+        "requirements": "先复算，保留失败和历史；报告用大白话。此输入仅为 Codex 工程验收。",
+        "resources": "本机短计算；自有五点合成数据；不调用真实模型。",
+        "work_time": {
+          "all_day": false,
+          "end": "23:59",
+          "start": "09:00",
+          "timezone": "Asia/Shanghai"
+        }
+      },
+      "plan": {
+        "executor": "固定程序流程演示",
+        "granularity": "一次只启动一个可核验的短任务；按依赖顺序准备输入、计算、复算",
+        "objective": "【工程演示】比较拟合直线与只猜均值，检查异常点对误差的影响。",
+        "requirements": "先复算，保留失败和历史；报告用大白话。此输入仅为 Codex 工程验收。",
+        "resources": "本机短计算；自有五点合成数据；不调用真实模型。",
+        "source": "platform bounded plan",
+        "steps": [
+          "准备本轮输入与数据",
+          "执行计算，保存实验数据和指标",
+          "独立复算，整理报告，等待组会"
+        ],
+        "unavailable": [
+          "论文和仓库自动探索",
+          "任意实验代码生成",
+          "根据剩余资源自主规划并持续研究"
+        ],
+        "work_window": "每天09:00–23:59（Asia/Shanghai）"
+      },
+      "created": 1791283529.6927686,
+      "legacy": false
+    },
+    "input_history": [
+      {
+        "project_id": "bdd2290081d64e63bd3940d1d4eac0f9",
+        "version": 1,
+        "body": {
+          "idea": "【工程演示】比较拟合直线与只猜均值，检查异常点对误差的影响。",
+          "permissions": {
+            "local_compute": true,
+            "model_calls": false,
+            "public_research": false
+          },
+          "requirements": "先复算，保留失败和历史；报告用大白话。此输入仅为 Codex 工程验收。",
+          "resources": "本机短计算；自有五点合成数据；不调用真实模型。",
+          "work_time": {
+            "all_day": false,
+            "end": "23:59",
+            "start": "09:00",
+            "timezone": "Asia/Shanghai"
+          }
+        },
+        "plan": {
+          "executor": "固定程序流程演示",
+          "granularity": "一次只启动一个可核验的短任务；按依赖顺序准备输入、计算、复算",
+          "objective": "【工程演示】比较拟合直线与只猜均值，检查异常点对误差的影响。",
+          "requirements": "先复算，保留失败和历史；报告用大白话。此输入仅为 Codex 工程验收。",
+          "resources": "本机短计算；自有五点合成数据；不调用真实模型。",
+          "source": "platform bounded plan",
+          "steps": [
+            "准备本轮输入与数据",
+            "执行计算，保存实验数据和指标",
+            "独立复算，整理报告，等待组会"
+          ],
+          "unavailable": [
+            "论文和仓库自动探索",
+            "任意实验代码生成",
+            "根据剩余资源自主规划并持续研究"
+          ],
+          "work_window": "每天09:00–23:59（Asia/Shanghai）"
+        },
+        "created": 1791283529.6927686
+      }
+    ],
+    "work_blocker": null,
+    "model_requests": []
+  },
+  "meeting": {
+    "id": "2b68f88e82ef43ff9b60cccbdb8a10ae",
+    "project_id": "bdd2290081d64e63bd3940d1d4eac0f9",
+    "version": 1,
+    "snapshot": {
+      "artifacts": [
+        {
+          "body": {
+            "dataset": {
+              "x": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "y": [
+                1,
+                3,
+                5,
+                7,
+                9
+              ]
+            },
+            "direction": "【工程演示】比较拟合直线与只猜均值，检查异常点对误差的影响。",
+            "limitation": "角色为固定程序，未调用语言模型或检索论文。只处理 5 个合成数据点；自由文字方向只保存，不会自动编写新实验。",
+            "plan_version": 1,
+            "role": "researcher",
+            "scenario": "clean",
+            "simulation": true,
+            "source": "LabCouncil 自有固定合成数据；没有文献来源",
+            "summary": "准备了 5 个可复算的数据点，用来演示组会如何改变下一轮输入。",
+            "task_id": "ea34558be25640428322a4bc3eba01a4"
+          },
+          "created": 1791283530.328588,
+          "id": "6409891d98cd489fb0a67421d66b8255",
+          "project_id": "bdd2290081d64e63bd3940d1d4eac0f9",
+          "role": "researcher",
+          "sha256": "c79c9b1e87c73f0ec0af2ad2fd01cea3519edcd777dbedfb5cb561182d610467",
+          "task_id": "ea34558be25640428322a4bc3eba01a4",
+          "version": 1
+        },
+        {
+          "body": {
+            "baseline": {
+              "mae": 2.4,
+              "mse": 8.0
+            },
+            "dataset_id": "6409891d98cd489fb0a67421d66b8255",
+            "dataset_sha256": "c79c9b1e87c73f0ec0af2ad2fd01cea3519edcd777dbedfb5cb561182d610467",
+            "direction": "【工程演示】比较拟合直线与只猜均值，检查异常点对误差的影响。",
+            "intercept": 1.0,
+            "limitation": "角色为固定程序，未调用语言模型或检索论文。只处理 5 个合成数据点；自由文字方向只保存，不会自动编写新实验。",
+            "method": "普通最小二乘；在同一批样本上拟合和评分，只用于流程演示",
+            "metrics": {
+              "mae": 0.0,
+              "mse": 0.0
+            },
+            "plan_version": 1,
+            "prediction": [
+              1.0,
+              3.0,
+              5.0,
+              7.0,
+              9.0
+            ],
+            "role": "executor",
+            "simulation": true,
+            "slope": 2.0,
+            "summary": "在这 5 个点上，拟合直线的平均平方误差是 0；只猜平均值是 8。这不是独立测试集表现。",
+            "task_id": "f0d5024740b345b8a6227da428a805d5"
+          },
+          "created": 1791283530.333222,
+          "id": "55547145f97142179d334f56a18d32c9",
+          "project_id": "bdd2290081d64e63bd3940d1d4eac0f9",
+          "role": "executor",
+          "sha256": "4316164247e9a10a38f469561e5f211bda38052a4da35e3bb1c7d5718890d603",
+          "task_id": "f0d5024740b345b8a6227da428a805d5",
+          "version": 1
+        },
+        {
+          "body": {
+            "checks": {
+              "baseline": true,
+              "coefficients": true,
+              "dataset_hash": true,
+              "mae": true,
+              "mse": true,
+              "predictions": true
+            },
+            "dataset_id": "6409891d98cd489fb0a67421d66b8255",
+            "direction": "【工程演示】比较拟合直线与只猜均值，检查异常点对误差的影响。",
+            "executor_artifact_id": "55547145f97142179d334f56a18d32c9",
+            "executor_sha256": "4316164247e9a10a38f469561e5f211bda38052a4da35e3bb1c7d5718890d603",
+            "independent_result": {
+              "baseline_mse": 8.0,
+              "intercept": 1.0,
+              "mae": 0.0,
+              "mse": 0.0,
+              "slope": 2.0
+            },
+            "limitation": "角色为固定程序，未调用语言模型或检索论文。只处理 5 个合成数据点；自由文字方向只保存，不会自动编写新实验。",
+            "plan_version": 1,
+            "role": "reviewer",
+            "simulation": true,
+            "summary": "复算对上了这批数据、系数和误差。这只核对算术，不能说明方法能推广到真实问题。",
+            "task_id": "3795026185a94efaaebc9d914df28527",
+            "verified": true
+          },
+          "created": 1791283530.3380678,
+          "id": "b76eb762608045afab2bd4d812308ca7",
+          "project_id": "bdd2290081d64e63bd3940d1d4eac0f9",
+          "role": "reviewer",
+          "sha256": "e7ac76c8f08f5501cf9e4a66bd57de42b36fed3a7b2cf21fd99b7c0815600936",
+          "task_id": "3795026185a94efaaebc9d914df28527",
+          "version": 1
+        }
+      ],
+      "cutoff": 1791283613.25096,
+      "idea": "【工程演示】比较拟合直线与只猜均值，检查异常点对误差的影响。",
+      "inputs": {
+        "body": {
+          "idea": "【工程演示】比较拟合直线与只猜均值，检查异常点对误差的影响。",
+          "permissions": {
+            "local_compute": true,
+            "model_calls": false,
+            "public_research": false
+          },
+          "requirements": "先复算，保留失败和历史；报告用大白话。此输入仅为 Codex 工程验收。",
+          "resources": "本机短计算；自有五点合成数据；不调用真实模型。",
+          "work_time": {
+            "all_day": false,
+            "end": "23:59",
+            "start": "09:00",
+            "timezone": "Asia/Shanghai"
+          }
+        },
+        "created": 1791283529.6927686,
+        "legacy": false,
+        "plan": {
+          "executor": "固定程序流程演示",
+          "granularity": "一次只启动一个可核验的短任务；按依赖顺序准备输入、计算、复算",
+          "objective": "【工程演示】比较拟合直线与只猜均值，检查异常点对误差的影响。",
+          "requirements": "先复算，保留失败和历史；报告用大白话。此输入仅为 Codex 工程验收。",
+          "resources": "本机短计算；自有五点合成数据；不调用真实模型。",
+          "source": "platform bounded plan",
+          "steps": [
+            "准备本轮输入与数据",
+            "执行计算，保存实验数据和指标",
+            "独立复算，整理报告，等待组会"
+          ],
+          "unavailable": [
+            "论文和仓库自动探索",
+            "任意实验代码生成",
+            "根据剩余资源自主规划并持续研究"
+          ],
+          "work_window": "每天09:00–23:59（Asia/Shanghai）"
+        },
+        "project_id": "bdd2290081d64e63bd3940d1d4eac0f9",
+        "version": 1
+      },
+      "notice": "这是开会时的固定快照。之后完成的任务请在项目最新进度中查看。",
+      "scenario": "clean",
+      "simulation": true,
+      "tasks": [
+        {
+          "error": null,
+          "id": "ea34558be25640428322a4bc3eba01a4",
+          "role": "researcher",
+          "status": "completed",
+          "version": 1
+        },
+        {
+          "error": null,
+          "id": "f0d5024740b345b8a6227da428a805d5",
+          "role": "executor",
+          "status": "completed",
+          "version": 1
+        },
+        {
+          "error": null,
+          "id": "3795026185a94efaaebc9d914df28527",
+          "role": "reviewer",
+          "status": "completed",
+          "version": 1
+        }
+      ]
+    },
+    "status": "in_review",
+    "created": 1791283613.2513049,
+    "discussion": [
+      {
+        "id": "8dab443338bf41bf9d4b04d50ee9f12e",
+        "meeting_id": "2b68f88e82ef43ff9b60cccbdb8a10ae",
+        "question": "【Codex工程验收】复核实际检查了什么？",
+        "answer": "【模拟模板答复】这场组会冻结了 3 份产物。复算对上了这批数据、系数和误差。这只核对算术，不能说明方法能推广到真实问题。原始证据入口保存了输入、计算结果和逐项检查；没有检索论文。你的问题已保存；改变方向请编辑并确认下一轮决定。",
+        "created": 1791283618.4258647
+      }
+    ],
+    "decision": null,
+    "draft": {
+      "meeting_id": "2b68f88e82ef43ff9b60cccbdb8a10ae",
+      "instruction": "【Codex工程评审】沿用第一轮数据，加入异常点后比较误差，不重复第一轮。",
+      "scenario": "outlier",
+      "revision": 1,
+      "edited": 1791283657.5845041,
+      "brief": {
+        "idea": "【Codex工程评审】沿用第一轮数据，加入异常点后比较误差，不重复第一轮。",
+        "permissions": {
+          "local_compute": true,
+          "model_calls": false,
+          "public_research": true
+        },
+        "requirements": "保留原规划、证据和决定；解释与第一轮的区别。公开查询授权只记录，尚未接入。",
+        "resources": "沿用同一项目的合成数据与本机工具；不调用真实模型。",
+        "work_time": {
+          "all_day": false,
+          "end": "23:59",
+          "start": "10:00",
+          "timezone": "Asia/Shanghai"
+        }
+      }
+    },
+    "inputs": {
+      "body": {
+        "idea": "【工程演示】比较拟合直线与只猜均值，检查异常点对误差的影响。",
+        "permissions": {
+          "local_compute": true,
+          "model_calls": false,
+          "public_research": false
+        },
+        "requirements": "先复算，保留失败和历史；报告用大白话。此输入仅为 Codex 工程验收。",
+        "resources": "本机短计算；自有五点合成数据；不调用真实模型。",
+        "work_time": {
+          "all_day": false,
+          "end": "23:59",
+          "start": "09:00",
+          "timezone": "Asia/Shanghai"
+        }
+      },
+      "created": 1791283529.6927686,
+      "legacy": false,
+      "plan": {
+        "executor": "固定程序流程演示",
+        "granularity": "一次只启动一个可核验的短任务；按依赖顺序准备输入、计算、复算",
+        "objective": "【工程演示】比较拟合直线与只猜均值，检查异常点对误差的影响。",
+        "requirements": "先复算，保留失败和历史；报告用大白话。此输入仅为 Codex 工程验收。",
+        "resources": "本机短计算；自有五点合成数据；不调用真实模型。",
+        "source": "platform bounded plan",
+        "steps": [
+          "准备本轮输入与数据",
+          "执行计算，保存实验数据和指标",
+          "独立复算，整理报告，等待组会"
+        ],
+        "unavailable": [
+          "论文和仓库自动探索",
+          "任意实验代码生成",
+          "根据剩余资源自主规划并持续研究"
+        ],
+        "work_window": "每天09:00–23:59（Asia/Shanghai）"
+      },
+      "project_id": "bdd2290081d64e63bd3940d1d4eac0f9",
+      "version": 1
+    },
+    "next_inputs": null
+  }
+}

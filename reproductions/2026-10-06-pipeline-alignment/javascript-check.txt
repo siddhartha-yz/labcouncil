@@ -1,0 +1,2 @@
+node --check labcouncil/static/app.js
+Exit code: 0

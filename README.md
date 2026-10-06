@@ -1,10 +1,10 @@
 # LabCouncil
 
-**Your ideas. An agent research team. A meeting where you steer the next experiment.**
+**Set the research inputs. Let agents work. Review and steer the next round.**
 
-LabCouncil is an open-source prototype for personal research groups made up of AI agents and a human researcher. Submit an idea, let agents investigate and produce evidence, meet on a schedule to review their reports, and turn your decisions into the next round of work.
+LabCouncil is an open-source prototype for personal research groups made up of AI agents and a human researcher. The intended loop has three steps: enter an idea, resources, permissions, daily work hours and requirements; agents plan and investigate within those constraints; open a meeting, review plain-language reports and update the five inputs for the next round. The same project retains its plans, experiments, evidence and decisions.
 
-**Status: local meeting platform with a tested two-round synthetic case.** Default mode is a deterministic simulation. Opt-in real-case mode uses DeepSeek Flash for tool requests, reports and meeting questions, with saved data and independent arithmetic checks. General research tools remain M2 work. The actual case exposed incorrect model descriptions of the input, even when numerical verification passed; see the [complete case record](reproductions/2026-10-06-complete-case/REPORT.md).
+**Status: local meeting platform with a tested two-round synthetic case.** Default mode is a deterministic simulation. Opt-in real-case mode uses DeepSeek Flash for tool requests, reports and meeting questions, with saved data and independent arithmetic checks. Versioned five-field inputs, daily task-start windows and meeting-to-input continuity are implemented. Autonomous research planning, paper/repository exploration and sustained research iteration remain M2 work. The actual case exposed incorrect model descriptions of the input, even when numerical verification passed; see the [complete case record](reproductions/2026-10-06-complete-case/REPORT.md).
 
 ## Try the local meeting
 
@@ -14,7 +14,7 @@ From the repository root, with Python 3.11+ on Linux:
 python3 -m labcouncil start
 ```
 
-Open [http://127.0.0.1:8765](http://127.0.0.1:8765). Create a project, review the three reports, ask a question and confirm the next round. No API key is needed for this simulation. It does not implement arbitrary ideas as experiments.
+Open [http://127.0.0.1:8765](http://127.0.0.1:8765). Enter the five research inputs, review the current plan and one plain-language report, open a meeting and return to the input form to confirm the next round. No API key is needed for this simulation. It does not implement arbitrary ideas as experiments.
 
 [运行说明](docs/RUNNING.md) includes stop/restart, budgets and limitations. [M1 acceptance record](reproductions/2026-10-06-m1-prototype/REPORT.md) includes actual browser checks and durable synthetic evidence. Choose “真实 Flash：合成研究案例” to use the ignored local `.env` configuration. This makes potentially billable requests: defaults are 12 background attempts and 1 meeting attempt, with no retries; token and monetary hard budgets are not implemented. The [complete case record](reproductions/2026-10-06-complete-case/REPORT.md) preserves 13 actual responses, two rounds, the review fixture, restart checks and report errors.
 
@@ -45,6 +45,7 @@ The initial focus is computational research that can be checked through document
 
 ## Documents
 
+- [三步产品流程 / Product flow](docs/PRODUCT.md): the user-confirmed loop and current implementation boundaries.
 - [实施计划 / Project plan](docs/PLAN.md): scope, architecture, milestones, and acceptance criteria.
 - [本地运行 / Running](docs/RUNNING.md): start the platform, select simulation or real case, and understand its limits.
 - [持续工作清单](docs/WORKLIST.md): all candidates, remaining validation, and the platform delivery sequence.
@@ -56,7 +57,7 @@ The initial focus is computational research that can be checked through document
 
 ## 中文简介
 
-LabCouncil 已有本地组会平台，完成了真实 Flash 参与的两轮合成案例；默认模拟模式仍可无 key 使用。正在向个人虚拟研究组平台推进。你提供 idea；agent 团队开展调研和实验，保存结果与证据；你定期开组会、追问并评审；确认后的决定变成下一轮任务，agent 会后继续工作。
+LabCouncil 已有本地组会平台，完成了真实 Flash 参与的两轮合成案例；默认模拟模式仍可无 key 使用。正在向个人虚拟研究组平台推进。目标流程是：你提供 idea、资源、权限、每日工作时段、额外要求；agent 据此规划、探索论文和仓库、复现、整理实验并在后台 loop；你选择开组会，阅读大白话报告、追问，再回到同一套输入修改下一轮。每轮保留上下文。当前执行器仍限固定计算，通用研究能力尚待接入。
 
 核心目标是验证：**人工组会能否让 agent 的下一轮工作更符合研究意图，并持续产出可检查的新证据。**
 

@@ -74,7 +74,7 @@ def handler(store):
                     raise ValueError("需要 JSON 对象")
                 path = urlsplit(self.path).path.strip("/").split("/")
                 if path == ["api", "projects"]:
-                    identifier = store.create_project(body.get("title"), body.get("idea"), body.get("scenario", "clean"), body.get("budget", 9), body.get("qa_budget", 6), body.get("meeting_at"),body.get("mode","simulation"),body.get("api_budget",18),body.get("qa_api_budget",3))
+                    identifier = store.create_project(body.get("title"), body.get("idea"), body.get("scenario", "clean"), body.get("budget", 9), body.get("qa_budget", 6), body.get("meeting_at"),body.get("mode","simulation"),body.get("api_budget",18),body.get("qa_api_budget",3),body.get('brief'))
                     return self.send(201, {"id": identifier})
                 if len(path) == 4 and path[:2] == ["api", "projects"]:
                     if path[3] == "meeting":
@@ -84,11 +84,11 @@ def handler(store):
                         return self.send(200, {"ok": True})
                 if len(path) == 4 and path[:2] == ["api", "meetings"]:
                     if path[3] == "draft":
-                        return self.send(200, store.save_draft(path[2], body.get("expected_revision"), body.get("instruction"), body.get("scenario")))
+                        return self.send(200, store.save_draft(path[2], body.get("expected_revision"), body.get("instruction"), body.get("scenario"),body.get('brief')))
                     if path[3] == "ask":
                         return self.send(200, {"answer": store.ask(path[2], body.get("question"))})
                     if path[3] == "confirm":
-                        return self.send(200, store.confirm(path[2], body.get("expected_version"), body.get("instruction"), body.get("scenario")))
+                        return self.send(200, store.confirm(path[2], body.get("expected_version"), body.get("instruction"), body.get("scenario"),body.get('brief')))
                 self.send(404, {"error": "找不到这个操作"})
             except NotFound as error:
                 self.send(404, {"error": str(error)})

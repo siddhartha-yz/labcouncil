@@ -68,6 +68,11 @@ class RealCaseTests(unittest.TestCase):
                 tool_result=json.loads(request['request']['messages'][-1]['content'])
                 self.assertIn('parameters',tool_result)
         self.assertEqual(p['artifacts'][-1]['body']['parameters']['test_outlier_fraction'],.1)
+        second_tool=p['model_requests'][7]['request']['messages'][-1]
+        context=json.loads(second_tool['content'])
+        self.assertEqual(context['current_inputs_excerpt']['idea'],'增加异常点和重复次数')
+        self.assertEqual(len(context['previous_round_reports_excerpt']),3)
+        self.assertEqual(context['previous_plans_excerpt'][0]['version'],1)
         with self.assertRaises(Conflict):answer_meeting(self.store,self.store.open_meeting(self.project),'额度用完',self.provider)
         self.assertEqual(len(self.server.seen),13)
     def test_tool_not_executed_before_or_without_valid_model_call(self):

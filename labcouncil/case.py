@@ -112,8 +112,15 @@ def execute(store,task,provider=None):
     else:expected={'executor_artifact_id':prior['id']};name='verify_saved_result'
     tool=schema(name,expected)
     reference='operation:'+task['id']
+    project=store.project(task['project_id'])
+    brief=project['current_inputs']['body']
+    context={**brief, **{key:brief[key][:1200] for key in ('idea','resources','requirements')}}
+    history=[{'version':a['version'],'role':a['role'],'summary':a['body']['summary'][:250],'evidence_id':a['id']}
+        for a in project['artifacts'] if a['version']<task['version']][-3:]
+    previous_plans=[{'version':r['version'],'objective':r['body']['idea'][:500],'steps':r['plan']['steps']}
+        for r in project['input_history'] if r['version']<task['version']][-2:]
     messages=[{'role':'system','content':f'你是合成科研案例的{role}角色，真实调用指定工具后写简短中文报告。工具参数必须符合任务，不编造工具结果，不调用其他工具。最终只返回JSON，字段summary（一到两句普通中文，不含阿拉伯数字；数字由证据呈现）、limitations（非空字符串数组）、evidence_refs（仅包含{reference}）。这不是论文复现，不要声称检索文献、训练新模型或证明一般科研质量。'},
-        {'role':'user','content':encode({'idea':store.project(task['project_id'])['idea'],'confirmed_direction':task['instruction'],'plan_version':task['version'],'required_tool_parameters':expected})}]
+        {'role':'user','content':encode({'current_inputs_excerpt':context,'full_inputs_saved_in_project':True,'previous_round_reports_excerpt':history,'previous_plans_excerpt':previous_plans,'confirmed_direction':task['instruction'][:1200],'plan_version':task['version'],'required_tool_parameters':expected})}]
     message,first=provider.call(store,task['project_id'],'background',role+'-tool',messages,tool,True,task)
     calls=message.get('tool_calls',[])
     if len(calls)!=1 or calls[0].get('function',{}).get('name')!=name:raise ValueError('实际模型没有按协议请求唯一允许工具')

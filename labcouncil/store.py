@@ -10,6 +10,7 @@ from pathlib import Path
 import sqlite3
 import time
 import uuid
+from .brief import normalize, start_blocker, make_plan
 
 
 class Conflict(ValueError):
@@ -38,7 +39,7 @@ def scenario(value):
 
 def quota(value):
     if type(value) is not int or not 0 <= value <= 100:
-        raise ValueError("模拟任务预算应为 0–100 的整数")
+        raise ValueError("任务或请求上限应为 0–100 的整数")
     return value
 
 
@@ -103,6 +104,18 @@ CREATE TABLE IF NOT EXISTS tool_operations (
  task_id TEXT NOT NULL UNIQUE REFERENCES tasks(id), body TEXT NOT NULL,
  sha256 TEXT NOT NULL, created REAL NOT NULL
 );
+CREATE TABLE IF NOT EXISTS round_inputs (
+ project_id TEXT NOT NULL REFERENCES projects(id), version INTEGER NOT NULL,
+ body TEXT NOT NULL, plan TEXT NOT NULL, created REAL NOT NULL,
+ PRIMARY KEY(project_id,version)
+);
+CREATE TABLE IF NOT EXISTS meeting_input_drafts (
+ meeting_id TEXT PRIMARY KEY REFERENCES meetings(id), body TEXT NOT NULL
+);
+CREATE TRIGGER IF NOT EXISTS inputs_no_update BEFORE UPDATE ON round_inputs
+ BEGIN SELECT RAISE(ABORT,'Confirmed round inputs are immutable'); END;
+CREATE TRIGGER IF NOT EXISTS inputs_no_delete BEFORE DELETE ON round_inputs
+ BEGIN SELECT RAISE(ABORT,'Confirmed round inputs are immutable'); END;
 CREATE TRIGGER IF NOT EXISTS operation_no_update BEFORE UPDATE ON tool_operations
  BEGIN SELECT RAISE(ABORT,'Tool results are immutable'); END;
 CREATE TRIGGER IF NOT EXISTS operation_no_delete BEFORE DELETE ON tool_operations
@@ -161,22 +174,39 @@ class Store:
             previous = identifier
 
     def create_project(self, title, idea, selected="clean", budget=9, qa_budget=6, meeting_at=None,
-                       mode="simulation", api_budget=18, qa_api_budget=3):
+                       mode="simulation", api_budget=18, qa_api_budget=3, brief=None):
         title, idea = text(title, "项目名称", 120), text(idea, "研究想法")
         selected, budget, qa_budget = scenario(selected), quota(budget), quota(qa_budget)
         if mode not in ("simulation", "real_case"):
             raise ValueError("运行模式无效")
         api_budget, qa_api_budget = quota(api_budget), quota(qa_api_budget)
+        brief = normalize(brief, idea, mode)
         if meeting_at is not None and (type(meeting_at) not in (int, float) or not 0 < meeting_at < 4102444800):
             raise ValueError("组会时间无效")
         identifier = uuid.uuid4().hex
         with self.connection(write=True) as con:
             con.execute("INSERT INTO projects(id,title,idea,version,scenario,budget,qa_budget,meeting_at,created) VALUES(?,?,?,?,?,?,?,?,?)",
                         (identifier, title, idea, 1, selected, budget, qa_budget, meeting_at, time.time()))
-            self.add_round(con, identifier, 1, idea, selected)
+            self.save_inputs(con, identifier, 1, brief, mode)
+            self.add_round(con, identifier, 1, brief['idea'], selected)
             con.execute("INSERT INTO project_execution VALUES(?,?,?,?)",(identifier,mode,api_budget if mode=="real_case" else 0,qa_api_budget if mode=="real_case" else 0))
             self.event(con, identifier, "project_created", {"simulation": mode=="simulation"})
         return identifier
+
+    def save_inputs(self, con, project_id, version, brief, mode):
+        con.execute('INSERT INTO round_inputs VALUES(?,?,?,?,?)',
+                    (project_id, version, encode(brief), encode(make_plan(brief, mode)), time.time()))
+
+    def inputs(self, con, project, version=None):
+        version = project['version'] if version is None else version
+        row = con.execute('SELECT * FROM round_inputs WHERE project_id=? AND version=?', (project['id'], version)).fetchone()
+        if row:
+            return {**dict(row), 'body': json.loads(row['body']), 'plan': json.loads(row['plan']), 'legacy': False}
+        execution = con.execute('SELECT mode FROM project_execution WHERE project_id=?', (project['id'],)).fetchone()
+        mode = execution['mode'] if execution else 'simulation'
+        decision = con.execute('SELECT instruction FROM decisions WHERE project_id=? AND to_version=?', (project['id'], version)).fetchone()
+        brief = normalize(None, decision['instruction'] if decision else project['idea'], mode)
+        return {'project_id': project['id'], 'version': version, 'body': brief, 'plan': make_plan(brief, mode), 'legacy': True}
 
     def projects(self):
         with self.connection() as con:
@@ -195,6 +225,10 @@ class Store:
                 operation["body"]=json.loads(operation["body"])
             execution = con.execute("SELECT * FROM project_execution WHERE project_id=?",(identifier,)).fetchone()
             result["execution"] = dict(execution) if execution else {"mode":"simulation","api_budget":0,"qa_api_budget":0}
+            result['current_inputs'] = self.inputs(con, result)
+            result['input_history'] = [{**dict(r), 'body': json.loads(r['body']), 'plan': json.loads(r['plan'])}
+                for r in con.execute('SELECT * FROM round_inputs WHERE project_id=? ORDER BY version', (identifier,))]
+            result['work_blocker'] = start_blocker(result['current_inputs']['body'], result['execution']['mode'], time.time())
             result["model_requests"] = [dict(r) for r in con.execute("SELECT * FROM model_requests WHERE project_id=? ORDER BY created",(identifier,))]
             for request in result["model_requests"]:
                 for key in ("request","response","usage"):
@@ -233,7 +267,16 @@ class Store:
                 WHERE t.status='queued' AND p.paused=0 AND t.version=p.version
                   AND (t.dependency IS NULL OR d.status='completed')
                   AND (t.charged=1 OR p.used<p.budget)
-                ORDER BY t.created LIMIT 1""").fetchall()
+                ORDER BY t.created""").fetchall()
+            eligible = []
+            for row in rows:
+                p = self.row(con, 'projects', row['project_id'])
+                execution = con.execute('SELECT mode FROM project_execution WHERE project_id=?', (p['id'],)).fetchone()
+                mode = execution['mode'] if execution else 'simulation'
+                if not start_blocker(self.inputs(con, p)['body'], mode, now):
+                    eligible.append(row)
+                    break
+            rows = eligible
             if not rows:
                 return None
             task = dict(rows[0])
@@ -307,6 +350,7 @@ class Store:
         execution=con.execute("SELECT mode FROM project_execution WHERE project_id=?",(project_id,)).fetchone()
         snapshot = {"simulation": not execution or execution["mode"]=="simulation", "cutoff": time.time(), "idea": p["idea"], "scenario": p["scenario"], "tasks": tasks, "artifacts": artifacts,
                     "notice": "这是开会时的固定快照。之后完成的任务请在项目最新进度中查看。"}
+        snapshot['inputs'] = self.inputs(con, p)
         identifier = uuid.uuid4().hex
         con.execute("INSERT INTO meetings VALUES(?,?,?,?,?,?)", (identifier, project_id, p["version"], encode(snapshot), "in_review", time.time()))
         con.execute("UPDATE projects SET meeting_at=NULL WHERE id=?", (project_id,))
@@ -328,9 +372,15 @@ class Store:
             result["decision"] = dict(decision) if decision else None
             draft = con.execute("SELECT * FROM meeting_drafts WHERE meeting_id=?", (identifier,)).fetchone()
             result["draft"] = dict(draft) if draft else None
+            inputs_draft = con.execute('SELECT body FROM meeting_input_drafts WHERE meeting_id=?', (identifier,)).fetchone()
+            if result['draft'] and inputs_draft:
+                result['draft']['brief'] = json.loads(inputs_draft['body'])
+            p = self.row(con, 'projects', result['project_id'])
+            result['inputs'] = result['snapshot'].get('inputs') or self.inputs(con, p, result['version'])
+            result['next_inputs'] = self.inputs(con, p, result['version']+1) if result['decision'] else None
             return result
 
-    def save_draft(self, meeting_id, expected_revision, instruction, selected):
+    def save_draft(self, meeting_id, expected_revision, instruction, selected, brief=None):
         instruction, selected = text(instruction, "决策草稿"), scenario(selected)
         if type(expected_revision) is not int or expected_revision < 0:
             raise ValueError("草稿版本应为非负整数")
@@ -342,10 +392,21 @@ class Store:
             revision = previous["revision"] if previous else 0
             if revision != expected_revision:
                 raise Conflict("草稿已在其他页面更新，请刷新后核对")
+            if brief is not None:
+                p = self.row(con, 'projects', meeting['project_id'])
+                execution = con.execute('SELECT mode FROM project_execution WHERE project_id=?', (p['id'],)).fetchone()
+                normalized = normalize(brief, p['idea'], execution['mode'] if execution else 'simulation')
+                if normalized['idea'] != instruction:
+                    raise ValueError('下一轮idea和指令须一致')
+                con.execute('INSERT INTO meeting_input_drafts VALUES(?,?) ON CONFLICT(meeting_id) DO UPDATE SET body=excluded.body', (meeting_id, encode(normalized)))
+            else:
+                con.execute('DELETE FROM meeting_input_drafts WHERE meeting_id=?', (meeting_id,))
             draft = {"meeting_id": meeting_id, "instruction": instruction, "scenario": selected,
                      "revision": revision+1, "edited": time.time()}
             con.execute("INSERT INTO meeting_drafts VALUES(:meeting_id,:instruction,:scenario,:revision,:edited) ON CONFLICT(meeting_id) DO UPDATE SET instruction=excluded.instruction,scenario=excluded.scenario,revision=excluded.revision,edited=excluded.edited", draft)
             self.event(con, meeting["project_id"], "draft_saved", draft)
+            if brief is not None:
+                draft['brief'] = normalized
             return draft
 
     def ask(self, meeting_id, question):
@@ -388,6 +449,8 @@ class Store:
             p=self.row(con,"projects",project_id)
             execution=con.execute("SELECT * FROM project_execution WHERE project_id=?",(project_id,)).fetchone()
             if not execution or execution["mode"]!="real_case":raise Conflict("模拟项目不能调用真实模型")
+            if not self.inputs(con,p)['body']['permissions']['model_calls']:
+                raise Conflict('本轮未授权模型调用')
             count=con.execute("SELECT COUNT(*) FROM model_requests WHERE project_id=? AND category=?",(project_id,category)).fetchone()[0]
             if count>=execution["api_budget" if category=="background" else "qa_api_budget"]:
                 raise Conflict("真实模型请求次数预算已用完；不会自动重试")
@@ -442,18 +505,25 @@ class Store:
             con.execute("INSERT INTO discussion VALUES(?,?,?,?,?)",(uuid.uuid4().hex,meeting_id,question,answer,time.time()))
             self.event(con,m["project_id"],"meeting_question",{"meeting_id":meeting_id,"source":"deepseek-flash"})
 
-    def confirm(self, meeting_id, expected_version, instruction, selected):
+    def confirm(self, meeting_id, expected_version, instruction, selected, brief=None):
         instruction, selected = text(instruction, "下一轮方向"), scenario(selected)
         if type(expected_version) is not int:
             raise ValueError("计划版本应为整数")
         with self.connection(write=True) as con:
             m = self.row(con, "meetings", meeting_id)
+            p = self.row(con, "projects", m["project_id"])
+            execution = con.execute('SELECT mode FROM project_execution WHERE project_id=?', (p['id'],)).fetchone()
+            mode = execution['mode'] if execution else 'simulation'
+            normalized = normalize(brief, instruction, mode) if brief is not None else {**self.inputs(con, p, m['version'])['body'], 'idea': instruction}
+            if normalized['idea'] != instruction:
+                raise ValueError('下一轮idea和指令须一致')
             existing = con.execute("SELECT * FROM decisions WHERE meeting_id=?", (meeting_id,)).fetchone()
             if existing:
                 if existing["instruction"] != instruction or existing["scenario"] != selected or existing["from_version"] != expected_version:
                     raise Conflict("这场组会已确认其他决定；重复确认只能重放原决定")
+                if brief is not None and self.inputs(con, p, existing['to_version'])['body'] != normalized:
+                    raise Conflict('这场组会已确认不同的资源、权限或时间')
                 return dict(existing)
-            p = self.row(con, "projects", m["project_id"])
             if m["version"] != expected_version or p["version"] != expected_version:
                 raise Conflict("计划已更新，请刷新后重新评审")
             new_version = expected_version+1
@@ -462,6 +532,7 @@ class Store:
             con.execute("UPDATE projects SET version=?,scenario=? WHERE id=?", (new_version, selected, p["id"]))
             con.execute("UPDATE tasks SET status='cancelled' WHERE project_id=? AND status='queued' AND version<?", (p["id"], new_version))
             con.execute("UPDATE meetings SET status='closed' WHERE id=?", (meeting_id,))
+            self.save_inputs(con, p['id'], new_version, normalized, mode)
             self.add_round(con, p["id"], new_version, instruction, selected)
             self.event(con, p["id"], "decision_confirmed", decision)
             return decision

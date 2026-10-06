@@ -1,94 +1,316 @@
 "use strict";
-const content = document.querySelector("#content");
-const message = document.querySelector("#message");
-let currentProject = null;
-let currentMeeting = null;
+const content = document.querySelector("#content"), message = document.querySelector("#message");
+let currentProject = null, currentMeeting = null, page = "project", navigation = 0;
 const drafts = new Map();
-let navigation = 0;
-const roles = {researcher:"资料角色",executor:"计算角色",reviewer:"复核角色"};
-const roleName=(role,simulated=true)=>roles[role]+(simulated?" · 模拟":" · 真实 Flash");
-function setMode(real){document.querySelector(".badge").textContent=real?"合成案例 · 真实 Flash":"本地模拟原型";document.querySelector("footer").textContent=real?"角色与问答使用真实 DeepSeek Flash。数据为合成，工具范围固定；不是自主科研或论文复现。":"当前角色和答复由固定程序模拟。没有模型调用、文献检索或真实科研结论。";}
-function caseNumbers(a){if(a.body.simulation!==false||!a.body.results)return "";return `<div class="muted">预测与测试数据的偏差（越小越接近）。每行是一次独立重复：</div><ul>${a.body.results.map(r=>`<li>重复 ${r.seed}：平方误差 ${r.metrics.linear.mse.toFixed(3)}，只猜均值 ${r.metrics.baseline.mse.toFixed(3)}；绝对误差 ${r.metrics.linear.mae.toFixed(3)}；典型偏差（中位数） ${r.metrics.linear.median_absolute_error.toFixed(3)}</li>`).join("")}</ul>`;}
-function caseInputs(a){const p=a.body.parameters;if(a.body.simulation!==false||!p)return "";return `<p class="notice">实际工具输入：${p.test_outlier_fraction===0?"干净测试标签":`测试标签 ${Math.round(p.test_outlier_fraction*100)}% 加入异常点`}；${p.seeds.length} 次重复。模型文字需与这些输入核对。</p>`;}
-function requestPanel(p){if(p.execution.mode!=="real_case")return "";const bg=p.model_requests.filter(r=>r.category==="background").length,qa=p.model_requests.length-bg;const known=p.model_requests.filter(r=>r.usage&&Number.isFinite(r.usage.total_tokens)),unknown=p.model_requests.length-known.length;return `<section class="panel"><h2>真实模型调用与用量</h2><p>后台请求 ${bg}/${p.execution.api_budget} · 组会请求 ${qa}/${p.execution.qa_api_budget}。失败和超时也占次数，不自动重试。</p><p>已知用量 ${known.reduce((n,r)=>n+r.usage.total_tokens,0)} tokens${unknown?`；${unknown} 次用量尚未知`:""}。人民币费用未知；没有 token 硬上限。</p><details><summary>查看每次请求和实际返回</summary><ul>${p.model_requests.map(r=>`<li><a href="/api/model-requests/${esc(r.id)}" target="_blank" rel="noopener">${esc(r.phase)} · ${esc(r.status)}</a>${r.error?`：${esc(r.error)}`:""}</li>`).join("")}</ul></details><details><summary>查看独立保存的工具结果</summary><ul>${(p.tool_operations||[]).map(o=>`<li><a href="/api/tool-operations/${esc(o.id)}" target="_blank" rel="noopener">${esc(o.body.tool)} · 完整输入和结果</a></li>`).join("")||"<li>早期记录仅保存在角色原始证据中。</li>"}</ul></details></section>`;}
-const statuses = {queued:"等待执行",running:"正在运行",completed:"已完成",failed:"运行失败",cancelled:"已被新计划取代"};
-const esc = x => String(x ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const when = t => new Date(t*1000).toLocaleString("zh-CN");
-const selectedName = (s,real=false) => real?(s==="outlier"?"测试标签含约一成异常点":"干净数据"):(s === "outlier" ? "含一个异常点" : "平稳数据");
-function announce(text, error=false) {message.textContent=text;message.className=error?"error":"";}
+const esc = x => String(x ?? "").replace(/[&<>"']/g, c => ({
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  "\"": "&quot;",
+  "'": "&#39;"
+}[c]));
+const when = t => new Date(t * 1000).toLocaleString("zh-CN");
+const states = {
+  queued: "等待",
+  running: "进行中",
+  completed: "完成",
+  failed: "失败",
+  cancelled: "已被新一轮替代"
+};
+const roles = {
+  researcher: "准备输入",
+  executor: "计算实验",
+  reviewer: "独立复算"
+};
+const defaultBrief = () => ({
+  idea: "",
+  resources: "",
+  requirements: "",
+  permissions: {
+    model_calls: false,
+    local_compute: true,
+    public_research: false
+  },
+  work_time: {
+    all_day: false,
+    start: "09:00",
+    end: "18:00",
+    timezone: "Asia/Shanghai"
+  }
+});
+function announce(text, error = false) {
+  message.textContent = text;
+  message.className = error ? "error" : "";
+}
+function modeLabel(real) {
+  document.querySelector(".badge").textContent = real ? "真实 Flash · 固定计算案例" : "流程演示 · 不调用模型";
+  document.querySelector("footer").textContent = "项目输入、规划、证据和组会决定按轮次保存。当前执行器限于固定计算案例，尚未接入自动文献研究。";
+}
+function pipeline(step) {
+  return `<ol class="pipeline" aria-label="项目流程">${ [
+    "设定本轮",
+    "后台工作与报告",
+    "开组会"
+  ].map((s, i) => `<li ${ step === i + 1 ? "aria-current=\"step\"" : "" }>${ i + 1 }. ${ s }</li>`).join("") }</ol>`;
+}
 async function api(path, body) {
-  const response = await fetch(path, body === undefined ? {cache:"no-store"} : {method:"POST",headers:{"Content-Type":"application/json","X-LabCouncil":"local"},body:JSON.stringify(body)});
+  const response = await fetch(path, body === undefined ? { cache: "no-store" } : {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-LabCouncil": "local"
+    },
+    body: JSON.stringify(body)
+  });
   const result = await response.json();
-  if (!response.ok) throw new Error(result.error || "操作失败，请刷新后再试");
+  if (!response.ok)
+    throw new Error(result.error || "操作失败");
   return result;
 }
-async function action(event, work) {
-  event.preventDefault();
-  const button=event.currentTarget.querySelector("button[type=submit]") || event.currentTarget;
-  if (button.disabled) return;
-  button.disabled=true;
-  try {await work();} catch(error) {announce(error.message,true);} finally {button.disabled=false;}
+async function action(e, work) {
+  e.preventDefault();
+  const b = e.currentTarget.querySelector?.("button[type=submit]") || e.currentTarget;
+  if (b.disabled)
+    return;
+  b.disabled = true;
+  try {
+    await work();
+  } catch (error) {
+    announce(error.message, true);
+  } finally {
+    b.disabled = false;
+  }
 }
 async function sidebar() {
-  const result=await api("/api/projects");
-  const nav=document.querySelector("#projects");
-  nav.innerHTML=result.projects.length ? result.projects.map(p=>`<button class="project-link ${p.id===currentProject?"active":""}" data-project="${esc(p.id)}">${esc(p.title)}<small>第 ${p.version} 轮 · ${p.paused?"已暂停":p.mode==="real_case"?"真实 Flash 案例":"模拟任务"}</small></button>`).join("") : '<p class="muted">还没有项目。先提交一个想法，走一遍组会流程。</p>';
-  nav.querySelectorAll("[data-project]").forEach(b=>b.addEventListener("click",()=>showProject(b.dataset.project).catch(e=>announce(e.message,true))));
-  return result.projects;
+  const r = await api("/api/projects");
+  document.querySelector("#projects").innerHTML = r.projects.map(p => `<button class="project-link ${ p.id === currentProject ? "active" : "" }" data-project="${ esc(p.id) }">${ esc(p.title) }<small>第 ${ p.version } 轮</small></button>`).join("") || "<p class=\"muted\">还没有项目</p>";
+  document.querySelectorAll("[data-project]").forEach(b => b.addEventListener("click", () => showProject(b.dataset.project).catch(e => announce(e.message, true))));
+  return r.projects;
 }
-function scenarios(value="clean",real=false) {if(real)return `<option value="clean" ${value==="clean"?"selected":""}>干净测试数据：一次重复</option><option value="outlier" ${value==="outlier"?"selected":""}>测试集含异常点：三次重复</option>`;return `<option value="clean" ${value==="clean"?"selected":""}>平稳数据：5 个点</option><option value="outlier" ${value==="outlier"?"selected":""}>含异常点：最后一个点增加 6</option>`;}
-function newProject() {
-  navigation++;currentProject=null;currentMeeting=null;setMode(false);
-  content.innerHTML=`<section class="hero"><p class="eyebrow">IDEA → EVIDENCE → MEETING</p><h1>把一个想法带进组会</h1><p>先走一遍：后台准备材料，你读报告、追问、确认下一步，研究组再继续。</p></section><div class="notice">选择模拟演示不用 API。真实 Flash 模式会调用本机已配置的 key，但仍限于这个合成计算案例，不能实现任意 idea。</div><form id="create" class="panel form-grid"><label class="wide">项目名称<input name="title" maxlength="120" required placeholder="例如：异常点会怎样影响拟合？"></label><label class="wide">研究想法与本轮要回答的问题<textarea name="idea" maxlength="4000" required placeholder="写清楚你想知道什么，以及什么结果能回答它。"></textarea></label><label>运行方式<select name="mode"><option value="simulation">模拟演示：不调用模型</option><option value="real_case">真实 Flash：合成研究案例</option></select></label><label>案例输入<select name="scenario">${scenarios()}</select></label><label>真实后台请求次数上限<input name="api_budget" type="number" min="0" max="100" value="12" required></label><label>真实组会请求次数上限<input name="qa_api_budget" type="number" min="0" max="100" value="1" required></label><label>准备组会材料的时间（本机时区）<input name="meeting_at" type="datetime-local"><span class="muted">可留空，随时手动开会。需 worker 在线。</span></label><label>后台角色任务总预算<input name="budget" type="number" min="0" max="100" value="9" required><span class="muted">每个角色执行一次计 1；每轮共 3。不是 token 或费用。</span></label><label>组会问答次数总预算<input name="qa_budget" type="number" min="0" max="100" value="6" required></label><div class="wide"><button class="primary" type="submit">创建项目，开始第一轮</button></div></form>`;
-  document.querySelector("#create [name=mode]").addEventListener("change",e=>{const select=document.querySelector("#create [name=scenario]");select.innerHTML=scenarios(select.value,e.target.value==="real_case");});
-  document.querySelector("#create").addEventListener("submit", e=>action(e,async()=>{
-    const form=new FormData(e.currentTarget);
-    const result=await api("/api/projects",{title:form.get("title"),idea:form.get("idea"),scenario:form.get("scenario"),mode:form.get("mode"),api_budget:Number(form.get("api_budget")),qa_api_budget:Number(form.get("qa_api_budget")),budget:Number(form.get("budget")),qa_budget:Number(form.get("qa_budget")),meeting_at:form.get("meeting_at")?new Date(form.get("meeting_at")).getTime()/1000:null});
-    announce("项目已创建。worker 会依次准备输入、计算和复核；每轮做完后等待你的下一次决定。");
-    await showProject(result.id);
+function briefFields(b) {
+  const w = b.work_time;
+  return `<label>Idea：这一轮想解决什么？<textarea name="idea" maxlength="4000" required placeholder="写清楚你想知道什么、希望得到什么结果">${ esc(b.idea) }</textarea></label><label>可调用资源<textarea name="resources" maxlength="4000" placeholder="例如：可用模型和调用额度、本机算力、已有数据、论文或仓库地址。不要填写密钥。">${ esc(b.resources) }</textarea></label><fieldset><legend>权限：允许 agent 做什么？</legend><label class="check"><input type="checkbox" name="model_calls" ${ b.permissions.model_calls ? "checked" : "" }>调用已配置的模型（可能产生费用）</label><label class="check"><input type="checkbox" name="local_compute" ${ b.permissions.local_compute ? "checked" : "" }>运行已接入的本地计算工具</label><label class="check"><input type="checkbox" name="public_research" ${ b.permissions.public_research ? "checked" : "" }>查询公开论文与仓库（尚未接入）</label><p class="muted">这些勾选不授权任意 shell、安装依赖、公开发布或访问其他私人文件。</p></fieldset><fieldset><legend>工作时间：每天什么时段可以工作？</legend><div class="form-grid"><label>每天开始<input name="start" type="time" value="${ esc(w.start) }" required></label><label>每天结束<input name="end" type="time" value="${ esc(w.end) }" required></label></div><label>时区<input name="timezone" value="${ esc(w.timezone) }" required></label><label class="check"><input name="all_day" type="checkbox" ${ w.all_day ? "checked" : "" }>全天可工作</label><p class="muted">支持跨午夜。时段外不启动新任务，已开始的短任务可收尾保存；你可随时开组会。</p></fieldset><label>额外要求<textarea name="requirements" maxlength="4000" placeholder="例如：先复现再采用；保留失败记录；报告用大白话；不要重复已有实验。">${ esc(b.requirements) }</textarea></label>`;
+}
+function readBrief(form) {
+  const f = new FormData(form);
+  return {
+    idea: f.get("idea"),
+    resources: f.get("resources"),
+    requirements: f.get("requirements"),
+    permissions: {
+      model_calls: f.has("model_calls"),
+      local_compute: f.has("local_compute"),
+      public_research: f.has("public_research")
+    },
+    work_time: {
+      all_day: f.has("all_day"),
+      start: f.get("start"),
+      end: f.get("end"),
+      timezone: f.get("timezone")
+    }
+  };
+}
+function scenarioOptions(s = "clean", real = false) {
+  return `<option value="clean" ${ s === "clean" ? "selected" : "" }>${ real ? "干净测试数据，一次重复" : "平稳数据" }</option><option value="outlier" ${ s === "outlier" ? "selected" : "" }>${ real ? "测试标签约一成异常，三次重复" : "含异常点" }</option>`;
+}
+function executorSettings(p = null) {
+  const real = p?.execution.mode === "real_case";
+  return `<details><summary>当前执行器与实验设置</summary><p class="muted">完整研究执行器仍在开发。当前只执行预先定义的数据准备、计算与复算，不能把任意 idea 自动实现成实验。资源文字与公开研究权限会保存，但尚不接入新的机器、文件或检索工具。</p>${ !p ? "<label>项目名称（可选）<input name=\"title\" maxlength=\"120\" placeholder=\"留空时使用 idea 开头\"></label>" : "" }${ p ? `<p>${ real ? "真实 Flash 与固定工具" : "固定程序流程演示" }；执行器在项目创建时选择。</p>` : `<label>执行器<select name="mode"><option value="simulation">流程演示，不调用模型</option><option value="real_case">真实 Flash，固定合成计算</option></select></label>` }<label>本轮计算输入<select name="scenario">${ scenarioOptions(p?.scenario, real) }</select></label>${ !p ? "<div class=\"form-grid\"><label>项目后台模型请求总上限<input type=\"number\" name=\"api_budget\" value=\"12\" min=\"0\" max=\"100\" required></label><label>项目组会模型请求总上限<input type=\"number\" name=\"qa_api_budget\" value=\"1\" min=\"0\" max=\"100\" required></label></div><p class=\"muted\">真实案例每轮通常6次请求；上限包含失败尝试，不自动重试。不是 token 或人民币预算。</p>" : "" }</details>`;
+}
+async function setup(p = null, m = null) {
+  navigation++;
+  page = "inputs";
+  currentProject = p?.id || null;
+  currentMeeting = m?.id || null;
+  const saved = m ? drafts.get(m.id) || m.draft : null;
+  let b = saved?.brief || p?.current_inputs.body || defaultBrief();
+  if (saved && !saved.brief)
+    b = {
+      ...b,
+      idea: saved.instruction
+    };
+  const real = p?.execution.mode === "real_case";
+  modeLabel(real);
+  content.innerHTML = `${ pipeline(1) }<h1>${ m ? `设定第 ${ m.version + 1 } 轮` : "设定第一轮" }</h1><p>${ m ? "同一个项目继续。原有目标、规划、实验、报告与组会决定都会保留。" : "给出目标和工作边界，再让后台开始工作。" }</p><form id="inputs" class="panel">${ briefFields(b) }${ executorSettings(saved ? {
+    ...p,
+    scenario: saved.scenario
+  } : p) }<div class="actions">${ m ? "<button id=\"save-inputs\" type=\"button\">保存草稿</button>" : "" }<button class="primary" type="submit">${ m ? "确认本轮输入，继续后台工作" : "确认输入，开始后台工作" }</button>${ m ? "<button id=\"back-meeting\" type=\"button\">返回组会</button>" : "" }</div><p id="draft-status" class="muted">${ saved ? `草稿版本 ${ saved.revision }。保存不会启动新任务。` : m ? "尚未保存。确认后才进入下一轮。" : "默认只演示流程；真实模型调用需要选择执行器并明确授权。" }</p></form>`;
+  const form = document.querySelector("#inputs");
+  if (!p) {
+    form.querySelector("[name=mode]").addEventListener("change", e => {
+      const yes = e.target.value === "real_case";
+      form.querySelector("[name=scenario]").innerHTML = scenarioOptions("clean", yes);
+      modeLabel(yes);
+    });
+  }
+  form.addEventListener("submit", e => action(e, async () => {
+    const brief = readBrief(form), f = new FormData(form);
+    if (m) {
+      await api(`/api/meetings/${ m.id }/confirm`, {
+        expected_version: m.version,
+        instruction: brief.idea,
+        scenario: f.get("scenario"),
+        brief
+      });
+      announce("已确认下一轮。此前上下文仍保留，后台会按权限和每日时段启动。");
+      await showProject(p.id);
+    } else {
+      const r = await api("/api/projects", {
+        title: f.get("title") || brief.idea.slice(0, 40),
+        idea: brief.idea,
+        brief,
+        mode: f.get("mode"),
+        scenario: f.get("scenario"),
+        budget: 9,
+        qa_budget: 6,
+        api_budget: Number(f.get("api_budget")),
+        qa_api_budget: Number(f.get("qa_api_budget"))
+      });
+      announce("输入已保存。后台按当前权限、工作时段和执行器处理。");
+      await showProject(r.id);
+    }
   }));
-  sidebar().catch(e=>announce(e.message,true));
+  if (m) {
+    document.querySelector("#back-meeting").addEventListener("click", () => showMeeting(m.id));
+    document.querySelector("#save-inputs").addEventListener("click", e => action(e, async () => {
+      const brief = readBrief(form), f = new FormData(form);
+      const r = await api(`/api/meetings/${ m.id }/draft`, {
+        expected_revision: (drafts.get(m.id) || saved)?.revision || 0,
+        instruction: brief.idea,
+        scenario: f.get("scenario"),
+        brief
+      });
+      drafts.set(m.id, r);
+      document.querySelector("#draft-status").textContent = `草稿已保存 · 版本 ${ r.revision }，没有启动新任务。`;
+      announce("五项输入已保存为草稿。");
+    }));
+    form.addEventListener("input", () => {
+      drafts.set(m.id, {
+        brief: readBrief(form),
+        scenario: new FormData(form).get("scenario"),
+        revision: (drafts.get(m.id) || saved)?.revision || 0
+      });
+      document.querySelector("#draft-status").textContent = "内容已修改，尚未保存；原有项目不会被覆盖。";
+    });
+  }
+  await sidebar();
 }
-function evidenceCards(artifacts) {
-  return artifacts.map(a=>`<article class="card"><p class="role">${esc(roleName(a.role,a.body.simulation!==false))} · 第 ${a.version} 轮</p><h3>${a.role==="researcher"?"准备了什么":a.role==="executor"?"得到什么结果":"核对了什么"}</h3>${caseInputs(a)}<p>${esc(a.body.summary)}</p>${caseNumbers(a)}<p class="muted">${esc(a.body.simulation===false?"合成案例。数值复算与模型文字准确性分别检查。":a.role==="researcher"?"固定合成输入，没有论文来源。":a.role==="executor"?"在同一批数据上拟合和评分，尚未检查新数据。":"独立程序复算，只验证这批数据的算术。")}</p>${a.body.simulation===false?`<details><summary>模型给出的限制说明</summary><ul>${(a.body.report?.limitations||[a.body.limitation]).map(x=>`<li>${esc(x)}</li>`).join("")}</ul></details>`:""}<a href="/api/evidence/${esc(a.id)}" target="_blank" rel="noopener">打开原始证据 ↗</a></article>`).join("");
+function inputsSummary(b) {
+  const w = b.work_time;
+  return `<dl><dt>Idea</dt><dd>${ esc(b.idea) }</dd><dt>资源</dt><dd>${ esc(b.resources) || "未补充" }</dd><dt>权限</dt><dd>${ [
+    b.permissions.model_calls ? "模型调用" : null,
+    b.permissions.local_compute ? "已接入本地计算" : null,
+    b.permissions.public_research ? "公开论文与仓库查询（未接入）" : null
+  ].filter(Boolean).join("、") || "未授权执行" }</dd><dt>每日时间</dt><dd>${ w.all_day ? "全天" : `${ esc(w.start) }–${ esc(w.end) }` } · ${ esc(w.timezone) }</dd><dt>额外要求</dt><dd>${ esc(b.requirements) || "未补充" }</dd></dl>`;
+}
+function report(artifacts, simulation) {
+  const by = Object.fromEntries(artifacts.map(a => [
+      a.role,
+      a
+    ])), computed = by.executor?.body, review = by.reviewer?.body;
+  let result = "尚无计算结果，暂时不能判断。";
+  if (computed) {
+    if (simulation)
+      result = computed.metrics.mse < computed.baseline.mse ? "拟合直线比总猜平均值更贴近这五个数据点。但这是拿拟合用的数据评分，尚不知道它对新数据的表现。" : "本轮拟合直线没有比总猜平均值更贴近这五个数据点，需要查看误差和输入。";
+    else {
+      const r = computed.results;
+      result = `已经保存 ${ r.length } 次重复的测试结果。${ r.every(x => x.metrics.linear.mse < x.metrics.baseline.mse) ? "每次重复中，拟合直线的平方误差都低于只猜均值。" : "结果方向不完全一致，需要继续检查。" }这些观察只适用于当前合成数据。`;
+    }
+  }
+  const numbers = computed && !simulation ? `<details><summary>查看具体数值（越小越接近测试标签）</summary><div class="table-scroll"><table><thead><tr><th>重复</th><th>直线平方误差</th><th>均值平方误差</th><th>直线绝对误差</th></tr></thead><tbody>${ computed.results.map(r => `<tr><td>${ r.seed }</td><td>${ r.metrics.linear.mse.toFixed(3) }</td><td>${ r.metrics.baseline.mse.toFixed(3) }</td><td>${ r.metrics.linear.mae.toFixed(3) }</td></tr>`).join("") }</tbody></table></div></details>` : computed ? `<details><summary>查看具体数值（演示数据）</summary><p>这五个点上的平均平方误差：拟合直线 ${ computed.metrics.mse.toFixed(3) }，只猜平均值 ${ computed.baseline.mse.toFixed(3) }。越小表示整体偏差越小；这不是新数据上的成绩。</p></details>` : "";
+  return `<section class="panel report"><h2>本轮报告</h2><p class="muted">摘要由程序依据已保存结果整理；角色原始报告与证据可在下方展开。</p><h3>做了什么</h3><p>${ by.researcher ? "准备输入" + (computed ? "、完成计算" : "") + (review ? "，并独立复算" : "") + "，过程和数据已保存。" : "尚未完成输入准备。" }${ simulation ? "当前使用固定程序演示。" : "角色使用真实 Flash，工具只处理合成计算。" }</p><h3>发现什么</h3><p>${ esc(result) }</p>${ numbers }<h3>还有什么没做</h3><p>${ review ? review.verified ? "数值已独立核对一致，但报告文字仍需审查。" : "数值核对存在不一致，需要检查原始证据。" : "独立核验尚未完成。" } 尚未探索论文或仓库，也没有根据这个 idea 自动编写新实验。</p><h3>组会需要决定什么</h3><p>是否认可这些有限结果？下一轮的目标、资源、权限、每日时段或额外要求是否需要调整？</p><details><summary>审查角色原始报告与证据（${ artifacts.length } 份）</summary>${ artifacts.map(a => {
+    const b = a.body, spec = b.parameters;
+    return `<article class="evidence"><h3>${ esc(roles[a.role]) }</h3>${ spec ? `<p class="muted">工具实际输入：${ spec.test_outlier_fraction === 0 ? "干净测试标签" : "测试标签约一成异常" }，${ spec.seeds.length } 次重复。</p>` : "" }<p>${ esc(b.summary) }</p>${ b.report?.limitations ? `<ul>${ b.report.limitations.map(x => `<li>${ esc(x) }</li>`).join("") }</ul>` : `<p class="muted">${ esc(b.limitation) }</p>` }<a href="/api/evidence/${ esc(a.id) }" target="_blank" rel="noopener">打开原始证据</a></article>`;
+  }).join("") || "<p>尚无产物</p>" }</details></section>`;
+}
+function requestDetails(p) {
+  const real = p.execution.mode === "real_case", rs = p.model_requests, known = rs.filter(r => r.usage && Number.isFinite(r.usage.total_tokens));
+  return `<details><summary>执行状态、额度与调用明细</summary><p>角色任务已用 ${ p.used }/${ p.budget }；问答已用 ${ p.qa_used }/${ p.qa_budget }。${ real ? `后台真实请求 ${ rs.filter(r => r.category === "background").length }/${ p.execution.api_budget }；组会真实请求 ${ rs.filter(r => r.category === "qa").length }/${ p.execution.qa_api_budget }。已知 ${ known.reduce((n, r) => n + r.usage.total_tokens, 0) } tokens；${ rs.length - known.length } 次用量未知。人民币费用未知，没有 token 硬上限。` : "角色与问答为固定程序，不调用模型。" }</p><ul>${ p.tasks.map(t => `<li>第 ${ t.version } 轮 · ${ esc(roles[t.role]) } · ${ esc(states[t.status]) }${ t.error ? `：${ esc(t.error) }` : "" }</li>`).join("") }</ul>${ real ? `<h3>实际模型请求</h3><ul>${ rs.map(r => `<li><a href="/api/model-requests/${ esc(r.id) }" target="_blank" rel="noopener">${ esc(r.phase) } · ${ esc(r.status) }</a></li>`).join("") }</ul><h3>独立保存的工具结果</h3><ul>${ p.tool_operations.map(o => `<li><a href="/api/tool-operations/${ esc(o.id) }" target="_blank" rel="noopener">${ esc(o.body.tool) }</a></li>`).join("") || "<li>早期工具结果保存在角色证据内。</li>" }</ul>` : "" }</details>`;
 }
 async function showProject(id) {
-  const ticket=++navigation;
-  currentProject=id;currentMeeting=null;
-  const p=await api(`/api/projects/${id}`);
-  if(ticket!==navigation)return;
-  currentProject=id;currentMeeting=null;
-  const real=p.execution.mode==="real_case";setMode(real);
-  const tasks=p.tasks.filter(t=>t.version===p.version);
-  const artifacts=p.artifacts.filter(a=>a.version===p.version);
-  const pending=tasks.filter(t=>t.status==="queued").length;
-  content.innerHTML=`<section class="hero"><p class="eyebrow">我的研究项目 · 第 ${p.version} 轮</p><h1>${esc(p.title)}</h1><p class="direction">${esc(p.idea)}</p><span class="pill">${esc(selectedName(p.scenario,real))}</span></section><div class="budget"><div><strong>${p.used} / ${p.budget}</strong><small>已用后台角色任务</small></div><div><strong>${p.qa_used} / ${p.qa_budget}</strong><small>已用组会问答次数</small></div><div><strong>${tasks.filter(t=>t.status==="completed").length} / 3</strong><small>本轮完成角色</small></div></div>${p.paused?'<div class="notice">项目已暂停，不会启动新任务。正在执行的短任务可以结束并保存。</div>':""}${pending&&p.used>=p.budget?'<div class="notice">后台角色任务预算已用完，剩余任务等待。你仍可读证据、开会，或在设置中增加预算。</div>':""}<div class="actions"><button class="primary" id="start-meeting">查看或开始本轮组会</button><button id="refresh">刷新进度</button><span class="muted">${p.meeting_at?`定时准备：${when(p.meeting_at)}`:"没有待执行的定时组会"}</span></div><div class="grid">${tasks.map(t=>`<article class="card"><p class="role">${esc(roleName(t.role,!real))}</p><span class="pill status-${esc(t.status)}">${esc(statuses[t.status])}</span><details><summary>本轮任务指令</summary><p class="muted direction">${esc(t.instruction)}</p></details>${t.error?`<p>${esc(t.error)}</p>`:""}</article>`).join("")}</div><div class="section-top"><h2>最新报告与证据</h2><span class="muted">${real?"真实模型与本地工具产物 · 合成数据":"全部为模拟角色产物"}</span></div>${real?'<div class="notice">数值复算通过仅说明计算一致。模型报告仍可能把输入场景说错；请结合实际工具输入和原始证据阅读。</div>':""}${artifacts.length?`<div class="grid">${evidenceCards(artifacts)}</div>`:'<div class="panel muted">还没有报告。如果状态一直等待，请按说明启动独立 worker。</div>'}<section class="panel"><h2>已保存的组会</h2><div class="history">${p.meetings.map(m=>`<div class="history-item"><div>第 ${m.version} 轮 · ${when(m.created)}<br><small class="muted">${m.status==="closed"?"决定已确认，会后任务已派发":"待你评审"}</small></div><button data-meeting="${esc(m.id)}">打开组会</button></div>`).join("")||'<p class="muted">组会开始后，报告会冻结为当时的版本。</p>'}</div></section>${requestPanel(p)}<details><summary>项目设置：暂停、预算与下次组会</summary><form id="configure" class="panel form-grid"><label>后台角色任务总上限<input type="number" name="budget" min="0" max="100" value="${p.budget}" required></label><label>组会问答次数总上限<input type="number" name="qa_budget" min="0" max="100" value="${p.qa_budget}" required></label><label>执行状态<select name="paused"><option value="false" ${!p.paused?"selected":""}>继续执行</option><option value="true" ${p.paused?"selected":""}>暂停新任务</option></select></label><label>准备组会时间（本机时区）<input type="datetime-local" name="meeting_at"><span class="muted">留空会取消尚未到时的安排。</span></label><div class="wide"><button type="submit">保存设置</button></div></form></details>`;
-  document.querySelector("#start-meeting").addEventListener("click",e=>action(e,async()=>{const m=await api(`/api/projects/${id}/meeting`,{});await showMeeting(m.id);}));
-  document.querySelector("#refresh").addEventListener("click",()=>showProject(id).catch(e=>announce(e.message,true)));
-  content.querySelectorAll("[data-meeting]").forEach(b=>b.addEventListener("click",()=>showMeeting(b.dataset.meeting).catch(e=>announce(e.message,true))));
-  document.querySelector("#configure").addEventListener("submit",e=>action(e,async()=>{const f=new FormData(e.currentTarget);await api(`/api/projects/${id}/configure`,{paused:f.get("paused")==="true",budget:Number(f.get("budget")),qa_budget:Number(f.get("qa_budget")),meeting_at:f.get("meeting_at")?new Date(f.get("meeting_at")).getTime()/1000:null});announce("设置已保存。");await showProject(id);}));
+  const ticket = ++navigation;
+  page = "project";
+  currentProject = id;
+  currentMeeting = null;
+  const p = await api(`/api/projects/${ id }`);
+  if (ticket !== navigation)
+    return;
+  const real = p.execution.mode === "real_case", b = p.current_inputs.body, tasks = p.tasks.filter(t => t.version === p.version), artifacts = p.artifacts.filter(a => a.version === p.version), done = tasks.every(t => t.status === "completed");
+  modeLabel(real);
+  let status = done ? "本轮工作完成，等待你开组会" : tasks.some(t => t.status === "failed") ? "本轮有任务失败，等待你审查" : p.paused ? "后台已暂停" : p.work_blocker || "后台按当前计划工作";
+  if (!done && p.used >= p.budget && !tasks.some(t => t.status === "running"))
+    status = "任务额度已用完，等待你审查";
+  content.innerHTML = `${ pipeline(2) }<h1>第 ${ p.version } 轮：工作与报告</h1><p class="muted">${ esc(status) }</p><p class="direction">${ esc(b.idea.slice(0, 240)) }${ b.idea.length > 240 ? "…（完整目标见本轮输入）" : "" }</p><div class="actions"><button class="primary" id="open-meeting">开组会，审查本轮报告</button><button id="refresh">刷新进度</button></div><details><summary>本轮输入：资源、权限、每日时间与要求</summary>${ inputsSummary(b) }${ p.current_inputs.legacy ? "<p class=\"muted\">旧案例没有保存五项输入，显示兼容默认值；历史证据没有修改。</p>" : "" }</details><details><summary>本轮规划与进度 · ${ tasks.filter(t => t.status === "completed").length }/3 项完成</summary><p>${ esc(p.current_inputs.plan.granularity) }</p><ol class="plan">${ p.current_inputs.plan.steps.map((s, i) => `<li>${ esc(s) } <span class="muted">${ esc(states[tasks[i]?.status] || "等待") }</span></li>`).join("") }</ol><p class="muted">当前计划由固定执行器生成。按资源和时间自主规划、自动探索论文／仓库及持续研究 loop 仍待接入。</p></details>${ report(artifacts, !real) }<details><summary>项目历史：原有输入、规划与组会决定</summary><p class="muted">新一轮接着同一个项目工作，不会清空旧证据。历史组会材料固定为当时版本。</p>${ p.input_history.map(i => `<details><summary>第 ${ i.version } 轮输入与规划</summary>${ inputsSummary(i.body) }<ol>${ i.plan.steps.map(s => `<li>${ esc(s) }</li>`).join("") }</ol></details>`).join("") }<div class="history">${ p.meetings.map(m => `<div class="history-item"><span>第 ${ m.version } 轮组会 · ${ m.status === "closed" ? "已确认下一轮" : "待审查" }</span><button data-meeting="${ esc(m.id) }">查看组会</button></div>`).join("") || "<p>尚未开组会</p>" }</div></details>${ requestDetails(p) }<details><summary>暂停、角色额度与定时准备材料</summary><form id="configure" class="panel"><div class="form-grid"><label>项目角色任务总上限<input name="budget" type="number" min="0" max="100" value="${ p.budget }" required></label><label>项目问答总上限<input name="qa_budget" type="number" min="0" max="100" value="${ p.qa_budget }" required></label></div><label>后台状态<select name="paused"><option value="false" ${ !p.paused ? "selected" : "" }>继续</option><option value="true" ${ p.paused ? "selected" : "" }>暂停新任务</option></select></label><label>下次准备组会材料时间（浏览器本机时区）<input name="meeting_at" type="datetime-local"><span class="muted">留空取消定时安排。每日工作时段在组会后的本轮输入中调整。</span></label><button type="submit">保存设置</button></form></details>`;
+  document.querySelector("#open-meeting").addEventListener("click", e => action(e, async () => {
+    const m = await api(`/api/projects/${ id }/meeting`, {});
+    await showMeeting(m.id);
+  }));
+  document.querySelector("#refresh").addEventListener("click", () => showProject(id).catch(e => announce(e.message, true)));
+  content.querySelectorAll("[data-meeting]").forEach(x => x.addEventListener("click", () => showMeeting(x.dataset.meeting).catch(e => announce(e.message, true))));
+  document.querySelector("#configure").addEventListener("submit", e => action(e, async () => {
+    const f = new FormData(e.currentTarget);
+    await api(`/api/projects/${ id }/configure`, {
+      paused: f.get("paused") === "true",
+      budget: Number(f.get("budget")),
+      qa_budget: Number(f.get("qa_budget")),
+      meeting_at: f.get("meeting_at") ? new Date(f.get("meeting_at")).getTime() / 1000 : null
+    });
+    announce("设置已保存。");
+    await showProject(id);
+  }));
   await sidebar();
 }
 async function showMeeting(id) {
-  const ticket=++navigation;
-  currentMeeting=id;
-  const m=await api(`/api/meetings/${id}`);
-  if(ticket!==navigation)return;
-  currentProject=m.project_id;currentMeeting=id;
-  const s=m.snapshot;const real=s.simulation===false;setMode(real);
-  const draft=drafts.get(id)||m.draft||{revision:0,instruction:real?"给测试标签加入约一成异常点，使用三个预设重复，比较三种误差并独立复算。只保留合成案例的有限结论。":"加入一个异常点，再比较误差，并复算关键结果。只保留这个小例子的结论。",scenario:"outlier"};
-  const unfinished=s.tasks.filter(t=>t.status!=="completed");
-  content.innerHTML=`<section class="hero"><p class="eyebrow">GROUP MEETING · 第 ${m.version} 轮</p><h1>先看证据，再定下一步</h1><p>做了什么、能说明什么、还有什么没做。你的确认会成为下一轮任务。</p><span class="pill">${m.status==="closed"?"组会已结束":"等待你评审"}</span></section><div class="actions"><button id="back">返回项目最新进度</button><span class="muted">报告截止：${when(s.cutoff)}</span></div><div class="notice">${esc(s.notice)}${unfinished.length?` 截止时还有 ${unfinished.length} 个角色未完成；本场材料并不完整。`:""}</div><div class="grid">${evidenceCards(s.artifacts)}</div>${!s.artifacts.length?'<div class="panel muted">开会时还没有产物。你可以返回项目读最新报告；本场快照不会自动补入它们。</div>':""}<section class="panel"><h2>追问与讨论</h2><p class="muted">${real?"当前答复使用真实 Flash，只依据这场快照。一次追问占一次真实组会请求；讨论不会派单。":"当前答复是程序模板，会引用快照；并非语言模型对任意问题的回答。讨论不会自动改变任务。"}</p><div id="discussion">${m.discussion.map(d=>`<div class="conversation"><strong>你的问题</strong><p>${esc(d.question)}</p><strong>${real?"真实 Flash 答复":"模拟角色答复"}</strong><p>${esc(d.answer)}</p></div>`).join("")||'<p class="muted">可以从“这些结果能说明什么？”开始。</p>'}</div>${m.status!=="closed"?`<form id="ask"><label>向组会追问<textarea name="question" maxlength="1000" required placeholder="例如：复核检查了哪些证据？"></textarea></label><button type="submit">${real?"向 Flash 追问并保存答复":"保存问题，查看模拟答复"}</button></form>`:""}</section><section class="panel"><h2>${m.decision?"已确认的下一轮决定":"编辑下一轮方向"}</h2>${m.decision?`<p class="direction">${esc(m.decision.instruction)}</p><p>第 ${m.decision.to_version} 轮 · ${esc(selectedName(m.decision.scenario,real))}</p><p class="muted">决定已保存。重复确认不会再派单。</p>`:`<p class="muted">自由文字会保存为任务指令。${real?"真实模型只调用本案例的受控工具，依据所选场景计算；不会自动编写新实验。":"模拟计算只执行所选的数据场景；不是自动编写新实验。"}</p><form id="confirm"><label>下一轮要做什么<textarea name="instruction" maxlength="4000" required>${esc(draft.instruction)}</textarea></label><label>下一轮演示输入<select name="scenario">${scenarios(draft.scenario,real)}</select></label><p id="draft-status" class="muted">${m.draft?`草稿已保存 · 版本 ${m.draft.revision} · ${when(m.draft.edited)}`:"草稿尚未保存。保存草稿不会派发任务；确认决定才会。"}</p><div class="actions"><button id="save-draft" type="button">保存草稿，不派单</button><button class="primary" type="submit">确认决定并启动第 ${m.version+1} 轮</button></div></form>`}</section>`;
-  document.querySelector("#back").addEventListener("click",()=>showProject(m.project_id).catch(e=>announce(e.message,true)));
-  const ask=document.querySelector("#ask");
-  if(ask) ask.addEventListener("submit",e=>action(e,async()=>{const f=new FormData(e.currentTarget);if(real)announce("正在依据快照向 Flash 追问，请稍候；本次会计入调用次数。");await api(`/api/meetings/${id}/ask`,{question:f.get("question")});await showMeeting(id);announce("追问已保存；下一轮方向仍需你单独确认。");}));
-  const confirm=document.querySelector("#confirm");
-  if(confirm) confirm.addEventListener("input",()=>{const f=new FormData(confirm);drafts.set(id,{instruction:f.get("instruction"),scenario:f.get("scenario"),revision: (drafts.get(id)||draft).revision||0});document.querySelector("#draft-status").textContent="内容已编辑，尚未保存这次修改。";});
-  const saveDraft=document.querySelector("#save-draft");
-  if(saveDraft) saveDraft.addEventListener("click",e=>action(e,async()=>{const f=new FormData(confirm);const saved=await api(`/api/meetings/${id}/draft`,{expected_revision:(drafts.get(id)||draft).revision||0,instruction:f.get("instruction"),scenario:f.get("scenario")});drafts.set(id,saved);await showMeeting(id);announce("草稿已保存，没有派发新任务。确认决定后才会开始下一轮。");}));
-  if(confirm) confirm.addEventListener("submit",e=>action(e,async()=>{const f=new FormData(e.currentTarget);const d=await api(`/api/meetings/${id}/confirm`,{expected_version:m.version,instruction:f.get("instruction"),scenario:f.get("scenario")});announce(`决定已确认，第 ${d.to_version} 轮任务已派发。`);await showMeeting(id);}));
+  const ticket = ++navigation;
+  page = "meeting";
+  currentMeeting = id;
+  const m = await api(`/api/meetings/${ id }`);
+  if (ticket !== navigation)
+    return;
+  currentProject = m.project_id;
+  const s = m.snapshot, real = !s.simulation;
+  modeLabel(real);
+  const p = await api(`/api/projects/${ m.project_id }`);
+  if (ticket !== navigation)
+    return;
+  const exhausted = real && p.model_requests.filter(r => r.category === "qa").length >= p.execution.qa_api_budget || p.qa_used >= p.qa_budget || real && !p.current_inputs.body.permissions.model_calls;
+  content.innerHTML = `${ pipeline(3) }<h1>第 ${ m.version } 轮组会</h1><p class="muted">材料截止 ${ when(s.cutoff) } · ${ m.status === "closed" ? "已确认下一轮" : "等待审查" }。${ s.tasks.some(t => t.status !== "completed") ? "开会时有任务尚未完成，本场材料不完整。" : "本轮报告已固定保存。" }</p><button id="back-project">返回项目</button>${ report(s.artifacts, s.simulation) }<section class="panel"><h2>追问与审查意见</h2><p class="muted">${ real ? "真实 Flash 依据本场快照回答。" : "当前为模板问答演示。" }讨论不会自动改变下一轮计划。</p>${ m.discussion.map(d => `<div class="conversation"><strong>问题</strong><p>${ esc(d.question) }</p><strong>${ real ? "Flash 答复" : "模拟答复" }</strong><p>${ esc(d.answer) }</p></div>`).join("") }${ m.status !== "closed" ? `<form id="ask"><label>你想追问什么？<textarea name="question" maxlength="1000" required ${ exhausted ? "disabled" : "" }></textarea></label><button type="submit" ${ exhausted ? "disabled" : "" }>保存追问并查看答复</button>${ exhausted ? "<p class=\"muted\">问答额度已用完或模型调用未授权。仍可审查证据并设定下一轮输入。</p>" : "" }</form>` : "" }</section>${ m.decision ? `<section class="panel"><h2>已确认的下一轮</h2><p>${ esc(m.decision.instruction) }</p><p>第 ${ m.decision.to_version } 轮；旧报告、规划与决定仍保留。</p><details><summary>查看确认后的五项输入</summary>${ inputsSummary(m.next_inputs.body) }</details></section>` : `<section class="panel"><h2>审查后，重新设定下一轮</h2><p>带着这个项目的上下文，调整 idea、资源、权限、每日工作时间和额外要求。只有确认后，后台才开始新一轮。</p><button class="primary" id="next-inputs">调整下一轮输入</button></section>` }<details><summary>本场组会对应的输入与规划</summary>${ inputsSummary(m.inputs.body) }<ol>${ m.inputs.plan.steps.map(x => `<li>${ esc(x) }</li>`).join("") }</ol></details>`;
+  document.querySelector("#back-project").addEventListener("click", () => showProject(m.project_id));
+  document.querySelector("#next-inputs")?.addEventListener("click", () => setup({
+    ...p,
+    current_inputs: m.inputs
+  }, m));
+  document.querySelector("#ask")?.addEventListener("submit", e => action(e, async () => {
+    if (real)
+      announce("正在依据固定快照回答，本次计入真实问答请求。");
+    await api(`/api/meetings/${ id }/ask`, { question: new FormData(e.currentTarget).get("question") });
+    await showMeeting(id);
+    announce("追问已保存；下一轮输入仍需你确认。");
+  }));
   await sidebar();
 }
-document.querySelector("#new-project").addEventListener("click",newProject);
-if(location.protocol==="file:"){document.querySelector("#new-project").disabled=true;announce("你正在预览 HTML 文件。请从本地服务地址打开，才能连接数据库和后台 worker。",true);}else (async()=>{try {const list=await sidebar();if(list.length)await showProject(list[0].id);else newProject();}catch(e){announce(`连接本地服务失败：${e.message}`,true);}})();
-setInterval(async()=>{if(!currentProject||currentMeeting||document.activeElement?.matches("input,textarea,select")||document.querySelector("details[open]"))return;try{await showProject(currentProject);}catch(e){announce(e.message,true);}},4000);
+document.querySelector("#new-project").addEventListener("click", () => setup().catch(e => announce(e.message, true)));
+if (location.protocol === "file:") {
+  document.querySelector("#new-project").disabled = true;
+  announce("请通过本地服务地址打开，HTML文件预览不能保存项目。", true);
+} else
+  (async () => {
+    try {
+      const ps = await sidebar();
+      if (ps.length)
+        await showProject(ps[0].id);
+      else
+        await setup();
+    } catch (e) {
+      announce(`连接本地服务失败：${ e.message }`, true);
+    }
+  })();
+setInterval(async () => {
+  if (page !== "project" || !currentProject || document.activeElement?.matches("input,textarea,select") || [...document.querySelectorAll("details[open]")].some(d => d.getClientRects().length))
+    return;
+  try {
+    await showProject(currentProject);
+  } catch (e) {
+    announce(e.message, true);
+  }
+}, 4000);

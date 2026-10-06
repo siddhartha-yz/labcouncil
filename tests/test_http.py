@@ -79,6 +79,28 @@ class HTTPTests(unittest.TestCase):
             self.assertEqual(status, 403)
         self.assertEqual(self.store.projects(), [])
 
+    def test_five_inputs_travel_through_http_draft_and_confirmation(self):
+        from labcouncil.brief import normalize
+        brief=normalize(None,'第一轮目标','simulation')
+        brief['resources']='自有公开数据'
+        status,_,raw=self.request('POST','/api/projects',{'title':'五项输入','idea':brief['idea'],'brief':brief})
+        self.assertEqual(status,201)
+        pid=json.loads(raw)['id']
+        _,_,raw=self.request('POST',f'/api/projects/{pid}/meeting',{})
+        mid=json.loads(raw)['id']
+        brief={**brief,'idea':'第二轮目标','requirements':'继承原有数据和规划'}
+        body={'expected_revision':0,'instruction':brief['idea'],'scenario':'outlier','brief':brief}
+        self.assertEqual(self.request('POST',f'/api/meetings/{mid}/draft',body)[0],200)
+        self.assertEqual(self.store.project(pid)['version'],1)
+        body={**body,'expected_version':1}
+        self.assertEqual(self.request('POST',f'/api/meetings/{mid}/confirm',body)[0],200)
+        status,_,raw=self.request('GET',f'/api/projects/{pid}')
+        self.assertEqual(status,200)
+        project=json.loads(raw)
+        self.assertEqual(project['current_inputs']['body'],brief)
+        self.assertEqual(len(project['input_history']),2)
+        self.assertEqual(len(project['tasks']),6)
+
     def test_invalid_requests_and_no_file_traversal(self):
         self.assertEqual(self.request("POST", "/api/projects", ["bad"])[0], 400)
         self.assertEqual(self.request("POST", "/api/projects", {"title":"x","idea":"y","budget":"9"})[0], 400)

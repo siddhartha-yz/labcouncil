@@ -1,0 +1,37 @@
+{
+  "source": "actual local stop/start after UI draft save",
+  "project_equal": true,
+  "meeting_and_five_input_draft_equal": true,
+  "model_requests": 0,
+  "stop": {
+    "stopped": {
+      "serve": true,
+      "worker": true
+    },
+    "database_retained": true
+  },
+  "start": {
+    "url": "http://127.0.0.1:8965",
+    "default_mode": "simulation",
+    "supports_real_case": true,
+    "services": {
+      "serve": {
+        "pid": 83121,
+        "command": "serve",
+        "instance": "ce94f7eadad6401a97d230d3db24b249",
+        "database": "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/pipeline-preview/state.sqlite3",
+        "created": 1791283699.2005374,
+        "port": 8965,
+        "running": true
+      },
+      "worker": {
+        "pid": 83123,
+        "command": "worker",
+        "instance": "951716f8f3e24ca88a22367a6c57f59e",
+        "database": "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/pipeline-preview/state.sqlite3",
+        "created": 1791283699.2587967,
+        "running": true
+      }
+    }
+  }
+}

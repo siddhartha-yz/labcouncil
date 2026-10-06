@@ -1,0 +1,14 @@
+{
+  "source": "actual UI inputs and owned local simulation worker",
+  "two_rounds_completed": true,
+  "five_inputs_inherited_and_changed": true,
+  "first_round_plan_and_evidence_unchanged": true,
+  "group_meeting_snapshot_unchanged": true,
+  "same_project_id": true,
+  "confirmed_input_versions": 2,
+  "role_artifacts": 6,
+  "questions": 1,
+  "decisions": 1,
+  "duplicate_confirmation_new_tasks": 0,
+  "actual_model_requests": 0
+}
