@@ -1,0 +1,626 @@
+{
+  "source_sha256": "c5f2b125ee2ba3d1a19be92932f06365d0b80e13ded7588046a196ff379ef32f",
+  "langgraph_version": "1.2.13",
+  "records": {
+    "original": {
+      "steps": [
+        {
+          "result": {
+            "remoteRuntimePendingInterrupt": {
+              "resourceId": "fixture",
+              "value": {
+                "action": "first-approval"
+              }
+            },
+            "__interrupt__": [
+              {
+                "value": {
+                  "action": "first-approval"
+                },
+                "id": "f4eadd5c8dd3cceb37a5560d62676e7e"
+              }
+            ]
+          }
+        },
+        {
+          "error_type": "RuntimeError",
+          "message": "(Interrupt(value={'action': 'second-approval'}, id='f4eadd5c8dd3cceb37a5560d62676e7e', response_schema=None),)",
+          "cause_type": "GraphInterrupt"
+        }
+      ],
+      "remote_calls": [
+        "approve-first"
+      ],
+      "pending_nodes": [
+        "resume"
+      ],
+      "final_values": {
+        "remoteRuntimePendingInterrupt": {
+          "resourceId": "fixture",
+          "value": {
+            "action": "first-approval"
+          }
+        }
+      }
+    },
+    "candidate": {
+      "steps": [
+        {
+          "result": {
+            "remoteRuntimePendingInterrupt": {
+              "resourceId": "fixture",
+              "value": {
+                "action": "first-approval"
+              }
+            },
+            "__interrupt__": [
+              {
+                "value": {
+                  "action": "first-approval"
+                },
+                "id": "e1bf0d0a265fb5c42611deca07d09fd8"
+              }
+            ]
+          }
+        },
+        {
+          "result": {
+            "remoteRuntimePendingInterrupt": {
+              "resourceId": "fixture",
+              "value": {
+                "action": "first-approval"
+              }
+            },
+            "__interrupt__": [
+              {
+                "value": {
+                  "action": "second-approval"
+                },
+                "id": "e1bf0d0a265fb5c42611deca07d09fd8"
+              }
+            ]
+          }
+        },
+        {
+          "result": {
+            "remoteRuntimePendingInterrupt": null,
+            "result": "completed"
+          }
+        }
+      ],
+      "remote_calls": [
+        "approve-first",
+        "approve-first",
+        "approve-second"
+      ],
+      "pending_nodes": [],
+      "final_values": {
+        "remoteRuntimePendingInterrupt": null,
+        "result": "completed"
+      }
+    },
+    "remote_error": {
+      "steps": [
+        {
+          "result": {
+            "remoteRuntimePendingInterrupt": {
+              "resourceId": "fixture",
+              "value": {
+                "action": "first-approval"
+              }
+            },
+            "__interrupt__": [
+              {
+                "value": {
+                  "action": "first-approval"
+                },
+                "id": "22759fc274a20d00667243120ddd4f2e"
+              }
+            ]
+          }
+        },
+        {
+          "error_type": "RuntimeError",
+          "message": "synthetic remote unavailable",
+          "cause_type": "OSError"
+        }
+      ],
+      "remote_calls": [
+        "approve-first"
+      ],
+      "pending_nodes": [
+        "resume"
+      ],
+      "final_values": {
+        "remoteRuntimePendingInterrupt": {
+          "resourceId": "fixture",
+          "value": {
+            "action": "first-approval"
+          }
+        }
+      }
+    },
+    "invalid_response": {
+      "steps": [
+        {
+          "result": {
+            "remoteRuntimePendingInterrupt": {
+              "resourceId": "fixture",
+              "value": {
+                "action": "first-approval"
+              }
+            },
+            "__interrupt__": [
+              {
+                "value": {
+                  "action": "first-approval"
+                },
+                "id": "6943bb0012500de73569ca123927114d"
+              }
+            ]
+          }
+        },
+        {
+          "error_type": "RuntimeError",
+          "message": "Remote runtime did not return a valid LangGraph state.",
+          "cause_type": null
+        }
+      ],
+      "remote_calls": [
+        "approve-first"
+      ],
+      "pending_nodes": [
+        "resume"
+      ],
+      "final_values": {
+        "remoteRuntimePendingInterrupt": {
+          "resourceId": "fixture",
+          "value": {
+            "action": "first-approval"
+          }
+        }
+      }
+    },
+    "wrong_resource": {
+      "steps": [
+        {
+          "result": {
+            "remoteRuntimePendingInterrupt": null
+          }
+        }
+      ],
+      "remote_calls": [],
+      "pending_nodes": [],
+      "final_values": {
+        "remoteRuntimePendingInterrupt": null
+      }
+    },
+    "candidate_stateful_remote": {
+      "steps": [
+        {
+          "result": {
+            "remoteRuntimePendingInterrupt": {
+              "resourceId": "fixture",
+              "value": {
+                "action": "first-approval"
+              }
+            },
+            "__interrupt__": [
+              {
+                "value": {
+                  "action": "first-approval"
+                },
+                "id": "520e1b4f23914a9b42f6470bef2ebc0e"
+              }
+            ]
+          }
+        },
+        {
+          "result": {
+            "remoteRuntimePendingInterrupt": {
+              "resourceId": "fixture",
+              "value": {
+                "action": "first-approval"
+              }
+            },
+            "__interrupt__": [
+              {
+                "value": {
+                  "action": "second-approval"
+                },
+                "id": "520e1b4f23914a9b42f6470bef2ebc0e"
+              }
+            ]
+          }
+        },
+        {
+          "error_type": "RuntimeError",
+          "message": "Approval replay mismatch: expected approve-second, got approve-first",
+          "cause_type": "ValueError"
+        }
+      ],
+      "remote_calls": [
+        "approve-first",
+        "approve-first"
+      ],
+      "pending_nodes": [
+        "resume"
+      ],
+      "final_values": {
+        "remoteRuntimePendingInterrupt": {
+          "resourceId": "fixture",
+          "value": {
+            "action": "first-approval"
+          }
+        }
+      }
+    },
+    "candidate_checkpointed_runtime": {
+      "steps": [
+        {
+          "result": {
+            "remoteRuntimePendingInterrupt": {
+              "resourceId": "fixture",
+              "value": {
+                "action": "first-approval"
+              }
+            },
+            "__interrupt__": [
+              {
+                "value": {
+                  "action": "first-approval"
+                },
+                "id": "c5a97ee378c60053cccd947a77cc9ece"
+              }
+            ]
+          }
+        },
+        {
+          "result": {
+            "remoteRuntimePendingInterrupt": {
+              "resourceId": "fixture",
+              "value": {
+                "action": "first-approval"
+              }
+            },
+            "__interrupt__": [
+              {
+                "value": {
+                  "action": "second-approval"
+                },
+                "id": "c5a97ee378c60053cccd947a77cc9ece"
+              }
+            ]
+          }
+        },
+        {
+          "result": {
+            "remoteRuntimePendingInterrupt": null,
+            "result": "completed",
+            "approvals": [
+              "approve-first",
+              "approve-first"
+            ]
+          }
+        }
+      ],
+      "remote_calls": [
+        "approve-first",
+        "approve-first"
+      ],
+      "pending_nodes": [],
+      "final_values": {
+        "remoteRuntimePendingInterrupt": null,
+        "result": "completed",
+        "approvals": [
+          "approve-first",
+          "approve-first"
+        ]
+      }
+    },
+    "durable_checkpointed_runtime": {
+      "steps": [
+        {
+          "result": {
+            "remoteRuntimePendingInterrupt": {
+              "resourceId": "fixture",
+              "value": {
+                "action": "first-approval"
+              }
+            },
+            "__interrupt__": [
+              {
+                "value": {
+                  "action": "first-approval"
+                },
+                "id": "b0d8152f1c65054307d1d74be0840ac0"
+              }
+            ]
+          }
+        },
+        {
+          "result": {
+            "remoteRuntimePendingInterrupt": {
+              "resourceId": "fixture",
+              "value": {
+                "action": "first-approval"
+              }
+            },
+            "__interrupt__": [
+              {
+                "value": {
+                  "action": "second-approval"
+                },
+                "id": "b0d8152f1c65054307d1d74be0840ac0"
+              }
+            ]
+          }
+        },
+        {
+          "result": {
+            "remoteRuntimePendingInterrupt": null,
+            "result": "completed",
+            "approvals": [
+              "approve-first",
+              "approve-second"
+            ]
+          }
+        }
+      ],
+      "remote_calls": [
+        "approve-first",
+        "approve-second"
+      ],
+      "pending_nodes": [],
+      "final_values": {
+        "remoteRuntimePendingInterrupt": null,
+        "result": "completed",
+        "approvals": [
+          "approve-first",
+          "approve-second"
+        ]
+      }
+    },
+    "durable_stateful_remote": {
+      "steps": [
+        {
+          "result": {
+            "remoteRuntimePendingInterrupt": {
+              "resourceId": "fixture",
+              "value": {
+                "action": "first-approval"
+              }
+            },
+            "__interrupt__": [
+              {
+                "value": {
+                  "action": "first-approval"
+                },
+                "id": "19b00004f87808184719fee773ee1973"
+              }
+            ]
+          }
+        },
+        {
+          "result": {
+            "remoteRuntimePendingInterrupt": {
+              "resourceId": "fixture",
+              "value": {
+                "action": "first-approval"
+              }
+            },
+            "__interrupt__": [
+              {
+                "value": {
+                  "action": "second-approval"
+                },
+                "id": "19b00004f87808184719fee773ee1973"
+              }
+            ]
+          }
+        },
+        {
+          "result": {
+            "remoteRuntimePendingInterrupt": null,
+            "result": "completed"
+          }
+        }
+      ],
+      "remote_calls": [
+        "approve-first",
+        "approve-second"
+      ],
+      "pending_nodes": [],
+      "final_values": {
+        "remoteRuntimePendingInterrupt": null,
+        "result": "completed"
+      }
+    },
+    "durable_remote_error": {
+      "steps": [
+        {
+          "result": {
+            "remoteRuntimePendingInterrupt": {
+              "resourceId": "fixture",
+              "value": {
+                "action": "first-approval"
+              }
+            },
+            "__interrupt__": [
+              {
+                "value": {
+                  "action": "first-approval"
+                },
+                "id": "0e318d24bd3637cbd7a218c3b4de8749"
+              }
+            ]
+          }
+        },
+        {
+          "error_type": "RuntimeError",
+          "message": "synthetic remote unavailable",
+          "cause_type": "OSError"
+        }
+      ],
+      "remote_calls": [
+        "approve-first"
+      ],
+      "pending_nodes": [
+        "resume"
+      ],
+      "final_values": {
+        "remoteRuntimePendingInterrupt": {
+          "resourceId": "fixture",
+          "value": {
+            "action": "first-approval"
+          }
+        }
+      }
+    },
+    "candidate_denial": {
+      "steps": [
+        {
+          "result": {
+            "remoteRuntimePendingInterrupt": {
+              "resourceId": "fixture",
+              "value": {
+                "action": "first-approval"
+              }
+            },
+            "__interrupt__": [
+              {
+                "value": {
+                  "action": "first-approval"
+                },
+                "id": "d80f138d8c5ee12ee26cb2b95db85cbf"
+              }
+            ]
+          }
+        },
+        {
+          "result": {
+            "remoteRuntimePendingInterrupt": {
+              "resourceId": "fixture",
+              "value": {
+                "action": "first-approval"
+              }
+            },
+            "__interrupt__": [
+              {
+                "value": {
+                  "action": "second-approval"
+                },
+                "id": "d80f138d8c5ee12ee26cb2b95db85cbf"
+              }
+            ]
+          }
+        },
+        {
+          "result": {
+            "remoteRuntimePendingInterrupt": null,
+            "result": "completed",
+            "approvals": [
+              "approve-first",
+              "approve-first"
+            ]
+          }
+        }
+      ],
+      "remote_calls": [
+        "approve-first",
+        "approve-first"
+      ],
+      "pending_nodes": [],
+      "final_values": {
+        "remoteRuntimePendingInterrupt": null,
+        "result": "completed",
+        "approvals": [
+          "approve-first",
+          "approve-first"
+        ]
+      }
+    },
+    "durable_denial": {
+      "steps": [
+        {
+          "result": {
+            "remoteRuntimePendingInterrupt": {
+              "resourceId": "fixture",
+              "value": {
+                "action": "first-approval"
+              }
+            },
+            "__interrupt__": [
+              {
+                "value": {
+                  "action": "first-approval"
+                },
+                "id": "d15e4c5ae5967404bd9717a378feab34"
+              }
+            ]
+          }
+        },
+        {
+          "result": {
+            "remoteRuntimePendingInterrupt": {
+              "resourceId": "fixture",
+              "value": {
+                "action": "first-approval"
+              }
+            },
+            "__interrupt__": [
+              {
+                "value": {
+                  "action": "second-approval"
+                },
+                "id": "d15e4c5ae5967404bd9717a378feab34"
+              }
+            ]
+          }
+        },
+        {
+          "result": {
+            "remoteRuntimePendingInterrupt": null,
+            "result": "completed",
+            "approvals": [
+              "approve-first",
+              "deny-second"
+            ]
+          }
+        }
+      ],
+      "remote_calls": [
+        "approve-first",
+        "deny-second"
+      ],
+      "pending_nodes": [],
+      "final_values": {
+        "remoteRuntimePendingInterrupt": null,
+        "result": "completed",
+        "approvals": [
+          "approve-first",
+          "deny-second"
+        ]
+      }
+    }
+  },
+  "checks": {
+    "original_wraps_second_interrupt": true,
+    "candidate_pauses_on_second_approval": true,
+    "candidate_completes_after_both_approvals": true,
+    "real_remote_failure_still_errors": true,
+    "invalid_remote_response_still_errors": true,
+    "wrong_resource_never_invoked": true,
+    "candidate_replay_problem_detected": true,
+    "candidate_wrong_decision_in_real_checkpoints_detected": true,
+    "durable_preserves_distinct_decisions": true,
+    "durable_calls_each_resume_once": true,
+    "durable_stateful_remote_completes": true,
+    "durable_real_remote_failure_still_errors": true,
+    "simple_candidate_loses_denial": true,
+    "durable_preserves_denial_payload": true
+  },
+  "model_calls": 0,
+  "remote_provider": "deterministic fixture",
+  "full_service_retested": false
+}

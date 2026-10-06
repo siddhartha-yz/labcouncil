@@ -9,3 +9,5 @@ reproductions/2026-10-05-comparison/runs/*/artifacts/**/*.csv -text whitespace=c
 reproductions/2026-10-04-source-mapping/freephdlabor-author-*/original-* -text whitespace=-blank-at-eof,-blank-at-eol
 # Preserve exact diagnostic output (tracebacks may end lines with spaces).
 reproductions/**/*.txt -text -whitespace
+# Unified diff context lines contain a required leading space.
+reproductions/**/*.patch -text -whitespace

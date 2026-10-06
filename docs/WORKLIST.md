@@ -9,9 +9,9 @@
 | InternAgent 1.5 | 原始基线两次通过；原 Claude runner 的 DeepSeek Flash 短连接通过；完整入口缺依赖 | 在固定预算下验证一次实际代码修改、实验和结果核验；补退出状态/超时防护，不将短连接当完整发现循环 |
 | SCP | 原 SDK 的 stdio 与回环 HTTP 自有小工具通过；保留环境超时和错误分支缺陷 | 有具体科学工具需求后检查那个工具及权限/费用/恢复；云端 Hub、科学工具库和完整自部署仍未验证 |
 | 书生·端砚 / Intern-Discovery | 已查公开产品页；未登录试用 | 检查开放入口、报告和证据导出、可接入接口；需要用户账号才能验证的部分明确留待验证 |
-| InternAgentS | 小计算和正常重启通过；连续审批、预算失败；浏览器交互未完成 | 固定兼容依赖，隔离验证审批异常修复与真实用量计量；重新验收协调服务路径和网页交互，之后再决定是否采用 |
+| InternAgentS | 小计算和正常重启通过；连续审批、预算失败；浏览器交互未完成 | 局部诊断确认简单补丁会重放审批；任务缓存候选局部通过。下一步在独立副本复验完整协调服务、否决、操作去重、真实用量和网页交互，再决定采用 |
 
-证据：[上海 AI Lab 调查](../reproductions/2026-10-05-shanghai-lab/REPORT.md)、[InternAgentS 实际试用](../reproductions/2026-10-06-internagents-runtime/REPORT.md)。新增：[InternAgent 最小运行](../reproductions/2026-10-06-internagent-autodebug/REPORT.md)、[SCP 最小工具](../reproductions/2026-10-06-scp-minimal/REPORT.md)。上游修复后的结果要另立记录，保留本轮失败。
+证据：[上海 AI Lab 调查](../reproductions/2026-10-05-shanghai-lab/REPORT.md)、[InternAgentS 实际试用](../reproductions/2026-10-06-internagents-runtime/REPORT.md)。新增：[InternAgent 最小运行](../reproductions/2026-10-06-internagent-autodebug/REPORT.md)、[SCP 最小工具](../reproductions/2026-10-06-scp-minimal/REPORT.md)。[连续审批局部诊断](../reproductions/2026-10-06-internagents-approval-component/REPORT.md)保留简单补丁的负结果与任务缓存候选；它不代替整套服务复验。上游修复后的结果要另立记录，保留本轮失败。
 
 ## 原有候选和未完成的科研复现
 
@@ -47,4 +47,4 @@ M1 已完成模拟两轮和一次确认组会，见 [记录](../reproductions/20
 3. 固定外部实验 ID、结果查询和重启恢复；再验收真实两轮与一次用户组会。
 4. 有具体工具需求时继续 InternAgent/SCP 组件集成，最后按 M4 开展代表性真实问题评估。
 
-端砚试用、InternAgentS 修复复验及原有候选按对应模块需要继续跟进。避免把主线拖成无限扩大的资料调查。具体验收仍以 [PLAN.md](PLAN.md) 为准。
+端砚试用、InternAgentS 修复复验及原有候选按对应模块需要继续跟进。避免把主线拖成无限扩大的资料调查。具体验收仍以 [PLAN.md](PLAN.md) 为准；下一轮真实接入按 [M2 协议](M2-PROTOCOL.md) 执行，避免模拟预算与真实费用混用。

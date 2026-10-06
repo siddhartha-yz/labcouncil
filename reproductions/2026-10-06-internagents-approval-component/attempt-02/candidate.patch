@@ -1,0 +1,28 @@
+--- a/internagents/agent_graph.py
++++ b/internagents/agent_graph.py
+@@ -1249,16 +1249,16 @@
+     decision = interrupt(pending.get("value"))
+     payload: Any = Command(resume=decision)
+     remote_config = _sanitize_remote_runtime_config(config)
+-    try:
+-        while True:
++    while True:
++        try:
+             result = await remote.ainvoke(payload, config=remote_config)
+-            interrupt_value = _remote_interrupt_value(result)
+-            if interrupt_value is None:
+-                break
+-            payload = Command(resume=interrupt(interrupt_value))
+-    except Exception as exc:
+-        message = _remote_runtime_exception_message(resource, exc)
+-        raise RuntimeError(message) from exc
++        except Exception as exc:
++            message = _remote_runtime_exception_message(resource, exc)
++            raise RuntimeError(message) from exc
++        interrupt_value = _remote_interrupt_value(result)
++        if interrupt_value is None:
++            break
++        payload = Command(resume=interrupt(interrupt_value))
+ 
+     if not isinstance(result, dict):
+         raise RuntimeError("Remote runtime did not return a valid LangGraph state.")

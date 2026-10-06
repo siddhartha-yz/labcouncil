@@ -1,0 +1,10 @@
+{
+  "attempt": "03",
+  "execution_environment": "restricted",
+  "completed": false,
+  "model_calls": 0,
+  "operator_terminated_owned_process": true,
+  "exit_code": 143,
+  "specific_restriction_identified": false,
+  "control": "Same source completed in permitted local-thread environment, see attempt-03/result.json"
+}

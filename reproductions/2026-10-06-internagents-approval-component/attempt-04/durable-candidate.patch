@@ -1,0 +1,41 @@
+--- a/internagents/agent_graph.py
++++ b/internagents/agent_graph.py
+@@ -86,6 +86,7 @@
+ from langgraph.graph import END, START, StateGraph
+ from langgraph.graph.message import add_messages
+ from langgraph.pregel.remote import RemoteGraph
++from langgraph.func import task
+ from langgraph.types import Command, interrupt
+ 
+ from internagents.dynamic_local_backend import (
+@@ -1249,16 +1250,20 @@
+     decision = interrupt(pending.get("value"))
+     payload: Any = Command(resume=decision)
+     remote_config = _sanitize_remote_runtime_config(config)
+-    try:
+-        while True:
+-            result = await remote.ainvoke(payload, config=remote_config)
+-            interrupt_value = _remote_interrupt_value(result)
+-            if interrupt_value is None:
+-                break
+-            payload = Command(resume=interrupt(interrupt_value))
+-    except Exception as exc:
+-        message = _remote_runtime_exception_message(resource, exc)
+-        raise RuntimeError(message) from exc
++    @task(name="resume_remote_runtime_call")
++    async def invoke_once(resume_value: Any) -> Any:
++        return await remote.ainvoke(Command(resume=resume_value), config=remote_config)
++
++    while True:
++        try:
++            result = await invoke_once(payload.resume)
++        except Exception as exc:
++            message = _remote_runtime_exception_message(resource, exc)
++            raise RuntimeError(message) from exc
++        interrupt_value = _remote_interrupt_value(result)
++        if interrupt_value is None:
++            break
++        payload = Command(resume=interrupt(interrupt_value))
+ 
+     if not isinstance(result, dict):
+         raise RuntimeError("Remote runtime did not return a valid LangGraph state.")
