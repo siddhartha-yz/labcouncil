@@ -7,7 +7,7 @@ PERMISSIONS = ('model_calls', 'local_compute', 'public_research')
 
 def normalize(value, idea, mode):
     defaults = {'idea': idea, 'resources': '', 'requirements': '',
-        'permissions': {'model_calls': mode == 'real_case', 'local_compute': True, 'public_research': False},
+        'permissions': {'model_calls': mode != 'simulation', 'local_compute': True, 'public_research': False},
         'work_time': {'all_day': True, 'start': '09:00', 'end': '18:00', 'timezone': 'Asia/Shanghai'}}
     if value is None:
         return defaults
@@ -53,9 +53,9 @@ def in_work_time(brief, now):
 
 
 def start_blocker(brief, mode, now):
-    if not brief['permissions']['local_compute']:
+    if mode != 'research' and not brief['permissions']['local_compute']:
         return '未授权本地计算；当前执行器需要此权限，等待组会调整'
-    if mode == 'real_case' and not brief['permissions']['model_calls']:
+    if mode != 'simulation' and not brief['permissions']['model_calls']:
         return '未授权模型调用，等待组会调整'
     if not in_work_time(brief, now):
         return '等待下一次每日工作时段'
@@ -63,6 +63,15 @@ def start_blocker(brief, mode, now):
 
 
 def make_plan(brief, mode):
+    if mode == 'research':
+        hours = brief['work_time']
+        return {'source': 'platform research boundaries; actual agent plan in each artifact', 'objective': brief['idea'],
+            'granularity': '每步选择一个查询或核对；依据资源与每日时段安排后续，最多六步后等组会',
+            'work_window': '全天' if hours['all_day'] else f"每天{hours['start']}–{hours['end']}（{hours['timezone']}）",
+            'resources': brief['resources'], 'requirements': brief['requirements'],
+            'steps': ['agent根据输入规划下一步', '保存公开资料或受控计算证据', '依据已有证据继续，达到边界后等组会'],
+            'unavailable': ['任意仓库代码执行', '完整论文全文阅读和论文实验复现', '任意GPU训练'],
+            'executor': '真实Flash与有界研究工具'}
     # This is a transparent bounded executor plan, not model-generated research.
     hours = brief['work_time']
     window = '每天全天' if hours['all_day'] else f"每天{hours['start']}–{hours['end']}（{hours['timezone']}）"
@@ -71,4 +80,4 @@ def make_plan(brief, mode):
         'work_window': window, 'resources': brief['resources'], 'requirements': brief['requirements'],
         'steps': ['准备本轮输入与数据', '执行计算，保存实验数据和指标', '独立复算，整理报告，等待组会'],
         'unavailable': ['论文和仓库自动探索', '任意实验代码生成', '根据剩余资源自主规划并持续研究'],
-        'executor': '真实Flash与固定工具' if mode == 'real_case' else '固定程序流程演示'}
+        'executor': '真实Flash与固定工具' if mode != 'simulation' else '固定程序流程演示'}

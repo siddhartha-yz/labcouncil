@@ -1,0 +1,31 @@
+{
+  "project_id": "ccea126f7d7e4758a4c72dd99379971e",
+  "scope": "front-end command public-source component; not daemon research validation",
+  "model_requests": 0,
+  "result": {
+    "status": "error",
+    "http_requests": [
+      {
+        "id": "5f6c72d5372d4d74a5805cf089512f29",
+        "url": "https://api.github.com/repos/InternScience/scp",
+        "status": "completed",
+        "sha256": "b9c2b90c7c33553badf510684cbf912965687bd3bc9ad472b6ff632fa8e0260b",
+        "cached": false,
+        "http_status": 200
+      },
+      {
+        "id": "be734fcf8bf3419c98609a0611ae087f",
+        "url": "https://api.github.com/repos/InternScience/scp/commits?per_page=1",
+        "status": "error",
+        "sha256": "5b61ffd0701e37e9ff9abf7071c6030d04d7977e92dae5518d978a069b1ba771",
+        "cached": false,
+        "http_status": null,
+        "error_type": "URLError",
+        "reason_type": "SSLEOFError",
+        "errno": null
+      }
+    ],
+    "error": "公开资料未能读取或格式不符合预期；不会偷偷重试同一请求"
+  },
+  "sources": []
+}

@@ -104,6 +104,17 @@ CREATE TABLE IF NOT EXISTS tool_operations (
  task_id TEXT NOT NULL UNIQUE REFERENCES tasks(id), body TEXT NOT NULL,
  sha256 TEXT NOT NULL, created REAL NOT NULL
 );
+CREATE TABLE IF NOT EXISTS source_requests (
+ id TEXT PRIMARY KEY, project_id TEXT NOT NULL REFERENCES projects(id),
+ task_id TEXT NOT NULL REFERENCES tasks(id), fingerprint TEXT NOT NULL,
+ url TEXT NOT NULL, status TEXT NOT NULL, body TEXT, sha256 TEXT,
+ http_status INTEGER, created REAL NOT NULL, finished REAL,
+ UNIQUE(project_id,fingerprint)
+);
+CREATE TRIGGER IF NOT EXISTS source_no_overwrite BEFORE UPDATE ON source_requests
+ WHEN OLD.status != 'started' BEGIN SELECT RAISE(ABORT,'Source attempt is immutable after completion'); END;
+CREATE TRIGGER IF NOT EXISTS source_no_delete BEFORE DELETE ON source_requests
+ BEGIN SELECT RAISE(ABORT,'Source attempt is immutable'); END;
 CREATE TABLE IF NOT EXISTS round_inputs (
  project_id TEXT NOT NULL REFERENCES projects(id), version INTEGER NOT NULL,
  body TEXT NOT NULL, plan TEXT NOT NULL, created REAL NOT NULL,
@@ -165,9 +176,9 @@ class Store:
         con.execute("INSERT INTO events(project_id,kind,body,created) VALUES(?,?,?,?)",
                     (project_id, kind, encode(body), time.time()))
 
-    def add_round(self, con, project_id, version, direction, selected):
+    def add_round(self, con, project_id, version, direction, selected, mode="simulation"):
         previous = None
-        for role in ("researcher", "executor", "reviewer"):
+        for role in (("research_step_01",) if mode == "research" else ("researcher", "executor", "reviewer")):
             identifier = uuid.uuid4().hex
             con.execute("INSERT INTO tasks(id,project_id,version,role,instruction,scenario,dependency,status,created) VALUES(?,?,?,?,?,?,?,?,?)",
                         (identifier, project_id, version, role, direction, selected, previous, "queued", time.time()))
@@ -177,7 +188,7 @@ class Store:
                        mode="simulation", api_budget=18, qa_api_budget=3, brief=None):
         title, idea = text(title, "项目名称", 120), text(idea, "研究想法")
         selected, budget, qa_budget = scenario(selected), quota(budget), quota(qa_budget)
-        if mode not in ("simulation", "real_case"):
+        if mode not in ("simulation", "real_case", "research"):
             raise ValueError("运行模式无效")
         api_budget, qa_api_budget = quota(api_budget), quota(qa_api_budget)
         brief = normalize(brief, idea, mode)
@@ -188,8 +199,8 @@ class Store:
             con.execute("INSERT INTO projects(id,title,idea,version,scenario,budget,qa_budget,meeting_at,created) VALUES(?,?,?,?,?,?,?,?,?)",
                         (identifier, title, idea, 1, selected, budget, qa_budget, meeting_at, time.time()))
             self.save_inputs(con, identifier, 1, brief, mode)
-            self.add_round(con, identifier, 1, brief['idea'], selected)
-            con.execute("INSERT INTO project_execution VALUES(?,?,?,?)",(identifier,mode,api_budget if mode=="real_case" else 0,qa_api_budget if mode=="real_case" else 0))
+            self.add_round(con, identifier, 1, brief['idea'], selected, mode)
+            con.execute("INSERT INTO project_execution VALUES(?,?,?,?)",(identifier,mode,api_budget if mode!="simulation" else 0,qa_api_budget if mode!="simulation" else 0))
             self.event(con, identifier, "project_created", {"simulation": mode=="simulation"})
         return identifier
 
@@ -233,6 +244,10 @@ class Store:
             for request in result["model_requests"]:
                 for key in ("request","response","usage"):
                     if request[key] is not None:request[key]=json.loads(request[key])
+            if result['execution']['mode'] == 'research' and result['execution']['api_budget'] - sum(r['category']=='background' for r in result['model_requests']) < 2:
+                result['work_blocker'] = '剩余模型额度不足以完成下一步，等待组会审查'
+            result['source_requests'] = [dict(r) for r in con.execute(
+                'SELECT id,task_id,url,status,sha256,http_status,created,finished FROM source_requests WHERE project_id=? ORDER BY created', (identifier,))]
             return result
 
     def configure(self, identifier, paused, budget, qa_budget, meeting_at=None):
@@ -255,11 +270,12 @@ class Store:
             for old in expired:
                 p = self.row(con, "projects", old["project_id"])
                 execution=con.execute("SELECT mode FROM project_execution WHERE project_id=?",(p["id"],)).fetchone()
-                real=execution and execution["mode"]=="real_case"
+                real=execution and execution["mode"]!="simulation"
                 new_status = "cancelled" if old["version"] != p["version"] else ("failed" if real or old["attempts"] >= 3 else "queued")
                 con.execute("UPDATE tasks SET status=?,owner=NULL,lease_until=NULL,error=? WHERE id=?",
                             (new_status, "真实调用中断，结果可能未知；不会自动重发" if real else "运行中断，租约过期；仅模拟任务可安全重算", old["id"]))
                 if real:
+                    con.execute("UPDATE source_requests SET status='unknown' WHERE task_id=? AND status='started'", (old['id'],))
                     con.execute("UPDATE model_requests SET status='unknown',error='worker lease expired' WHERE task_id=? AND status='started'",(old["id"],))
                 self.event(con, p["id"], "lease_expired", {"task_id": old["id"], "status": new_status})
             rows = con.execute("""SELECT t.* FROM tasks t JOIN projects p ON p.id=t.project_id
@@ -273,6 +289,10 @@ class Store:
                 p = self.row(con, 'projects', row['project_id'])
                 execution = con.execute('SELECT mode FROM project_execution WHERE project_id=?', (p['id'],)).fetchone()
                 mode = execution['mode'] if execution else 'simulation'
+                if mode == 'research':
+                    used = con.execute("SELECT COUNT(*) FROM model_requests WHERE project_id=? AND category='background'", (p['id'],)).fetchone()[0]
+                    cap = con.execute('SELECT api_budget FROM project_execution WHERE project_id=?', (p['id'],)).fetchone()[0]
+                    if cap - used < 2: continue
                 if not start_blocker(self.inputs(con, p)['body'], mode, now):
                     eligible.append(row)
                     break
@@ -286,7 +306,7 @@ class Store:
             if not task["charged"]:
                 con.execute("UPDATE projects SET used=used+1 WHERE id=?", (task["project_id"],))
             con.execute("UPDATE tasks SET status='running',charged=1,attempts=attempts+1,owner=?,lease_until=?,error=NULL WHERE id=?",
-                        (owner, now+(180 if mode=="real_case" else lease_seconds), task["id"]))
+                        (owner, now+(180 if mode!="simulation" else lease_seconds), task["id"]))
             self.event(con, task["project_id"], "task_started", {"task_id": task["id"], "attempt": task["attempts"]+1})
             return {**self.row(con, "tasks", task["id"]),"mode":mode}
 
@@ -316,6 +336,22 @@ class Store:
                         (uuid.uuid4().hex, task["id"], task["project_id"], task["version"], task["role"], canonical, hashlib.sha256(canonical.encode()).hexdigest(), time.time()))
             con.execute("UPDATE tasks SET status='completed',finished=?,owner=NULL,lease_until=NULL WHERE id=?", (time.time(), task["id"]))
             self.event(con, task["project_id"], "task_completed", {"task_id": task["id"], "version": task["version"]})
+            if task.get('mode') == 'research':
+                p = self.row(con, 'projects', task['project_id'])
+                execution = con.execute('SELECT * FROM project_execution WHERE project_id=?', (p['id'],)).fetchone()
+                count = con.execute('SELECT COUNT(*) FROM tasks WHERE project_id=? AND version=?', (p['id'], task['version'])).fetchone()[0]
+                requests = con.execute("SELECT COUNT(*) FROM model_requests WHERE project_id=? AND category='background'", (p['id'],)).fetchone()[0]
+                reason = 'agent准备好组会材料'
+                if body.get('continue_work'):
+                    if p['version'] != task['version']: reason = '已确认新一轮，旧轮停止'
+                    elif count >= 6: reason = '本轮六步上限已到'
+                    elif p['used'] >= p['budget']: reason = '项目任务额度已到'
+                    elif execution['api_budget'] - requests < 2: reason = '剩余模型额度不足以完成下一步'
+                    else:
+                        con.execute('INSERT INTO tasks(id,project_id,version,role,instruction,scenario,dependency,status,created) VALUES(?,?,?,?,?,?,?,?,?)',
+                            (uuid.uuid4().hex,p['id'],task['version'],f'research_step_{count+1:02d}',task['instruction'],task['scenario'],task['id'],'queued',time.time()))
+                        reason = None
+                if reason: self.event(con,p['id'],'research_stopped',{'version':task['version'],'reason':reason})
 
     def fail(self, task, error):
         with self.connection(write=True) as con:
@@ -351,6 +387,10 @@ class Store:
         snapshot = {"simulation": not execution or execution["mode"]=="simulation", "cutoff": time.time(), "idea": p["idea"], "scenario": p["scenario"], "tasks": tasks, "artifacts": artifacts,
                     "notice": "这是开会时的固定快照。之后完成的任务请在项目最新进度中查看。"}
         snapshot['inputs'] = self.inputs(con, p)
+        snapshot['tool_operations'] = [{**dict(r),'body':json.loads(r['body'])} for r in con.execute(
+            'SELECT o.* FROM tool_operations o JOIN tasks t ON t.id=o.task_id WHERE o.project_id=? AND t.version=? ORDER BY o.created', (project_id,p['version']))]
+        snapshot['source_requests'] = [dict(r) for r in con.execute(
+            'SELECT s.id,s.url,s.status,s.http_status,s.sha256 FROM source_requests s JOIN tasks t ON t.id=s.task_id WHERE s.project_id=? AND t.version=? ORDER BY s.created', (project_id,p['version']))]
         identifier = uuid.uuid4().hex
         con.execute("INSERT INTO meetings VALUES(?,?,?,?,?,?)", (identifier, project_id, p["version"], encode(snapshot), "in_review", time.time()))
         con.execute("UPDATE projects SET meeting_at=NULL WHERE id=?", (project_id,))
@@ -413,7 +453,10 @@ class Store:
         question = text(question, "问题", 1000)
         meeting=self.meeting(meeting_id)
         if not meeting["snapshot"]["simulation"]:
-            from .case import answer_meeting
+            if self.project(meeting['project_id'])['execution']['mode'] == 'research':
+                from .research import answer_meeting
+            else:
+                from .case import answer_meeting
             return answer_meeting(self,meeting_id,question)
         with self.connection(write=True) as con:
             meeting = self.row(con, "meetings", meeting_id)
@@ -448,7 +491,7 @@ class Store:
         with self.connection(write=True) as con:
             p=self.row(con,"projects",project_id)
             execution=con.execute("SELECT * FROM project_execution WHERE project_id=?",(project_id,)).fetchone()
-            if not execution or execution["mode"]!="real_case":raise Conflict("模拟项目不能调用真实模型")
+            if not execution or execution["mode"]=="simulation":raise Conflict("模拟项目不能调用真实模型")
             if not self.inputs(con,p)['body']['permissions']['model_calls']:
                 raise Conflict('本轮未授权模型调用')
             count=con.execute("SELECT COUNT(*) FROM model_requests WHERE project_id=? AND category=?",(project_id,category)).fetchone()[0]
@@ -533,6 +576,40 @@ class Store:
             con.execute("UPDATE tasks SET status='cancelled' WHERE project_id=? AND status='queued' AND version<?", (p["id"], new_version))
             con.execute("UPDATE meetings SET status='closed' WHERE id=?", (meeting_id,))
             self.save_inputs(con, p['id'], new_version, normalized, mode)
-            self.add_round(con, p["id"], new_version, instruction, selected)
+            self.add_round(con, p["id"], new_version, instruction, selected, mode)
             self.event(con, p["id"], "decision_confirmed", decision)
             return decision
+
+    def reserve_source(self, task, fingerprint, url):
+        """One durable attempt per exact source request, including failed/unknown reads."""
+        with self.connection(write=True) as con:
+            p = self.row(con, 'projects', task['project_id'])
+            current = self.row(con, 'tasks', task['id'])
+            if current['status'] != 'running' or current['owner'] != task['owner'] or current['lease_until'] <= time.time() or current['version'] != p['version']:
+                raise Conflict('任务已失效，停止公开查询')
+            if not self.inputs(con,p)['body']['permissions']['public_research']:
+                raise Conflict('未授权公开资料查询')
+            old = con.execute('SELECT * FROM source_requests WHERE project_id=? AND fingerprint=?', (p['id'],fingerprint)).fetchone()
+            if old: return dict(old), False
+            count = con.execute('SELECT COUNT(*) FROM source_requests WHERE project_id=?',(p['id'],)).fetchone()[0]
+            if count >= 24: raise Conflict('项目公开HTTP请求二十四次上限已到')
+            identifier = uuid.uuid4().hex
+            con.execute("INSERT INTO source_requests(id,project_id,task_id,fingerprint,url,status,created) VALUES(?,?,?,?,?,'started',?)",
+                (identifier,p['id'],task['id'],fingerprint,url,time.time()))
+            return self.row(con,'source_requests',identifier), True
+
+    def finish_source(self, identifier, body, status, http_status=None):
+        canonical = encode(body)
+        with self.connection(write=True) as con:
+            row = self.row(con,'source_requests',identifier)
+            if row['status'] != 'started': raise Conflict('已保存的查询结果不可覆盖')
+            con.execute('UPDATE source_requests SET body=?,sha256=?,status=?,http_status=?,finished=? WHERE id=?',
+                (canonical,hashlib.sha256(canonical.encode()).hexdigest(),status,http_status,time.time(),identifier))
+
+    def source_record(self, identifier):
+        with self.connection() as con:
+            row = self.row(con,'source_requests',identifier)
+            if row['body'] is not None:
+                if hashlib.sha256(row['body'].encode()).hexdigest() != row['sha256']: raise Conflict('公开资料记录哈希不一致')
+                row['body'] = json.loads(row['body'])
+            return row

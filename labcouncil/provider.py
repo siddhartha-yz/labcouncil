@@ -25,6 +25,8 @@ class Provider:
             payload['tool_choice']={'type':'function','function':{'name':tool['function']['name']}} if require_tool else 'none'
         if len(json.dumps(payload,ensure_ascii=False).encode())>20000:
             raise ValueError('案例模型输入超过二万字节限制')
+        if not any('json' in str(m.get('content','')).lower() for m in messages if m.get('role') in ('system','user')):
+            raise ValueError('JSON输出模式需要在system或user提示中明确JSON；请求未发送')
         key=self.config['DEEPSEEK_API_KEY']
         safe_payload=redact(payload,key)
         identifier=store.reserve_request(project_id,category,phase,safe_payload,task,meeting_id)
@@ -39,8 +41,14 @@ class Provider:
                 body=json.loads(raw,parse_constant=lambda value: (_ for _ in ()).throw(ValueError('非有限数字')))
         except urllib.error.HTTPError as error:
             status=error.code
-            error.close()
-            store.finish_request(identifier,http_status=status,error='provider_http_error',elapsed=time.monotonic()-started)
+            try:
+                raw_error=error.read(16385)
+                diagnostic=json.loads(raw_error) if len(raw_error)<=16384 else {'error':'http_error_body_too_large'}
+            except (OSError,ValueError):
+                diagnostic={'error':'http_error_body_unavailable'}
+            finally:
+                error.close()
+            store.finish_request(identifier,response=redact(diagnostic,key),http_status=status,error='provider_http_error',elapsed=time.monotonic()-started)
             raise ValueError(f'真实模型 HTTP {status}；这次请求已计入，不自动重试') from None
         except (OSError,ValueError,TimeoutError):
             store.finish_request(identifier,error='transport_or_response_error',elapsed=time.monotonic()-started)

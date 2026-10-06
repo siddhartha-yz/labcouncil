@@ -33,7 +33,7 @@ def handler(store):
             path = urlsplit(self.path).path
             try:
                 if path == "/api/health":
-                    return self.send(200, {"ok": True, "default_mode":"simulation","supports_real_case":True, "instance_id": self.server.instance_id})
+                    return self.send(200, {"ok": True, "default_mode":"simulation","supports_real_case":True, "supports_research":True, "instance_id": self.server.instance_id})
                 if path == "/api/projects":
                     return self.send(200, {"projects": store.projects(), "default_mode":"simulation"})
                 parts = path.strip("/").split("/")
@@ -48,6 +48,8 @@ def handler(store):
                     return self.send(200,store.request_record(parts[2]))
                 if len(parts)==3 and parts[:2]==["api","tool-operations"]:
                     return self.send(200,store.operation_record(parts[2]))
+                if len(parts)==3 and parts[:2]==["api","source-requests"]:
+                    return self.send(200,store.source_record(parts[2]))
                 files = {"/": ("index.html", "text/html; charset=utf-8"), "/app.js": ("app.js", "text/javascript; charset=utf-8"), "/style.css": ("style.css", "text/css; charset=utf-8")}
                 if path in files:
                     filename, mime = files[path]

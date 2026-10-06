@@ -117,3 +117,5 @@ The [freephdlabor real-agent record](reproductions/2026-10-04-freephdlabor-agent
 The [Virtual Lab individual-meeting supplement](reproductions/2026-10-04-virtual-lab-meeting/REPORT.md) preserves source criticism into the saved follow-up summary. Separate semantic inspection found an invalid proposal to reuse one seed's baseline score across other seeds. Preserving criticism does not establish scientific correctness.
 
 The [historical-source audit](reproductions/2026-10-04-source-mapping/REPORT.md) distinguishes the paper-era Assistants interface from the newer Chat Completions implementation. The [controlled comparison](reproductions/2026-10-05-comparison/REPORT.md) contains 12 real runs across single-agent, multi-agent, and actual user-review conditions; its small synthetic tasks do not establish general scientific superiority.
+
+研究模式新增实际逐步规划与公开资料适配器，每步根据已保存证据选择下一步；真实验收仍有公网TLS失败，论文摘要和完整README尚未取得。不是完整论文复现平台，结果与限制见 [研究loop记录](reproductions/2026-10-06-research-loop/REPORT.md)。

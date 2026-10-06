@@ -1,0 +1,26 @@
+{
+  "before_calls": 12,
+  "after_calls": 12,
+  "source_attempts": 4,
+  "artifacts_and_inputs_unchanged": true,
+  "claim_after_restart": null,
+  "services": {
+    "serve": {
+      "pid": 108035,
+      "command": "serve",
+      "instance": "15dc825588da410d902df5a2c03b6125",
+      "database": "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/pipeline-preview/state.sqlite3",
+      "created": 1791286324.3831222,
+      "port": 8965,
+      "running": true
+    },
+    "worker": {
+      "pid": 108037,
+      "command": "worker",
+      "instance": "447a5bc29ad047ac8f69b1ef551bae72",
+      "database": "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/pipeline-preview/state.sqlite3",
+      "created": 1791286324.4959168,
+      "running": true
+    }
+  }
+}

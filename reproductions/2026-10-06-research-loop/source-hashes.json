@@ -1,0 +1,12 @@
+{
+  "labcouncil/store.py": "3613e396daa883a5d3f919427c1aa2f2c96f4e22d3afdfd46663d25a06997ed2",
+  "labcouncil/brief.py": "cddb709f54e17631c87cb189db12fa5034146a20ab601c8cd6ba68fe88600db1",
+  "labcouncil/research.py": "df2dd0eb5f1ff9c15863efee80ebacb8db476971abd02280d539fad95c452063",
+  "labcouncil/sources.py": "30293687fd72ad1b6007072dedacbfb0ee0fdb5dcba80b060dd04b63ca6084e5",
+  "labcouncil/provider.py": "1e118d2b4a4d36bd39982b4de89f3de26734b3de475d3b83231de5b2f8bebdd8",
+  "labcouncil/worker.py": "778ec9435dea4fec5ddedaa91d62d6e7c3c4bfb056eed742cd08f92d29623339",
+  "labcouncil/web.py": "903453a2cd4180ed99bd54ecff7af1d84ef864c116b894a38560309024a2f8e5",
+  "labcouncil/lifecycle.py": "be8a04bf9cd7028ee9b9e5f61d1229e9eadef92f720555af887e589c13a00c76",
+  "labcouncil/static/app.js": "bf42d4e0bd2ca12d1079b05f8b4c6d1ed71bb2a7e6b8b2e67e0219e3e7ec48ab",
+  "tests/test_research.py": "a9748abc02132beb4191141ec76c565335f73b24efc396eea6760e26fddb4489"
+}
