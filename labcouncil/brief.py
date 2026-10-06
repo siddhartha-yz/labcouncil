@@ -2,12 +2,12 @@
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-PERMISSIONS = ('model_calls', 'local_compute', 'public_research')
+PERMISSIONS = ('model_calls', 'local_compute', 'public_research', 'retry_public_reads')
 
 
 def normalize(value, idea, mode):
     defaults = {'idea': idea, 'resources': '', 'requirements': '',
-        'permissions': {'model_calls': mode != 'simulation', 'local_compute': True, 'public_research': False},
+        'permissions': {'model_calls': mode != 'simulation', 'local_compute': True, 'public_research': False, 'retry_public_reads': False},
         'work_time': {'all_day': True, 'start': '09:00', 'end': '18:00', 'timezone': 'Asia/Shanghai'}}
     if value is None:
         return defaults
@@ -21,6 +21,9 @@ def normalize(value, idea, mode):
     if not result['idea']:
         raise ValueError('请填写本轮 idea')
     permissions = result['permissions']
+    if isinstance(permissions,dict) and set(permissions) == set(PERMISSIONS)-{'retry_public_reads'}:
+        permissions = {**permissions,'retry_public_reads':False}
+        result['permissions'] = permissions
     if not isinstance(permissions, dict) or set(permissions) != set(PERMISSIONS) or any(type(v) is not bool for v in permissions.values()):
         raise ValueError('权限必须为明确的勾选项')
     hours = result['work_time']

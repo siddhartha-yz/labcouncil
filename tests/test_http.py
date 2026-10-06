@@ -119,3 +119,9 @@ class HTTPTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+    def test_public_source_cap_is_preserved_in_http_creation(self):
+        status,_,raw=self.request('POST','/api/projects',{'title':'bounded','idea':'check','source_budget':3})
+        self.assertEqual(status,201)
+        self.assertEqual(self.store.project(json.loads(raw)['id'])['execution']['source_budget'],3)
+        self.assertEqual(self.request('POST','/api/projects',{'title':'invalid','idea':'check','source_budget':25})[0],400)

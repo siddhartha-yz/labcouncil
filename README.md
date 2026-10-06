@@ -4,7 +4,7 @@
 
 LabCouncil is an open-source prototype for personal research groups made up of AI agents and a human researcher. The intended loop has three steps: enter an idea, resources, permissions, daily work hours and requirements; agents plan and investigate within those constraints; open a meeting, review plain-language reports and update the five inputs for the next round. The same project retains its plans, experiments, evidence and decisions.
 
-**Status: local meeting platform with a tested two-round synthetic case.** Default mode is a deterministic simulation. Opt-in real-case mode uses DeepSeek Flash for tool requests, reports and meeting questions, with saved data and independent arithmetic checks. Versioned five-field inputs, daily task-start windows and meeting-to-input continuity are implemented. Autonomous research planning, paper/repository exploration and sustained research iteration remain M2 work. The actual case exposed incorrect model descriptions of the input, even when numerical verification passed; see the [complete case record](reproductions/2026-10-06-complete-case/REPORT.md).
+**Status: local meeting platform with a tested two-round synthetic case.** Default mode is a deterministic simulation. Opt-in real-case mode uses DeepSeek Flash for tool requests, reports and meeting questions, with saved data and independent arithmetic checks. Versioned five-field inputs, daily task-start windows and meeting-to-input continuity are implemented. Opt-in research mode now lets Flash choose bounded steps, read arXiv abstracts and pinned GitHub READMEs, and prepare a meeting. Running arbitrary upstream experiments and sustained scientific iteration remain M2 work. The actual case exposed incorrect model descriptions of the input, even when numerical verification passed; see the [complete case record](reproductions/2026-10-06-complete-case/REPORT.md).
 
 ## Try the local meeting
 
@@ -118,4 +118,4 @@ The [Virtual Lab individual-meeting supplement](reproductions/2026-10-04-virtual
 
 The [historical-source audit](reproductions/2026-10-04-source-mapping/REPORT.md) distinguishes the paper-era Assistants interface from the newer Chat Completions implementation. The [controlled comparison](reproductions/2026-10-05-comparison/REPORT.md) contains 12 real runs across single-agent, multi-agent, and actual user-review conditions; its small synthetic tasks do not establish general scientific superiority.
 
-研究模式新增实际逐步规划与公开资料适配器，每步根据已保存证据选择下一步；真实验收仍有公网TLS失败，论文摘要和完整README尚未取得。不是完整论文复现平台，结果与限制见 [研究loop记录](reproductions/2026-10-06-research-loop/REPORT.md)。
+研究模式由真实Flash逐步规划、读取资料并准备组会。[首轮记录](reproductions/2026-10-06-research-loop/REPORT.md)保留早期失败；[恢复验收](reproductions/2026-10-06-network-recovery/REPORT.md)实际取得论文摘要和固定commit README。网络仍可能中断：明确勾选后，每个URL全项目最多三次连接尝试，每次单独记账；不重试模型请求。尚未接入完整论文复现实验。

@@ -76,7 +76,7 @@ def handler(store):
                     raise ValueError("需要 JSON 对象")
                 path = urlsplit(self.path).path.strip("/").split("/")
                 if path == ["api", "projects"]:
-                    identifier = store.create_project(body.get("title"), body.get("idea"), body.get("scenario", "clean"), body.get("budget", 9), body.get("qa_budget", 6), body.get("meeting_at"),body.get("mode","simulation"),body.get("api_budget",18),body.get("qa_api_budget",3),body.get('brief'))
+                    identifier = store.create_project(body.get("title"), body.get("idea"), body.get("scenario", "clean"), body.get("budget", 9), body.get("qa_budget", 6), body.get("meeting_at"),body.get("mode","simulation"),body.get("api_budget",18),body.get("qa_api_budget",3),body.get('brief'),source_budget=body.get('source_budget',24))
                     return self.send(201, {"id": identifier})
                 if len(path) == 4 and path[:2] == ["api", "projects"]:
                     if path[3] == "meeting":

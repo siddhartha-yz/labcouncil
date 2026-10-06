@@ -1,0 +1,37 @@
+[
+  {
+    "url": "https://api.github.com/repos/InternScience/scp/commits?per_page=1",
+    "adapter": "python",
+    "attempts": 1,
+    "elapsed": 1.394689279000886,
+    "error_type": "URLError",
+    "reason_type": "SSLEOFError",
+    "ssl_reason": "UNEXPECTED_EOF_WHILE_READING"
+  },
+  {
+    "url": "https://api.github.com/repos/InternScience/scp/commits?per_page=1",
+    "adapter": "curl",
+    "attempts": 1,
+    "elapsed": 1.6563478790012596,
+    "exit_code": 0,
+    "metrics": "200 0 198.18.0.51 2",
+    "error": ""
+  },
+  {
+    "url": "https://export.arxiv.org/api/query?id_list=2602.08990&max_results=1",
+    "adapter": "python",
+    "attempts": 1,
+    "elapsed": 8.674150396000186,
+    "http_status": 200,
+    "bytes": 6028
+  },
+  {
+    "url": "https://export.arxiv.org/api/query?id_list=2602.08990&max_results=1",
+    "adapter": "curl",
+    "attempts": 1,
+    "elapsed": 0.5243972160005796,
+    "exit_code": 35,
+    "metrics": "000 1  0",
+    "error": "curl: (35) TLS connect error: error:0A000126:SSL routines::unexpected eof while reading\n"
+  }
+]

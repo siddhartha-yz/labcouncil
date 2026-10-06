@@ -1,0 +1,205 @@
+{
+  "project_id": "672a8e1eba3b4cf0a28e88a7cdae3670",
+  "component_only": true,
+  "model_requests": 0,
+  "source_budget": 12,
+  "source_count": 4,
+  "cache_new_requests": 0,
+  "results": {
+    "read_abstract": {
+      "status": "completed",
+      "http_requests": [
+        {
+          "id": "a9e359f050cb4a1e8aac797ba16bbe41",
+          "url": "https://export.arxiv.org/api/query?id_list=2602.08990&max_results=1",
+          "status": "completed",
+          "sha256": "82a27b4eb04024ebf524917040bc5414be4c5f83c4f86032aecc84fc3858e38f",
+          "cached": false,
+          "http_status": 200,
+          "transport": "urllib",
+          "attempt_number": 1,
+          "elapsed_seconds": 0.584
+        }
+      ],
+      "sources": [
+        {
+          "kind": "paper_abstract",
+          "id": "2602.08990v1",
+          "url": "https://arxiv.org/abs/2602.08990v1",
+          "title": "InternAgent-1.5: A Unified Agentic Framework for Long-Horizon Autonomous Scientific Discovery",
+          "authors": [
+            "Shiyang Feng",
+            "Runmin Ma",
+            "Xiangchao Yan",
+            "Yue Fan",
+            "Yusong Hu",
+            "Songtao Huang",
+            "Shuaiyu Zhang",
+            "Zongsheng Cao",
+            "Tianshuo Peng",
+            "Jiakang Yuan",
+            "Zijie Guo",
+            "Zhijie Zhong",
+            "Shangheng Du",
+            "Weida Wang",
+            "Jinxin Shi",
+            "Yuhao Zhou",
+            "Xiaohan He",
+            "Zhiyin Yu",
+            "Fangchen Yu",
+            "Qihao Zheng",
+            "Jiamin Wu",
+            "Mianxin Liu",
+            "Chi Zhang",
+            "Shaowei Hou",
+            "Shuya Li",
+            "Yankai Jiang",
+            "Wenjie Lou",
+            "Lilong Wang",
+            "Zifu Wang",
+            "Jiong Wang",
+            "Wanghan Xu",
+            "Yue Deng",
+            "Dongrui Liu",
+            "Yiheng Wang",
+            "Wenlong Zhang",
+            "Fenghua Ling",
+            "Shufei Zhang",
+            "Xiaosong Wang",
+            "Shuangjia Zheng",
+            "Xun Huang",
+            "Siqi Sun",
+            "Shuyue Hu",
+            "Peng Ye",
+            "Chunfeng Song",
+            "Bin Wang",
+            "Conghui He",
+            "Yihao Liu",
+            "Xin Li",
+            "Qibin Hou",
+            "Tao Chen",
+            "Xiangyu Yue",
+            "Bin Wang",
+            "Liang He",
+            "Dahua Lin",
+            "Bowen Zhou",
+            "Bo Zhang",
+            "Lei Bai"
+          ],
+          "published": "2026-02-09T18:36:06Z",
+          "updated": "2026-02-09T18:36:06Z",
+          "verification": "只读取元数据和摘要，未读全文、未复现实验"
+        }
+      ]
+    },
+    "inspect_repository": {
+      "status": "completed",
+      "http_requests": [
+        {
+          "id": "4cb4ffad575a4c5b8c3c75f4d69c850c",
+          "url": "https://api.github.com/repos/InternScience/scp",
+          "status": "completed",
+          "sha256": "188d059ead9665cf905d025afe0996587d4e5199a0de783ac680d2d258c80ad1",
+          "cached": false,
+          "http_status": 200,
+          "transport": "urllib",
+          "attempt_number": 1,
+          "elapsed_seconds": 0.563
+        },
+        {
+          "id": "a02e559752774267923731bc71ee3136",
+          "url": "https://api.github.com/repos/InternScience/scp/commits?per_page=1",
+          "status": "completed",
+          "sha256": "751f15db7eb67ef544509839dfefcf8f2bf28d92e5871b7297b677fd7d6b89d4",
+          "cached": false,
+          "http_status": 200,
+          "transport": "urllib",
+          "attempt_number": 1,
+          "elapsed_seconds": 0.618
+        },
+        {
+          "id": "78cd0cecdc8c456ca896920c3ebd20f6",
+          "url": "https://api.github.com/repos/InternScience/scp/readme?ref=cea5398564032aea65a78e246d06c30ae945e03f",
+          "status": "completed",
+          "sha256": "2ebb51ef72c22e2853419aaf26de504ca52ba279652e6697f91895524d473523",
+          "cached": false,
+          "http_status": 200,
+          "transport": "urllib",
+          "attempt_number": 1,
+          "elapsed_seconds": 0.648
+        }
+      ],
+      "sources": [
+        {
+          "kind": "repository_readme",
+          "id": "InternScience/scp@cea5398564032aea65a78e246d06c30ae945e03f",
+          "url": "https://github.com/InternScience/scp/tree/cea5398564032aea65a78e246d06c30ae945e03f",
+          "title": "InternScience/scp",
+          "commit": "cea5398564032aea65a78e246d06c30ae945e03f",
+          "license": "MIT",
+          "readme_truncated": true,
+          "readme_sha256": "829f9609808d4f2c9d4e35dff8793dcfae3003ee02a548f0445437e7457e5dc3",
+          "verification": "固定commit的README；未执行仓库代码、未验证作者成绩"
+        }
+      ]
+    }
+  },
+  "replay_status": {
+    "read_abstract": "completed",
+    "inspect_repository": "completed"
+  },
+  "requests": [
+    {
+      "id": "a9e359f050cb4a1e8aac797ba16bbe41",
+      "task_id": "4b073b5e491b499eb4284fbf183374a2",
+      "url": "https://export.arxiv.org/api/query?id_list=2602.08990&max_results=1",
+      "status": "completed",
+      "sha256": "82a27b4eb04024ebf524917040bc5414be4c5f83c4f86032aecc84fc3858e38f",
+      "http_status": 200,
+      "created": 1791292393.719133,
+      "finished": 1791292394.3045564,
+      "transport": "urllib",
+      "attempt_number": 1,
+      "elapsed_seconds": 0.584
+    },
+    {
+      "id": "4cb4ffad575a4c5b8c3c75f4d69c850c",
+      "task_id": "4b073b5e491b499eb4284fbf183374a2",
+      "url": "https://api.github.com/repos/InternScience/scp",
+      "status": "completed",
+      "sha256": "188d059ead9665cf905d025afe0996587d4e5199a0de783ac680d2d258c80ad1",
+      "http_status": 200,
+      "created": 1791292394.3430285,
+      "finished": 1791292394.9084644,
+      "transport": "urllib",
+      "attempt_number": 1,
+      "elapsed_seconds": 0.563
+    },
+    {
+      "id": "a02e559752774267923731bc71ee3136",
+      "task_id": "4b073b5e491b499eb4284fbf183374a2",
+      "url": "https://api.github.com/repos/InternScience/scp/commits?per_page=1",
+      "status": "completed",
+      "sha256": "751f15db7eb67ef544509839dfefcf8f2bf28d92e5871b7297b677fd7d6b89d4",
+      "http_status": 200,
+      "created": 1791292394.9469774,
+      "finished": 1791292395.5675364,
+      "transport": "urllib",
+      "attempt_number": 1,
+      "elapsed_seconds": 0.618
+    },
+    {
+      "id": "78cd0cecdc8c456ca896920c3ebd20f6",
+      "task_id": "4b073b5e491b499eb4284fbf183374a2",
+      "url": "https://api.github.com/repos/InternScience/scp/readme?ref=cea5398564032aea65a78e246d06c30ae945e03f",
+      "status": "completed",
+      "sha256": "2ebb51ef72c22e2853419aaf26de504ca52ba279652e6697f91895524d473523",
+      "http_status": 200,
+      "created": 1791292395.6066842,
+      "finished": 1791292396.2566235,
+      "transport": "urllib",
+      "attempt_number": 1,
+      "elapsed_seconds": 0.648
+    }
+  ]
+}

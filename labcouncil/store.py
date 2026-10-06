@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS events (
 );
 CREATE TABLE IF NOT EXISTS project_execution (
  project_id TEXT PRIMARY KEY REFERENCES projects(id), mode TEXT NOT NULL,
- api_budget INTEGER NOT NULL, qa_api_budget INTEGER NOT NULL
+ api_budget INTEGER NOT NULL, qa_api_budget INTEGER NOT NULL, source_budget INTEGER NOT NULL DEFAULT 24
 );
 CREATE TABLE IF NOT EXISTS model_requests (
  id TEXT PRIMARY KEY, project_id TEXT NOT NULL REFERENCES projects(id),
@@ -147,6 +147,10 @@ class Store:
         with closing(sqlite3.connect(self.database, timeout=10, isolation_level=None)) as con:
             con.execute("PRAGMA journal_mode=WAL")
             con.executescript(SCHEMA)
+            con.execute('BEGIN IMMEDIATE')
+            if 'source_budget' not in [row[1] for row in con.execute('PRAGMA table_info(project_execution)')]:
+                con.execute('ALTER TABLE project_execution ADD COLUMN source_budget INTEGER NOT NULL DEFAULT 24')
+            con.commit()
 
     @contextmanager
     def connection(self, write=False):
@@ -185,12 +189,14 @@ class Store:
             previous = identifier
 
     def create_project(self, title, idea, selected="clean", budget=9, qa_budget=6, meeting_at=None,
-                       mode="simulation", api_budget=18, qa_api_budget=3, brief=None):
+                       mode="simulation", api_budget=18, qa_api_budget=3, brief=None, source_budget=24):
         title, idea = text(title, "项目名称", 120), text(idea, "研究想法")
         selected, budget, qa_budget = scenario(selected), quota(budget), quota(qa_budget)
         if mode not in ("simulation", "real_case", "research"):
             raise ValueError("运行模式无效")
         api_budget, qa_api_budget = quota(api_budget), quota(qa_api_budget)
+        source_budget = quota(source_budget)
+        if source_budget>24: raise ValueError('公开HTTP请求上限不得超过24')
         brief = normalize(brief, idea, mode)
         if meeting_at is not None and (type(meeting_at) not in (int, float) or not 0 < meeting_at < 4102444800):
             raise ValueError("组会时间无效")
@@ -200,7 +206,7 @@ class Store:
                         (identifier, title, idea, 1, selected, budget, qa_budget, meeting_at, time.time()))
             self.save_inputs(con, identifier, 1, brief, mode)
             self.add_round(con, identifier, 1, brief['idea'], selected, mode)
-            con.execute("INSERT INTO project_execution VALUES(?,?,?,?)",(identifier,mode,api_budget if mode!="simulation" else 0,qa_api_budget if mode!="simulation" else 0))
+            con.execute("INSERT INTO project_execution(project_id,mode,api_budget,qa_api_budget,source_budget) VALUES(?,?,?,?,?)",(identifier,mode,api_budget if mode!="simulation" else 0,qa_api_budget if mode!="simulation" else 0,source_budget))
             self.event(con, identifier, "project_created", {"simulation": mode=="simulation"})
         return identifier
 
@@ -247,7 +253,11 @@ class Store:
             if result['execution']['mode'] == 'research' and result['execution']['api_budget'] - sum(r['category']=='background' for r in result['model_requests']) < 2:
                 result['work_blocker'] = '剩余模型额度不足以完成下一步，等待组会审查'
             result['source_requests'] = [dict(r) for r in con.execute(
-                'SELECT id,task_id,url,status,sha256,http_status,created,finished FROM source_requests WHERE project_id=? ORDER BY created', (identifier,))]
+                'SELECT id,task_id,url,status,sha256,http_status,created,finished,body FROM source_requests WHERE project_id=? ORDER BY created', (identifier,))]
+            for request in result['source_requests']:
+                body = json.loads(request.pop('body') or '{}')
+                for key in ('transport','attempt_number','elapsed_seconds','error_type','reason_type'):
+                    if key in body: request[key] = body[key]
             return result
 
     def configure(self, identifier, paused, budget, qa_budget, meeting_at=None):
@@ -306,7 +316,7 @@ class Store:
             if not task["charged"]:
                 con.execute("UPDATE projects SET used=used+1 WHERE id=?", (task["project_id"],))
             con.execute("UPDATE tasks SET status='running',charged=1,attempts=attempts+1,owner=?,lease_until=?,error=NULL WHERE id=?",
-                        (owner, now+(180 if mode!="simulation" else lease_seconds), task["id"]))
+                        (owner, now+(300 if mode=="research" else 180 if mode=="real_case" else lease_seconds), task["id"]))
             self.event(con, task["project_id"], "task_started", {"task_id": task["id"], "attempt": task["attempts"]+1})
             return {**self.row(con, "tasks", task["id"]),"mode":mode}
 
@@ -346,6 +356,7 @@ class Store:
                     if p['version'] != task['version']: reason = '已确认新一轮，旧轮停止'
                     elif count >= 6: reason = '本轮六步上限已到'
                     elif p['used'] >= p['budget']: reason = '项目任务额度已到'
+                    elif con.execute('SELECT COUNT(*) FROM source_requests WHERE project_id=?',(p['id'],)).fetchone()[0] >= execution['source_budget']: reason = '公开资料请求额度已到'
                     elif execution['api_budget'] - requests < 2: reason = '剩余模型额度不足以完成下一步'
                     else:
                         con.execute('INSERT INTO tasks(id,project_id,version,role,instruction,scenario,dependency,status,created) VALUES(?,?,?,?,?,?,?,?,?)',
@@ -580,7 +591,7 @@ class Store:
             self.event(con, p["id"], "decision_confirmed", decision)
             return decision
 
-    def reserve_source(self, task, fingerprint, url):
+    def reserve_source(self, task, fingerprint, url, allow_new=True):
         """One durable attempt per exact source request, including failed/unknown reads."""
         with self.connection(write=True) as con:
             p = self.row(con, 'projects', task['project_id'])
@@ -591,8 +602,11 @@ class Store:
                 raise Conflict('未授权公开资料查询')
             old = con.execute('SELECT * FROM source_requests WHERE project_id=? AND fingerprint=?', (p['id'],fingerprint)).fetchone()
             if old: return dict(old), False
+            if not allow_new: return None, False
             count = con.execute('SELECT COUNT(*) FROM source_requests WHERE project_id=?',(p['id'],)).fetchone()[0]
-            if count >= 24: raise Conflict('项目公开HTTP请求二十四次上限已到')
+            execution = con.execute('SELECT source_budget FROM project_execution WHERE project_id=?',(p['id'],)).fetchone()
+            cap = execution['source_budget'] if execution else 24
+            if count >= cap: raise Conflict('项目公开HTTP请求上限已到')
             identifier = uuid.uuid4().hex
             con.execute("INSERT INTO source_requests(id,project_id,task_id,fingerprint,url,status,created) VALUES(?,?,?,?,?,'started',?)",
                 (identifier,p['id'],task['id'],fingerprint,url,time.time()))

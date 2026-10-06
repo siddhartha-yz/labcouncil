@@ -29,7 +29,8 @@ const defaultBrief = () => ({
   permissions: {
     model_calls: false,
     local_compute: true,
-    public_research: false
+    public_research: false,
+    retry_public_reads: false
   },
   work_time: {
     all_day: false,
@@ -89,7 +90,7 @@ async function sidebar() {
 }
 function briefFields(b) {
   const w = b.work_time;
-  return `<label>Idea：这一轮想解决什么？<textarea name="idea" maxlength="4000" required placeholder="写清楚你想知道什么、希望得到什么结果">${ esc(b.idea) }</textarea></label><label>可调用资源<textarea name="resources" maxlength="4000" placeholder="例如：可用模型和调用额度、本机算力、已有数据、论文或仓库地址。不要填写密钥。">${ esc(b.resources) }</textarea></label><fieldset><legend>权限：允许 agent 做什么？</legend><label class="check"><input type="checkbox" name="model_calls" ${ b.permissions.model_calls ? "checked" : "" }>调用已配置的模型（可能产生费用）</label><label class="check"><input type="checkbox" name="local_compute" ${ b.permissions.local_compute ? "checked" : "" }>运行已接入的本地计算工具</label><label class="check"><input type="checkbox" name="public_research" ${ b.permissions.public_research ? "checked" : "" }>查询公开论文与仓库</label><p class="muted">这些勾选不授权任意 shell、安装依赖、公开发布或访问其他私人文件。</p></fieldset><fieldset><legend>工作时间：每天什么时段可以工作？</legend><div class="form-grid"><label>每天开始<input name="start" type="time" value="${ esc(w.start) }" required></label><label>每天结束<input name="end" type="time" value="${ esc(w.end) }" required></label></div><label>时区<input name="timezone" value="${ esc(w.timezone) }" required></label><label class="check"><input name="all_day" type="checkbox" ${ w.all_day ? "checked" : "" }>全天可工作</label><p class="muted">支持跨午夜。时段外不启动新任务，已开始的短任务可收尾保存；你可随时开组会。</p></fieldset><label>额外要求<textarea name="requirements" maxlength="4000" placeholder="例如：先复现再采用；保留失败记录；报告用大白话；不要重复已有实验。">${ esc(b.requirements) }</textarea></label>`;
+  return `<label>Idea：这一轮想解决什么？<textarea name="idea" maxlength="4000" required placeholder="写清楚你想知道什么、希望得到什么结果">${ esc(b.idea) }</textarea></label><label>可调用资源<textarea name="resources" maxlength="4000" placeholder="例如：可用模型和调用额度、本机算力、已有数据、论文或仓库地址。不要填写密钥。">${ esc(b.resources) }</textarea></label><fieldset><legend>权限：允许 agent 做什么？</legend><label class="check"><input type="checkbox" name="model_calls" ${ b.permissions.model_calls ? "checked" : "" }>调用已配置的模型（可能产生费用）</label><label class="check"><input type="checkbox" name="local_compute" ${ b.permissions.local_compute ? "checked" : "" }>运行已接入的本地计算工具</label><label class="check"><input type="checkbox" name="public_research" ${ b.permissions.public_research ? "checked" : "" }>查询公开论文与仓库</label><label class="check"><input type="checkbox" name="retry_public_reads" ${b.permissions.retry_public_reads ? "checked" : ""}>公开资料连接失败后，允许最多再试两次（每次留记录并计入额度）</label><p class="muted">这些勾选不授权任意 shell、安装依赖、公开发布或访问其他私人文件。</p></fieldset><fieldset><legend>工作时间：每天什么时段可以工作？</legend><div class="form-grid"><label>每天开始<input name="start" type="time" value="${ esc(w.start) }" required></label><label>每天结束<input name="end" type="time" value="${ esc(w.end) }" required></label></div><label>时区<input name="timezone" value="${ esc(w.timezone) }" required></label><label class="check"><input name="all_day" type="checkbox" ${ w.all_day ? "checked" : "" }>全天可工作</label><p class="muted">支持跨午夜。时段外不启动新任务，已开始的短任务可收尾保存；你可随时开组会。</p></fieldset><label>额外要求<textarea name="requirements" maxlength="4000" placeholder="例如：先复现再采用；保留失败记录；报告用大白话；不要重复已有实验。">${ esc(b.requirements) }</textarea></label>`;
 }
 function readBrief(form) {
   const f = new FormData(form);
@@ -100,7 +101,8 @@ function readBrief(form) {
     permissions: {
       model_calls: f.has("model_calls"),
       local_compute: f.has("local_compute"),
-      public_research: f.has("public_research")
+      public_research: f.has("public_research"),
+      retry_public_reads: f.has("retry_public_reads")
     },
     work_time: {
       all_day: f.has("all_day"),
@@ -115,7 +117,7 @@ function scenarioOptions(s = "clean", real = false) {
 }
 function executorSettings(p = null) {
   const real = p ? p.execution.mode !== "simulation" : false;
-  return `<details><summary>当前执行器与实验设置</summary><p class="muted">研究模式：每步由 Flash 根据输入与已保存资料选择检索、读摘要、读仓库 README 或准备组会，每轮最多六步。仅支持已接入的本地合成计算，不会运行任意仓库代码。固定案例保留用于比较。</p>${ !p ? "<label>项目名称（可选）<input name=\"title\" maxlength=\"120\" placeholder=\"留空时使用 idea 开头\"></label>" : "" }${ p ? `<p>${ p.execution.mode === "research" ? "真实 Flash 逐步研究" : real ? "真实 Flash 与固定工具" : "固定程序流程演示" }；执行器在项目创建时选择。</p>` : `<label>执行器<select name="mode"><option value="simulation">流程演示，不调用模型</option><option value="real_case">真实 Flash，固定合成计算</option><option value="research">真实 Flash，逐步研究</option></select></label>` }<label ${p?.execution.mode === "research" ? "hidden" : ""}>本轮计算输入<select name="scenario">${ scenarioOptions(p?.scenario, real) }</select></label>${ !p ? "<div class=\"form-grid\"><label>项目后台模型请求总上限<input type=\"number\" name=\"api_budget\" value=\"12\" min=\"0\" max=\"100\" required></label><label>项目组会模型请求总上限<input type=\"number\" name=\"qa_api_budget\" value=\"1\" min=\"0\" max=\"100\" required></label></div><p class=\"muted\">研究模式每步2次模型请求、每轮最多6步；固定案例每轮通常6次请求。上限包含失败尝试，不自动重试。不是 token 或人民币预算。</p>" : "" }</details>`;
+  return `<details><summary>当前执行器与实验设置</summary><p class="muted">研究模式：每步由 Flash 根据输入与已保存资料选择检索、读摘要、读仓库 README 或准备组会，每轮最多六步。仅支持已接入的本地合成计算，不会运行任意仓库代码。固定案例保留用于比较。</p>${ !p ? "<label>项目名称（可选）<input name=\"title\" maxlength=\"120\" placeholder=\"留空时使用 idea 开头\"></label>" : "" }${ p ? `<p>${ p.execution.mode === "research" ? "真实 Flash 逐步研究" : real ? "真实 Flash 与固定工具" : "固定程序流程演示" }；执行器在项目创建时选择。</p>` : `<label>执行器<select name="mode"><option value="simulation">流程演示，不调用模型</option><option value="real_case">真实 Flash，固定合成计算</option><option value="research">真实 Flash，逐步研究</option></select></label>` }<label ${p?.execution.mode === "research" ? "hidden" : ""}>本轮计算输入<select name="scenario">${ scenarioOptions(p?.scenario, real) }</select></label>${ !p ? "<div class=\"form-grid\"><label>项目后台模型请求总上限<input type=\"number\" name=\"api_budget\" value=\"12\" min=\"0\" max=\"100\" required></label><label>项目组会模型请求总上限<input type=\"number\" name=\"qa_api_budget\" value=\"1\" min=\"0\" max=\"100\" required></label></div><label>项目公开HTTP请求总上限<input type=\"number\" name=\"source_budget\" value=\"24\" min=\"0\" max=\"24\" required></label><p class=\"muted\">研究模式每步2次模型请求、每轮最多6步；固定案例每轮通常6次请求。上限包含失败尝试。模型请求不重试；公开连接仅在勾选允许时有限重试。不是 token 或人民币预算。</p>" : "" }</details>`;
 }
 async function setup(p = null, m = null) {
   navigation++;
@@ -165,7 +167,8 @@ async function setup(p = null, m = null) {
         budget: 9,
         qa_budget: 6,
         api_budget: Number(f.get("api_budget")),
-        qa_api_budget: Number(f.get("qa_api_budget"))
+        qa_api_budget: Number(f.get("qa_api_budget")),
+        source_budget: Number(f.get("source_budget"))
       });
       announce("输入已保存。后台按当前权限、工作时段和执行器处理。");
       await showProject(r.id);
@@ -201,7 +204,8 @@ function inputsSummary(b) {
   return `<dl><dt>Idea</dt><dd>${ esc(b.idea) }</dd><dt>资源</dt><dd>${ esc(b.resources) || "未补充" }</dd><dt>权限</dt><dd>${ [
     b.permissions.model_calls ? "模型调用" : null,
     b.permissions.local_compute ? "已接入本地计算" : null,
-    b.permissions.public_research ? "公开论文与仓库查询" : null
+    b.permissions.public_research ? "公开论文与仓库查询" : null,
+    b.permissions.retry_public_reads ? "连接失败后最多重试两次（每次计入）" : null
   ].filter(Boolean).join("、") || "未授权执行" }</dd><dt>每日时间</dt><dd>${ w.all_day ? "全天" : `${ esc(w.start) }–${ esc(w.end) }` } · ${ esc(w.timezone) }</dd><dt>额外要求</dt><dd>${ esc(b.requirements) || "未补充" }</dd></dl>`;
 }
 function report(artifacts, simulation, research = false, operations = []) {
@@ -237,7 +241,7 @@ function researchReport(artifacts, operations) {
 
 function requestDetails(p) {
   const real = p.execution.mode !== "simulation", rs = p.model_requests, known = rs.filter(r => r.usage && Number.isFinite(r.usage.total_tokens));
-  return `<details><summary>执行状态、额度与调用明细</summary><p>角色任务已用 ${ p.used }/${ p.budget }；问答已用 ${ p.qa_used }/${ p.qa_budget }。${ real ? `后台真实请求 ${ rs.filter(r => r.category === "background").length }/${ p.execution.api_budget }；组会真实请求 ${ rs.filter(r => r.category === "qa").length }/${ p.execution.qa_api_budget }。已知 ${ known.reduce((n, r) => n + r.usage.total_tokens, 0) } tokens；${ rs.length - known.length } 次用量未知。人民币费用未知，没有 token 硬上限。` : "角色与问答为固定程序，不调用模型。" }</p><ul>${ p.tasks.map(t => `<li>第 ${ t.version } 轮 · ${ esc(roles[t.role] || t.role.replace("research_step_", "研究步骤 ")) } · ${ esc(states[t.status]) }${ t.error ? `：${ esc(t.error) }` : "" }</li>`).join("") }</ul>${ real ? `<h3>实际模型请求</h3><ul>${ rs.map(r => `<li><a href="/api/model-requests/${ esc(r.id) }" target="_blank" rel="noopener">${ esc(r.phase) } · ${ esc(r.status) }</a></li>`).join("") }</ul><h3>公开来源请求</h3><ul>${(p.source_requests || []).map(r => `<li><a href="/api/source-requests/${esc(r.id)}" target="_blank" rel="noopener">${esc(r.url)} · ${esc(r.status)} · HTTP ${r.http_status ?? "未知"}</a></li>`).join("") || "<li>无公开来源请求</li>"}</ul><h3>独立保存的工具结果</h3><ul>${ p.tool_operations.map(o => `<li><a href="/api/tool-operations/${ esc(o.id) }" target="_blank" rel="noopener">${ esc(o.body.tool || researchActions[o.body.action] || o.body.action) }</a></li>`).join("") || "<li>早期工具结果保存在角色证据内。</li>" }</ul>` : "" }</details>`;
+  return `<details><summary>执行状态、额度与调用明细</summary><p>角色任务已用 ${ p.used }/${ p.budget }；问答已用 ${ p.qa_used }/${ p.qa_budget }。${ real ? `后台真实请求 ${ rs.filter(r => r.category === "background").length }/${ p.execution.api_budget }；公开资料请求 ${(p.source_requests || []).length}/${p.execution.source_budget ?? 24}；组会真实请求 ${ rs.filter(r => r.category === "qa").length }/${ p.execution.qa_api_budget }。已知 ${ known.reduce((n, r) => n + r.usage.total_tokens, 0) } tokens；${ rs.length - known.length } 次用量未知。人民币费用未知，没有 token 硬上限。` : "角色与问答为固定程序，不调用模型。" }</p><ul>${ p.tasks.map(t => `<li>第 ${ t.version } 轮 · ${ esc(roles[t.role] || t.role.replace("research_step_", "研究步骤 ")) } · ${ esc(states[t.status]) }${ t.error ? `：${ esc(t.error) }` : "" }</li>`).join("") }</ul>${ real ? `<h3>实际模型请求</h3><ul>${ rs.map(r => `<li><a href="/api/model-requests/${ esc(r.id) }" target="_blank" rel="noopener">${ esc(r.phase) } · ${ esc(r.status) }</a></li>`).join("") }</ul><h3>公开来源请求</h3><ul>${(p.source_requests || []).map(r => `<li><a href="/api/source-requests/${esc(r.id)}" target="_blank" rel="noopener">${esc(r.url)} · ${esc(r.status)} · HTTP ${r.http_status ?? "未知"} · ${esc(r.transport || "原记录")} · 第 ${r.attempt_number ?? 1} 次尝试</a></li>`).join("") || "<li>无公开来源请求</li>"}</ul><h3>独立保存的工具结果</h3><ul>${ p.tool_operations.map(o => `<li><a href="/api/tool-operations/${ esc(o.id) }" target="_blank" rel="noopener">${ esc(o.body.tool || researchActions[o.body.action] || o.body.action) }</a></li>`).join("") || "<li>早期工具结果保存在角色证据内。</li>" }</ul>` : "" }</details>`;
 }
 async function showProject(id) {
   const ticket = ++navigation;

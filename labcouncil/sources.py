@@ -5,13 +5,14 @@ import hashlib
 import json
 from pathlib import Path
 import re
+import ssl
 import threading
 import time
 import urllib.error
 import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
-from .store import encode
+from .store import encode, Conflict
 
 ROOT = Path(__file__).resolve().parents[1]
 REPO = re.compile(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,99}/[A-Za-z0-9][A-Za-z0-9_.-]{0,99}\Z')
@@ -49,15 +50,20 @@ def _network(url, headers):
         return raw,response.status
 
 
-def fetch(store, task, url):
-    fingerprint = hashlib.sha256(url.encode()).hexdigest()
-    row,fresh = store.reserve_source(task,fingerprint,url)
+def _fetch_once(store, task, url, attempt, allow_new=True):
+    # Attempt 1 retains the original cache identity, including historical errors.
+    identity = url if attempt == 1 else encode({'url':url,'attempt':attempt})
+    fingerprint = hashlib.sha256(identity.encode()).hexdigest()
+    row,fresh = store.reserve_source(task,fingerprint,url,allow_new)
+    if row is None: return None
     if not fresh:
         saved = store.source_record(row['id'])
         return {**saved,'cached':True}
     headers = {'User-Agent':'LabCouncil/0.1 (https://github.com/siddhartha-yz/labcouncil)',
         'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2026-03-10'}
     http_status = None
+    started = time.monotonic()
+    if attempt > 1: time.sleep(2)
     try:
         if urllib.parse.urlsplit(url).hostname == 'export.arxiv.org':
             # Shared across workers/databases on this host, single connection + 3s spacing.
@@ -78,13 +84,42 @@ def fetch(store, task, url):
         status = 'completed'
     except urllib.error.HTTPError as error:
         http_status = error.code;error.close()
-        body,status = {'error':'公开接口HTTP错误，无自动重试'},'error'
+        body,status = {'error':'公开接口HTTP错误，不重试','retryable':False},'error'
     except (OSError,ValueError,TimeoutError) as error:
-        body,status = {'error':'公开资料连接、大小或编码检查失败，无自动重试',
+        body,status = {'error':'公开资料连接、大小或编码检查失败',
+            'retryable':_transient(error),
             'error_type':type(error).__name__,'reason_type':type(getattr(error,'reason',None)).__name__,
             'errno':getattr(error,'errno',None)},'error'
+    body.update(transport='urllib',attempt_number=attempt,elapsed_seconds=round(time.monotonic()-started,3))
     store.finish_source(row['id'],body,status,http_status)
     return {**store.source_record(row['id']),'cached':False}
+
+
+TRANSIENT = ('SSLEOFError','ConnectionResetError','ConnectionAbortedError','TimeoutError','gaierror')
+
+
+def _transient(error):
+    reason = getattr(error,'reason',error)
+    return not isinstance(reason,ssl.SSLCertVerificationError) and type(reason).__name__ in TRANSIENT
+
+
+def fetch(store, task, url):
+    allowed = store.project(task['project_id'])['current_inputs']['body']['permissions'].get('retry_public_reads',False)
+    records = []
+    for attempt in range(1,4):
+        try: current = _fetch_once(store,task,url,attempt,attempt == 1 or allowed)
+        except Conflict:
+            if not records: raise
+            return {**row,'attempt_records':records,'retry_stopped':True}
+        if current is None: break
+        row = current
+        body = row.get('body') or {}
+        records.append({**{k:row[k] for k in ('id','url','status','sha256','cached','http_status')},
+            **{k:body[k] for k in ('error_type','reason_type','errno','transport','attempt_number','elapsed_seconds') if k in body}})
+        # Legacy records can be retried only when their recorded class is known.
+        retryable = body.get('retryable', body.get('reason_type') in TRANSIENT or body.get('error_type') in TRANSIENT)
+        if row['status'] != 'error' or row['http_status'] is not None or not retryable: break
+    return {**row,'attempt_records':records}
 
 
 def retrieve(store,task,action,value):
@@ -92,8 +127,7 @@ def retrieve(store,task,action,value):
     records = [];sources = []
     def read(path, arxiv=False):
         row = fetch(store,task,('https://export.arxiv.org/api/query?' if arxiv else 'https://api.github.com/')+path)
-        records.append({**{k:row[k] for k in ('id','url','status','sha256','cached','http_status')},
-            **{k:row['body'][k] for k in ('error_type','reason_type','errno') if row.get('body') and k in row['body']}})
+        records.extend(row['attempt_records'])
         if row['status'] != 'completed': raise ValueError('接口未返回可用资料；错误或未知尝试已保留')
         return row['body']['text']
     try:
@@ -137,6 +171,6 @@ def retrieve(store,task,action,value):
                 'readme_sha256':hashlib.sha256(readme.encode()).hexdigest(),
                 'verification':'固定commit的README；未执行仓库代码、未验证作者成绩'}]
         return {'status':'completed','sources':sources,'http_requests':records}
-    except (ValueError,KeyError,TypeError,IndexError,ET.ParseError):
+    except (ValueError,KeyError,TypeError,IndexError,ET.ParseError,Conflict):
         return {'status':'error','sources':sources,'http_requests':records,
-            'error':'公开资料未能读取或格式不符合预期；不会偷偷重试同一请求'}
+            'error':'公开资料未能读取、额度已到或格式不符合预期；实际尝试见请求账本'}
