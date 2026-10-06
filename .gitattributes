@@ -7,3 +7,5 @@ reproductions/2026-10-04-source-mapping/official-example-*/discussions/**/*.md -
 reproductions/2026-10-05-comparison/runs/*/artifacts/**/*.csv -text whitespace=cr-at-eol
 # Raw original CLI records retain their ending blank lines.
 reproductions/2026-10-04-source-mapping/freephdlabor-author-*/original-* -text whitespace=-blank-at-eof,-blank-at-eol
+# Preserve exact diagnostic output (tracebacks may end lines with spaces).
+reproductions/**/*.txt -text -whitespace

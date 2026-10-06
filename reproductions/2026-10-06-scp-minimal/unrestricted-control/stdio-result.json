@@ -1,0 +1,193 @@
+{
+  "events": [
+    {
+      "initialize": {
+        "meta": null,
+        "protocolVersion": "2024-11-05",
+        "capabilities": {
+          "experimental": {},
+          "logging": null,
+          "prompts": {
+            "listChanged": false
+          },
+          "resources": {
+            "subscribe": false,
+            "listChanged": false
+          },
+          "tools": {
+            "listChanged": false
+          }
+        },
+        "serverInfo": {
+          "name": "LabCouncil arithmetic check",
+          "version": "unknown"
+        },
+        "instructions": null
+      }
+    },
+    {
+      "tools": {
+        "meta": null,
+        "nextCursor": null,
+        "tools": [
+          {
+            "name": "mean_squared_error",
+            "description": "Calculate MSE on finite equal-length nonempty vectors.",
+            "inputSchema": {
+              "properties": {
+                "actual": {
+                  "items": {
+                    "type": "number"
+                  },
+                  "title": "Actual",
+                  "type": "array"
+                },
+                "predicted": {
+                  "items": {
+                    "type": "number"
+                  },
+                  "title": "Predicted",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "actual",
+                "predicted"
+              ],
+              "title": "mean_squared_errorArguments",
+              "type": "object"
+            },
+            "annotations": null
+          }
+        ]
+      }
+    },
+    {
+      "case": "valid",
+      "arguments": {
+        "actual": [
+          1,
+          3,
+          5,
+          7,
+          9
+        ],
+        "predicted": [
+          5,
+          5,
+          5,
+          5,
+          5
+        ]
+      },
+      "response": {
+        "meta": null,
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"n\": 5,\n  \"mse\": 8.0\n}",
+            "annotations": null
+          }
+        ],
+        "isError": false
+      }
+    },
+    {
+      "case": "length_error",
+      "arguments": {
+        "actual": [
+          1,
+          3
+        ],
+        "predicted": [
+          1
+        ]
+      },
+      "response": {
+        "meta": null,
+        "content": [
+          {
+            "type": "text",
+            "text": "Error executing tool mean_squared_error: Vectors must be nonempty and have equal lengths",
+            "annotations": null
+          }
+        ],
+        "isError": true
+      }
+    },
+    {
+      "case": "type_error",
+      "arguments": {
+        "actual": [
+          "invalid"
+        ],
+        "predicted": [
+          1
+        ]
+      },
+      "response": {
+        "meta": null,
+        "content": [
+          {
+            "type": "text",
+            "text": "Error executing tool mean_squared_error: 1 validation error for mean_squared_errorArguments\nactual.0\n  Input should be a valid number, unable to parse string as a number [type=float_parsing, input_value='invalid', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/float_parsing",
+            "annotations": null
+          }
+        ],
+        "isError": true
+      }
+    },
+    {
+      "case": "unknown_tool",
+      "arguments": {},
+      "response": {
+        "meta": null,
+        "content": [
+          {
+            "type": "text",
+            "text": "Unknown tool: no_such_tool",
+            "annotations": null
+          }
+        ],
+        "isError": true
+      }
+    },
+    {
+      "case": "valid_after_errors",
+      "arguments": {
+        "actual": [
+          1,
+          3,
+          5,
+          7,
+          9
+        ],
+        "predicted": [
+          1,
+          3,
+          5,
+          7,
+          9
+        ]
+      },
+      "response": {
+        "meta": null,
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"n\": 5,\n  \"mse\": 0.0\n}",
+            "annotations": null
+          }
+        ],
+        "isError": false
+      }
+    }
+  ],
+  "checks": {
+    "independent_mse": true,
+    "valid_after_errors": true,
+    "negative_cases": true
+  },
+  "model_calls": 0,
+  "hosted_hub_verified": false
+}

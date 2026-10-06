@@ -1,6 +1,6 @@
 # 首轮复现后的采用决定
 
-日期：2026-10-05。现阶段不把 Virtual Lab 或 freephdlabor 整套接入平台。
+更新：2026-10-06。现阶段不把 Virtual Lab 或 freephdlabor 整套接入平台。
 
 上海 AI Lab 的 InternAgentS 工作台、InternAgent 1.5 实验模块及 SCP 工具生态已加入候选。[源码检查](../reproductions/2026-10-05-shanghai-lab/REPORT.md)后，[2026-10-06 实际试用](../reproductions/2026-10-06-internagents-runtime/REPORT.md)确认 DeepSeek Flash 小计算和正常停止重启持久化；连续审批经协调服务转发失败，token 预算未实际停止续跑，报告也有术语与字数自查错误。暂不整套采用；界面交互、崩溃恢复和论文科研结果仍未验证。
 
@@ -22,6 +22,8 @@
 
 原论文的科研结果、纳米抗体计算和湿实验、长期24/7可靠性、多个真实研究问题上的研究质量提升、完整人力成本效率，都保持未复现。首轮以实现、受控流程和采用判断为范围，不用组件测试替代论文结果。
 
-本仓库尚无定时组会 Web 平台。后续平台原型需要验收浏览器关闭、worker 重启、重复决策、预算耗尽，以及实际科研任务中的方向偏移。这些是新的工程工作，不把它们算作本轮已完成。
+本仓库已有 [M1 本地模拟 Web 原型](../reproductions/2026-10-06-m1-prototype/REPORT.md)，完成后台两轮、会议快照、模板追问、草稿和确认决定，并检查重启与重复派单。它只运行固定合成计算；真实模型预算、外部实验恢复、提醒和实际科研方向偏移仍属于后续验收。
+
+新增的 [InternAgent](../reproductions/2026-10-06-internagent-autodebug/REPORT.md) 基线和后端短连接、[SCP](../reproductions/2026-10-06-scp-minimal/REPORT.md) 自有小工具调用通过。两者保持可选组件候选，不作为已经验证的整套研究后端，也不为 M1 增加不必要的依赖。
 
 详细证据：[规则](REPRODUCTION.md)、[历史版本](../reproductions/2026-10-04-source-mapping/REPORT.md)、[Virtual Lab](../reproductions/2026-10-04-virtual-lab-meeting/REPORT.md)、[freephdlabor](../reproductions/2026-10-04-freephdlabor-agent/REPORT.md)、[等预算比较](../reproductions/2026-10-05-comparison/REPORT.md)。

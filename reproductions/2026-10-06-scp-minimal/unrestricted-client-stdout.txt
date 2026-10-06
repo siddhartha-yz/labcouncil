@@ -1,0 +1,3 @@
+Starting upstream stdio transport
+Transport started; initializing session
+{"independent_mse": true, "valid_after_errors": true, "negative_cases": true}

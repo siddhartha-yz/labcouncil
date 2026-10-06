@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/upstreams/internagent/launch_discovery.py", line 19, in <module>
+    from internagent.stage import IdeaGenerator, ExperimentRunner
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/upstreams/internagent/internagent/stage.py", line 14, in <module>
+    from internagent.mas.interface import InternAgentInterface
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/upstreams/internagent/internagent/mas/interface.py", line 16, in <module>
+    from .agents.agent_factory import AgentFactory
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/upstreams/internagent/internagent/mas/agents/agent_factory.py", line 13, in <module>
+    from .survey_agent import SurveyAgent
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/upstreams/internagent/internagent/mas/agents/survey_agent.py", line 17, in <module>
+    from ..tools.literature_search import LiteratureSearch, PaperMetadata
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/upstreams/internagent/internagent/mas/tools/__init__.py", line 10, in <module>
+    from .mcp_manager_fastmcp import MCPManagerFastMCP as MCPManager
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/upstreams/internagent/internagent/mas/tools/mcp_manager_fastmcp.py", line 13, in <module>
+    from fastmcp import Client
+ModuleNotFoundError: No module named 'fastmcp'

@@ -1,0 +1,170 @@
+{
+  "id": "fc8b55ceb470455d806f547ee183b168",
+  "project_id": "72b1b2dd5dac42a79a445ea55b60ac73",
+  "version": 1,
+  "snapshot": {
+    "artifacts": [
+      {
+        "body": {
+          "dataset": {
+            "x": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ],
+            "y": [
+              1,
+              3,
+              5,
+              7,
+              9
+            ]
+          },
+          "direction": "先用平稳数据比较拟合直线与只猜平均值。我将在组会追问证据，再决定加入异常点。结论只适用于演示数据。",
+          "limitation": "角色为固定程序，未调用语言模型或检索论文。只处理 5 个合成数据点；自由文字方向只保存，不会自动编写新实验。",
+          "plan_version": 1,
+          "role": "researcher",
+          "scenario": "clean",
+          "simulation": true,
+          "source": "LabCouncil 自有固定合成数据；没有文献来源",
+          "summary": "准备了 5 个可复算的数据点，用来演示组会如何改变下一轮输入。",
+          "task_id": "4b3657fde2ed4139a91a2a5acfee01b6"
+        },
+        "created": 1791238566.4186356,
+        "id": "d442c82e9b4342799cf898dc27c06d31",
+        "project_id": "72b1b2dd5dac42a79a445ea55b60ac73",
+        "role": "researcher",
+        "sha256": "271bfd2adfc10b84b124a3e6e7fb60d20600d2fcf33a873d4779f23f837ce2bd",
+        "task_id": "4b3657fde2ed4139a91a2a5acfee01b6",
+        "version": 1
+      },
+      {
+        "body": {
+          "baseline": {
+            "mae": 2.4,
+            "mse": 8.0
+          },
+          "dataset_id": "d442c82e9b4342799cf898dc27c06d31",
+          "dataset_sha256": "271bfd2adfc10b84b124a3e6e7fb60d20600d2fcf33a873d4779f23f837ce2bd",
+          "direction": "先用平稳数据比较拟合直线与只猜平均值。我将在组会追问证据，再决定加入异常点。结论只适用于演示数据。",
+          "intercept": 1.0,
+          "limitation": "角色为固定程序，未调用语言模型或检索论文。只处理 5 个合成数据点；自由文字方向只保存，不会自动编写新实验。",
+          "method": "普通最小二乘；在同一批样本上拟合和评分，只用于流程演示",
+          "metrics": {
+            "mae": 0.0,
+            "mse": 0.0
+          },
+          "plan_version": 1,
+          "prediction": [
+            1.0,
+            3.0,
+            5.0,
+            7.0,
+            9.0
+          ],
+          "role": "executor",
+          "simulation": true,
+          "slope": 2.0,
+          "summary": "在这 5 个点上，拟合直线的平均平方误差是 0；只猜平均值是 8。这不是独立测试集表现。",
+          "task_id": "aed2f1f688584c1995cc3ac66f9e5cb1"
+        },
+        "created": 1791238566.421972,
+        "id": "de44fb2c90e546c0a7606676f208fe69",
+        "project_id": "72b1b2dd5dac42a79a445ea55b60ac73",
+        "role": "executor",
+        "sha256": "3f3572b3bcc6cb98fe63a79f5e6e9a305ea095013e0748b0429fb3bb449c97b9",
+        "task_id": "aed2f1f688584c1995cc3ac66f9e5cb1",
+        "version": 1
+      },
+      {
+        "body": {
+          "checks": {
+            "baseline": true,
+            "coefficients": true,
+            "dataset_hash": true,
+            "mae": true,
+            "mse": true,
+            "predictions": true
+          },
+          "dataset_id": "d442c82e9b4342799cf898dc27c06d31",
+          "direction": "先用平稳数据比较拟合直线与只猜平均值。我将在组会追问证据，再决定加入异常点。结论只适用于演示数据。",
+          "executor_artifact_id": "de44fb2c90e546c0a7606676f208fe69",
+          "executor_sha256": "3f3572b3bcc6cb98fe63a79f5e6e9a305ea095013e0748b0429fb3bb449c97b9",
+          "independent_result": {
+            "baseline_mse": 8.0,
+            "intercept": 1.0,
+            "mae": 0.0,
+            "mse": 0.0,
+            "slope": 2.0
+          },
+          "limitation": "角色为固定程序，未调用语言模型或检索论文。只处理 5 个合成数据点；自由文字方向只保存，不会自动编写新实验。",
+          "plan_version": 1,
+          "role": "reviewer",
+          "simulation": true,
+          "summary": "复算对上了这批数据、系数和误差。这只核对算术，不能说明方法能推广到真实问题。",
+          "task_id": "1db02d14266c489da1e79a991abf3ae7",
+          "verified": true
+        },
+        "created": 1791238566.425494,
+        "id": "617c6361300a473981b6ebbca0c0c3a7",
+        "project_id": "72b1b2dd5dac42a79a445ea55b60ac73",
+        "role": "reviewer",
+        "sha256": "a6fbf782c93efc60c0baa01516ed05b7338849abe9acf49755d81e2305bb7b0f",
+        "task_id": "1db02d14266c489da1e79a991abf3ae7",
+        "version": 1
+      }
+    ],
+    "cutoff": 1791238600.328327,
+    "idea": "先用平稳数据比较拟合直线与只猜平均值。我将在组会追问证据，再决定加入异常点。结论只适用于演示数据。",
+    "notice": "这是开会时的固定快照。之后完成的任务请在项目最新进度中查看。",
+    "scenario": "clean",
+    "simulation": true,
+    "tasks": [
+      {
+        "error": null,
+        "id": "4b3657fde2ed4139a91a2a5acfee01b6",
+        "role": "researcher",
+        "status": "completed",
+        "version": 1
+      },
+      {
+        "error": null,
+        "id": "aed2f1f688584c1995cc3ac66f9e5cb1",
+        "role": "executor",
+        "status": "completed",
+        "version": 1
+      },
+      {
+        "error": null,
+        "id": "1db02d14266c489da1e79a991abf3ae7",
+        "role": "reviewer",
+        "status": "completed",
+        "version": 1
+      }
+    ]
+  },
+  "status": "closed",
+  "created": 1791238600.3285103,
+  "discussion": [
+    {
+      "id": "089cde616e294ee38e5e7cf3c849e46b",
+      "meeting_id": "fc8b55ceb470455d806f547ee183b168",
+      "question": "复核检查了什么？这些证据可靠吗？",
+      "answer": "【模拟答复】这场组会冻结了 3 份产物。计算只针对固定的 5 个合成数据点；复核结果仅说明这些数能对上。没有检索论文，也不能据此回答任意研究问题。可打开下方原始证据检查输入和计算。你的问题已保存；改变方向请编辑并确认下一轮决定。",
+      "created": 1791238911.787882
+    }
+  ],
+  "decision": {
+    "id": "a5e91bb63ebb4d26bd8eed91a67ce6b5",
+    "meeting_id": "fc8b55ceb470455d806f547ee183b168",
+    "project_id": "72b1b2dd5dac42a79a445ea55b60ac73",
+    "from_version": 1,
+    "to_version": 2,
+    "instruction": "加入一个异常点；比较误差变化，并独立复算。只报告这个例子。",
+    "scenario": "outlier",
+    "created": 1791239055.2422602
+  },
+  "draft": null
+}

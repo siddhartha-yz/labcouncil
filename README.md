@@ -2,9 +2,21 @@
 
 **Your ideas. An agent research team. A meeting where you steer the next experiment.**
 
-LabCouncil is a planned, open-source platform for personal research groups made up of AI agents and a human researcher. Submit an idea, let agents investigate and produce evidence, meet on a schedule to review their reports, and turn your decisions into the next round of work.
+LabCouncil is an open-source prototype for personal research groups made up of AI agents and a human researcher. Submit an idea, let agents investigate and produce evidence, meet on a schedule to review their reports, and turn your decisions into the next round of work.
 
-**Status: planning and bounded validation.** This repository contains the project plan, research references, and runnable verification scripts. There is no platform application yet.
+**Status: M1 local simulation prototype, with separate upstream validation records.** The application now supports two-round background work, evidence, meeting questions, saved drafts and confirmed decisions. Its three roles and answers are deterministic simulations; real research tools remain M2 work.
+
+## Try the local meeting
+
+From the repository root, with Python 3.11+ on Linux:
+
+```bash
+python3 -m labcouncil start
+```
+
+Open [http://127.0.0.1:8765](http://127.0.0.1:8765). Create a project, review the three reports, ask a question and confirm the next round. No API key is needed for this simulation. It does not implement arbitrary ideas as experiments.
+
+[运行说明](docs/RUNNING.md) includes stop/restart, budgets and limitations. [M1 acceptance record](reproductions/2026-10-06-m1-prototype/REPORT.md) includes actual browser checks and durable synthetic evidence.
 
 ## The research loop
 
@@ -34,6 +46,7 @@ The initial focus is computational research that can be checked through document
 ## Documents
 
 - [实施计划 / Project plan](docs/PLAN.md): scope, architecture, milestones, and acceptance criteria.
+- [本地运行 / Running](docs/RUNNING.md): start the simulation and understand its limits.
 - [持续工作清单](docs/WORKLIST.md): all candidates, remaining validation, and the platform delivery sequence.
 - [研究参考 / Research references](docs/REFERENCES.md): relevant repositories, papers, results, and limitations.
 - [复现与采用规则 / Reproduction](docs/REPRODUCTION.md): evidence levels, validation gates, and experiment records.
@@ -43,7 +56,7 @@ The initial focus is computational research that can be checked through document
 
 ## 中文简介
 
-LabCouncil 是一个正在规划的个人虚拟研究组平台。你提供 idea；agent 团队开展调研和实验，保存结果与证据；你定期开组会、追问并评审；确认后的决定变成下一轮任务，agent 会后继续工作。
+LabCouncil 已有可运行的本地模拟组会原型，正在向个人虚拟研究组平台推进。你提供 idea；agent 团队开展调研和实验，保存结果与证据；你定期开组会、追问并评审；确认后的决定变成下一轮任务，agent 会后继续工作。
 
 核心目标是验证：**人工组会能否让 agent 的下一轮工作更符合研究意图，并持续产出可检查的新证据。**
 
@@ -59,7 +72,7 @@ Copy `.env.example` to a local `.env` and fill `GEMINI_API_KEY`. The `.env` file
 python3 reproductions/check_gemini_connectivity.py --output logs/gemini-check-01.json
 ```
 
-This makes one potentially billable request to `gemini-3.8-flash`, with no automatic retries. Use a new output filename for each attempt. No runnable platform exists yet.
+This makes one potentially billable request to `gemini-3.8-flash`, with no automatic retries. Use a new output filename for each attempt. The local simulation app is separate from this connectivity check.
 
 ## Minimal DeepSeek connectivity check
 
@@ -80,11 +93,17 @@ python3 reproductions/check_deepseek_workflow.py first --output-dir logs/my-work
 python3 reproductions/check_deepseek_workflow.py continue --output-dir logs/my-workflow
 ```
 
-Use a fresh directory and configure the local `.env`. Each experiment has a shared limit of 12 API request attempts; requests may be billable. No platform UI, scheduler, arbitrary code execution, or general recovery is implemented.
+Use a fresh directory and configure the local `.env`. Each experiment has a shared limit of 12 API request attempts; requests may be billable. This harness is separate from the M1 simulation UI and its limited scheduling/recovery. Arbitrary code execution and real-model platform integration are not implemented.
 
 ## Pinned upstream meeting check
 
 The [Virtual Lab meeting-function record](reproductions/2026-10-04-virtual-lab-meeting/REPORT.md) runs two real meetings using unchanged pinned upstream source and a DeepSeek connection adapter. Speaking order, saved files, prior-summary input and updated plans were checked. Strict output-format attempts failed; the saved outputs passed offline reassessment under an explicit Markdown/JSON adapter contract. The original failures remain public. This changed-model check does not reproduce the paper's research results or select Virtual Lab as our backend.
+
+## Shanghai AI Lab component checks
+
+The [InternAgent AutoDebug record](reproductions/2026-10-06-internagent-autodebug/REPORT.md) includes two original baseline runs and a real DeepSeek Flash connection through the original Claude runner. It does not validate an autonomous discovery loop.
+
+The [SCP record](reproductions/2026-10-06-scp-minimal/REPORT.md) verifies original SDK discovery/calls through stdio and local HTTP using a small custom tool. Initial failures and execution-environment controls are retained. Hosted resources and permissions remain unverified.
 
 ## License
 

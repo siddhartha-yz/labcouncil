@@ -1,0 +1,28 @@
+test_actual_http_workflow_and_evidence (test_http.HTTPTests.test_actual_http_workflow_and_evidence) ... ok
+test_cross_site_and_rebinding_mutations_blocked (test_http.HTTPTests.test_cross_site_and_rebinding_mutations_blocked) ... ok
+test_invalid_requests_and_no_file_traversal (test_http.HTTPTests.test_invalid_requests_and_no_file_traversal) ... ok
+test_static_ui_available_with_csp (test_http.HTTPTests.test_static_ui_available_with_csp) ... ok
+test_detached_start_idempotent_restart_and_stop (test_lifecycle.LifecycleTests.test_detached_start_idempotent_restart_and_stop) ... ok
+test_different_database_in_same_directory_not_silently_reused (test_lifecycle.LifecycleTests.test_different_database_in_same_directory_not_silently_reused) ... ok
+test_unrelated_pid_is_never_stopped (test_lifecycle.LifecycleTests.test_unrelated_pid_is_never_stopped) ... ok
+test_atomic_artifact_and_completion_roll_back_together (test_workflow.WorkflowTests.test_atomic_artifact_and_completion_roll_back_together) ... ok
+test_budget_stops_before_start_and_qa_separate (test_workflow.WorkflowTests.test_budget_stops_before_start_and_qa_separate) ... ok
+test_concurrent_confirmation_is_idempotent (test_workflow.WorkflowTests.test_concurrent_confirmation_is_idempotent) ... ok
+test_database_enforces_evidence_and_snapshot_immutability (test_workflow.WorkflowTests.test_database_enforces_evidence_and_snapshot_immutability) ... ok
+test_expired_worker_fenced_and_retry_not_charged_twice (test_workflow.WorkflowTests.test_expired_worker_fenced_and_retry_not_charged_twice) ... ok
+test_input_validation_never_creates_partial_project (test_workflow.WorkflowTests.test_input_validation_never_creates_partial_project) ... ok
+test_late_old_round_result_kept_only_as_history (test_workflow.WorkflowTests.test_late_old_round_result_kept_only_as_history) ... ok
+test_lease_retry_limit_and_failed_dependency (test_workflow.WorkflowTests.test_lease_retry_limit_and_failed_dependency) ... ok
+test_pause_then_resume_and_zero_budget (test_workflow.WorkflowTests.test_pause_then_resume_and_zero_budget) ... ok
+test_restart_in_independent_process_preserves_queue (test_workflow.WorkflowTests.test_restart_in_independent_process_preserves_queue) ... ok
+test_reviewer_detects_wrong_computation (test_workflow.WorkflowTests.test_reviewer_detects_wrong_computation) ... ok
+test_saved_draft_survives_restart_without_dispatching (test_workflow.WorkflowTests.test_saved_draft_survives_restart_without_dispatching) ... ok
+test_scheduled_meeting_only_once_and_no_auto_confirm (test_workflow.WorkflowTests.test_scheduled_meeting_only_once_and_no_auto_confirm) ... ok
+test_snapshot_stays_fixed_when_tasks_finish (test_workflow.WorkflowTests.test_snapshot_stays_fixed_when_tasks_finish) ... ok
+test_stale_version_and_invalid_version_rejected (test_workflow.WorkflowTests.test_stale_version_and_invalid_version_rejected) ... ok
+test_two_rounds_preserve_evidence_and_decision (test_workflow.WorkflowTests.test_two_rounds_preserve_evidence_and_decision) ... ok
+
+----------------------------------------------------------------------
+Ran 23 tests in 4.365s
+
+OK

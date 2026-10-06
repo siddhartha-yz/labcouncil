@@ -1,0 +1,59 @@
+{
+  "commit": "fa8c3eedfa9751d3752ea6eb49220b303ac2397d",
+  "source_sha256": "535bce4425589cbaa4e83089ac47817703b67a71216355ba4ee0228f5c7a1cad",
+  "environment": {
+    "python": "3.11.10 (main, Oct 16 2024, 04:38:48) [Clang 18.1.8 ]",
+    "torch": "2.5.1+cu124",
+    "sklearn": "1.5.2",
+    "numpy": "1.26.4",
+    "cuda_available": false
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "exit_code": 0,
+      "copy_sha256": "535bce4425589cbaa4e83089ac47817703b67a71216355ba4ee0228f5c7a1cad",
+      "result": {
+        "mse": 238.68499755859375,
+        "r2": 0.9938621520996094,
+        "mae": 12.788394927978516,
+        "training_time": 4.541324138641357,
+        "config": {
+          "hidden_dims": [
+            64,
+            32
+          ],
+          "dropout": 0.0,
+          "epochs": 100,
+          "lr": 0.001,
+          "batch_size": 32
+        }
+      },
+      "finite_metrics": true,
+      "training_under_30_seconds": true
+    },
+    {
+      "attempt": 2,
+      "exit_code": 0,
+      "copy_sha256": "535bce4425589cbaa4e83089ac47817703b67a71216355ba4ee0228f5c7a1cad",
+      "result": {
+        "mse": 260.3899230957031,
+        "r2": 0.9933040142059326,
+        "mae": 13.237897872924805,
+        "training_time": 2.5060064792633057,
+        "config": {
+          "hidden_dims": [
+            64,
+            32
+          ],
+          "dropout": 0.0,
+          "epochs": 100,
+          "lr": 0.001,
+          "batch_size": 32
+        }
+      },
+      "finite_metrics": true,
+      "training_under_30_seconds": true
+    }
+  ]
+}

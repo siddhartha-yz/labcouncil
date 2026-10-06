@@ -1,0 +1,129 @@
+Traceback (most recent call last):
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-compat-env/lib/python3.12/site-packages/anyio/streams/memory.py", line 111, in receive
+    return self.receive_nowait()
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-compat-env/lib/python3.12/site-packages/anyio/streams/memory.py", line 106, in receive_nowait
+    raise WouldBlock
+anyio.WouldBlock
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-compat-env/lib/python3.12/site-packages/anyio/_core/_tasks.py", line 115, in fail_after
+    yield cancel_scope
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-compat-env/lib/python3.12/site-packages/scp/shared/session.py", line 259, in send_request
+    response_or_error = await response_stream_reader.receive()
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-compat-env/lib/python3.12/site-packages/anyio/streams/memory.py", line 119, in receive
+    await receive_event.wait()
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-compat-env/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1668, in wait
+    await self._event.wait()
+  File "/home/yang-zhi/.local/share/uv/python/cpython-3.12.14-linux-x86_64-gnu/lib/python3.12/asyncio/locks.py", line 212, in wait
+    await fut
+asyncio.exceptions.CancelledError: Cancelled by cancel scope 7860c4de1df0
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-compat-env/lib/python3.12/site-packages/scp/shared/session.py", line 258, in send_request
+    with anyio.fail_after(timeout):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yang-zhi/.local/share/uv/python/cpython-3.12.14-linux-x86_64-gnu/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-compat-env/lib/python3.12/site-packages/anyio/_core/_tasks.py", line 118, in fail_after
+    raise TimeoutError
+TimeoutError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/yang-zhi/文档/ChatGPT/云组会/reproductions/check_scp_minimal.py", line 54, in client
+    events.append({"initialize": (await session.initialize()).model_dump(mode="json")})
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-compat-env/lib/python3.12/site-packages/scp/client/session.py", line 127, in initialize
+    result = await self.send_request(
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-compat-env/lib/python3.12/site-packages/scp/shared/session.py", line 261, in send_request
+    raise McpError(
+          ^^^^^^^^
+NameError: name 'McpError' is not defined. Did you mean: 'ScpError'?
+
+During handling of the above exception, another exception occurred:
+
+  + Exception Group Traceback (most recent call last):
+  |   File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-compat-env/lib/python3.12/site-packages/scp/client/stdio/__init__.py", line 177, in stdio_client
+  |     yield read_stream, write_stream
+  |   File "/home/yang-zhi/文档/ChatGPT/云组会/reproductions/check_scp_minimal.py", line 53, in client
+  |     async with ClientSession(read, write, read_timeout_seconds=timedelta(seconds=5), message_handler=on_message) as session:
+  |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |   File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-compat-env/lib/python3.12/site-packages/scp/shared/session.py", line 209, in __aexit__
+  |     return await self._task_group.__aexit__(exc_type, exc_val, exc_tb)
+  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |   File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-compat-env/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 685, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "/home/yang-zhi/文档/ChatGPT/云组会/reproductions/check_scp_minimal.py", line 54, in client
+    |     events.append({"initialize": (await session.initialize()).model_dump(mode="json")})
+    |                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-compat-env/lib/python3.12/site-packages/scp/client/session.py", line 127, in initialize
+    |     result = await self.send_request(
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-compat-env/lib/python3.12/site-packages/scp/shared/session.py", line 261, in send_request
+    |     raise McpError(
+    |           ^^^^^^^^
+    | NameError: name 'McpError' is not defined. Did you mean: 'ScpError'?
+    +------------------------------------
+
+During handling of the above exception, another exception occurred:
+
+  + Exception Group Traceback (most recent call last):
+  |   File "/home/yang-zhi/文档/ChatGPT/云组会/reproductions/check_scp_minimal.py", line 91, in <module>
+  |     asyncio.run(client())
+  |   File "/home/yang-zhi/.local/share/uv/python/cpython-3.12.14-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 195, in run
+  |     return runner.run(main)
+  |            ^^^^^^^^^^^^^^^^
+  |   File "/home/yang-zhi/.local/share/uv/python/cpython-3.12.14-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+  |     return self._loop.run_until_complete(task)
+  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |   File "/home/yang-zhi/.local/share/uv/python/cpython-3.12.14-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 691, in run_until_complete
+  |     return future.result()
+  |            ^^^^^^^^^^^^^^^
+  |   File "/home/yang-zhi/文档/ChatGPT/云组会/reproductions/check_scp_minimal.py", line 51, in client
+  |     async with stdio_client(params, errlog=stderr) as (read, write):
+  |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |   File "/home/yang-zhi/.local/share/uv/python/cpython-3.12.14-linux-x86_64-gnu/lib/python3.12/contextlib.py", line 231, in __aexit__
+  |     await self.gen.athrow(value)
+  |   File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-compat-env/lib/python3.12/site-packages/scp/client/stdio/__init__.py", line 171, in stdio_client
+  |     anyio.create_task_group() as tg,
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+  |   File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-compat-env/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 685, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Exception Group Traceback (most recent call last):
+    |   File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-compat-env/lib/python3.12/site-packages/scp/client/stdio/__init__.py", line 177, in stdio_client
+    |     yield read_stream, write_stream
+    |   File "/home/yang-zhi/文档/ChatGPT/云组会/reproductions/check_scp_minimal.py", line 53, in client
+    |     async with ClientSession(read, write, read_timeout_seconds=timedelta(seconds=5), message_handler=on_message) as session:
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-compat-env/lib/python3.12/site-packages/scp/shared/session.py", line 209, in __aexit__
+    |     return await self._task_group.__aexit__(exc_type, exc_val, exc_tb)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-compat-env/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 685, in __aexit__
+    |     raise BaseExceptionGroup(
+    | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+    +-+---------------- 1 ----------------
+      | Traceback (most recent call last):
+      |   File "/home/yang-zhi/文档/ChatGPT/云组会/reproductions/check_scp_minimal.py", line 54, in client
+      |     events.append({"initialize": (await session.initialize()).model_dump(mode="json")})
+      |                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+      |   File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-compat-env/lib/python3.12/site-packages/scp/client/session.py", line 127, in initialize
+      |     result = await self.send_request(
+      |              ^^^^^^^^^^^^^^^^^^^^^^^^
+      |   File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-compat-env/lib/python3.12/site-packages/scp/shared/session.py", line 261, in send_request
+      |     raise McpError(
+      |           ^^^^^^^^
+      | NameError: name 'McpError' is not defined. Did you mean: 'ScpError'?
+      +------------------------------------

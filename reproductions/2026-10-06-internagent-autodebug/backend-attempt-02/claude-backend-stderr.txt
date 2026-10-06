@@ -1,0 +1,7 @@
+INFO:internagent.experiments_utils_claude:[2026-10-06 06:22:20] Running Claude CLI with prompt: This is a bounded connectivity test. Do not use any tools, read files, or change anything. Reply with exactly LABCOUNCIL_BACKEND_OK....
+INFO:internagent.experiments_utils_claude:[2026-10-06 06:22:21] Claude command completed with return code: 0
+INFO:internagent.experiments_utils_claude:Claude output: LABCOUNCIL_BACKEND_OK
+...
+ERROR:internagent.experiments_utils_claude:Claude CLI error (return code 0): "deepseek-flash" isn't described by this version's model catalog; update Claude Code, or map it with behavesAs on a modelPicker row (or modelOverrides, if it is a provider id of a model this version knows). Until then auto-compact keeps this session within 200k tokens (the context window it assumes); if the model accepts more, append [1m] to the model name for 1M, or set CLAUDE_CODE_MAX_CONTEXT_TOKENS to its real window; CLAUDE_CODE_DISABLE_UNKNOWN_MODEL_WINDOW_ENFORCEMENT=1 restores the previous wait-for-the-API behavior.
+[claude-code:unrecognized_model] {"model":"deepseek-flash","query_source":"sdk"}
+

@@ -1,0 +1,2 @@
+Starting upstream stdio transport
+Transport started; initializing session

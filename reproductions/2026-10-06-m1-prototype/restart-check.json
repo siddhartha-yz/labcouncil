@@ -1,0 +1,73 @@
+{
+  "checked_at": 1791272980.7274125,
+  "python": "3.14.4",
+  "project_and_meetings_identical_after_restart": true,
+  "version": 2,
+  "tasks": 6,
+  "artifacts": 6,
+  "decisions": 1,
+  "commands": [
+    {
+      "command": "stop",
+      "returncode": 0,
+      "result": {
+        "stopped": {
+          "serve": true,
+          "worker": true
+        },
+        "database_retained": true
+      }
+    },
+    {
+      "command": "start",
+      "returncode": 0,
+      "result": {
+        "url": "http://127.0.0.1:8765",
+        "simulation": true,
+        "services": {
+          "serve": {
+            "pid": 488755,
+            "command": "serve",
+            "instance": "172dbbf28f344e7f9ff5e284eb0fe2e8",
+            "database": "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/m1-preview/state.sqlite3",
+            "created": 1791272980.491034,
+            "port": 8765,
+            "running": true
+          },
+          "worker": {
+            "pid": 488757,
+            "command": "worker",
+            "instance": "331cda04b0a44169834c16e7e85e3a3c",
+            "database": "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/m1-preview/state.sqlite3",
+            "created": 1791272980.5490012,
+            "running": true
+          }
+        }
+      }
+    },
+    {
+      "command": "status",
+      "returncode": 0,
+      "result": {
+        "serve": {
+          "pid": 488755,
+          "command": "serve",
+          "instance": "172dbbf28f344e7f9ff5e284eb0fe2e8",
+          "database": "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/m1-preview/state.sqlite3",
+          "created": 1791272980.491034,
+          "port": 8765,
+          "running": true
+        },
+        "worker": {
+          "pid": 488757,
+          "command": "worker",
+          "instance": "331cda04b0a44169834c16e7e85e3a3c",
+          "database": "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/m1-preview/state.sqlite3",
+          "created": 1791272980.5490012,
+          "running": true
+        }
+      }
+    }
+  ],
+  "source": "Codex browser acceptance fixture, not a user research review"
+}

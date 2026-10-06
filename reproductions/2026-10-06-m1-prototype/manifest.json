@@ -1,0 +1,13 @@
+{
+  "format": "sha256 of exact file bytes",
+  "files": {
+    "REPORT.md": "952158e0cb0dd98d0d97e6ff800d8ae20be9c5801e47619cfab2746b5414cf75",
+    "meeting-round-01.json": "34f0e67ca196da9ba7459193acee24358b5ff45a3328fb698b92705b90ede531",
+    "meeting-round-02.json": "05b021308e7de0c946ef979290283c8e7a287e0a2473c28092e15500731a38e2",
+    "project.json": "93f5f3b2e0e0e751e2ed1c2ac952747e905618322c18a508219354b696c522ef",
+    "restart-check.json": "d7946dbac3e1b37b7426606c59078296deb98270b46e9ae23b2353c01fa36642",
+    "round-02.jpg": "ef7d6b0280de1d221a159551fd1967c2c1ba220c855d197ada90d447b7373eb2",
+    "tests-python311.txt": "e96b200494e6321e75dfddfa0091848a9fb7b29014da46897472ff0b9b53ba4c",
+    "tests-python314.txt": "dac72fb077447c5bb462cc9333ad373e71d4ba4e9676fe06ad2c92ef112b268f"
+  }
+}

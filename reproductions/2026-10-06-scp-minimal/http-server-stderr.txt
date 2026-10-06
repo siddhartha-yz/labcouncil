@@ -1,0 +1,95 @@
+/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-env/lib/python3.12/site-packages/pydantic_settings/sources/utils.py:47: IncompleteFieldDefinitionWarning: Field 'lifespan' has an incomplete definition: its annotation contains an unresolved forward reference, so settings sources may fail to correctly resolve its value. Call `model_rebuild()` on the model where the field is defined, once all the referenced types are defined.
+  warnings.warn(
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:23495
+[33mPress CTRL+C to quit[0m
+127.0.0.1 - - [06/Oct/2026 06:13:28] "GET /health HTTP/1.1" 200 -
+127.0.0.1 - - [06/Oct/2026 06:13:28] "GET /tools HTTP/1.1" 200 -
+127.0.0.1 - - [06/Oct/2026 06:13:28] "POST /tools/call_tool HTTP/1.1" 200 -
+Exception on /tools/call_tool [POST]
+Traceback (most recent call last):
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-env/lib/python3.12/site-packages/scp/server/fastmcp/tools/base.py", line 91, in run
+    return await self.fn_metadata.call_fn_with_arg_validation(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-env/lib/python3.12/site-packages/scp/server/fastmcp/utilities/func_metadata.py", line 68, in call_fn_with_arg_validation
+    return fn(**arguments_parsed_dict)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yang-zhi/文档/ChatGPT/云组会/reproductions/check_scp_http.py", line 24, in mean_squared_error
+    raise ValueError("Vectors must have equal nonzero lengths")
+ValueError: Vectors must have equal nonzero lengths
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-env/lib/python3.12/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-env/lib/python3.12/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-env/lib/python3.12/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-env/lib/python3.12/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-env/lib/python3.12/site-packages/asgiref/sync.py", line 332, in __call__
+    return call_result.result()
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/yang-zhi/.local/share/uv/python/cpython-3.12.14-linux-x86_64-gnu/lib/python3.12/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/yang-zhi/.local/share/uv/python/cpython-3.12.14-linux-x86_64-gnu/lib/python3.12/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-env/lib/python3.12/site-packages/asgiref/sync.py", line 372, in main_wrap
+    result = await awaitable
+             ^^^^^^^^^^^^^^^
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-env/lib/python3.12/site-packages/scp/lab/server.py", line 32, in call_tool
+    result = await self.call_tool(name, arguments)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-env/lib/python3.12/site-packages/scp/server/fastmcp/server.py", line 235, in call_tool
+    result = await self._tool_manager.call_tool(name, arguments, context=context)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-env/lib/python3.12/site-packages/scp/server/fastmcp/tools/tool_manager.py", line 64, in call_tool
+    return await tool.run(arguments, context=context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-env/lib/python3.12/site-packages/scp/server/fastmcp/tools/base.py", line 100, in run
+    raise ToolError(f"Error executing tool {self.name}: {e}") from e
+scp.server.fastmcp.exceptions.ToolError: Error executing tool mean_squared_error: Vectors must have equal nonzero lengths
+127.0.0.1 - - [06/Oct/2026 06:13:28] "[35m[1mPOST /tools/call_tool HTTP/1.1[0m" 500 -
+Exception on /tools/call_tool [POST]
+Traceback (most recent call last):
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-env/lib/python3.12/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-env/lib/python3.12/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-env/lib/python3.12/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-env/lib/python3.12/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-env/lib/python3.12/site-packages/asgiref/sync.py", line 332, in __call__
+    return call_result.result()
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/yang-zhi/.local/share/uv/python/cpython-3.12.14-linux-x86_64-gnu/lib/python3.12/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/yang-zhi/.local/share/uv/python/cpython-3.12.14-linux-x86_64-gnu/lib/python3.12/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-env/lib/python3.12/site-packages/asgiref/sync.py", line 372, in main_wrap
+    result = await awaitable
+             ^^^^^^^^^^^^^^^
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-env/lib/python3.12/site-packages/scp/lab/server.py", line 32, in call_tool
+    result = await self.call_tool(name, arguments)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-env/lib/python3.12/site-packages/scp/server/fastmcp/server.py", line 235, in call_tool
+    result = await self._tool_manager.call_tool(name, arguments, context=context)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/yang-zhi/文档/ChatGPT/云组会/workspaces/scp-env/lib/python3.12/site-packages/scp/server/fastmcp/tools/tool_manager.py", line 62, in call_tool
+    raise ToolError(f"Unknown tool: {name}")
+scp.server.fastmcp.exceptions.ToolError: Unknown tool: no_such_tool
+127.0.0.1 - - [06/Oct/2026 06:13:28] "[35m[1mPOST /tools/call_tool HTTP/1.1[0m" 500 -
+127.0.0.1 - - [06/Oct/2026 06:13:28] "POST /tools/call_tool HTTP/1.1" 200 -

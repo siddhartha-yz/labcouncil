@@ -1,0 +1,18 @@
+{
+  "request": {
+    "jsonrpc": "2.0",
+    "id": 0,
+    "method": "initialize",
+    "params": {
+      "protocolVersion": "2024-11-05",
+      "capabilities": {},
+      "clientInfo": {
+        "name": "wire-probe",
+        "version": "1"
+      }
+    }
+  },
+  "stdout": "",
+  "stderr": "Traceback (most recent call last):\n  File \"/home/yang-zhi/\u6587\u6863/ChatGPT/\u4e91\u7ec4\u4f1a/reproductions/check_scp_minimal.py\", line 86, in <module>\n    server()\n  File \"/home/yang-zhi/\u6587\u6863/ChatGPT/\u4e91\u7ec4\u4f1a/reproductions/check_scp_minimal.py\", line 17, in server\n    from scp.server.fastmcp import FastMCP\nModuleNotFoundError: No module named 'scp'\n",
+  "exit": 1
+}

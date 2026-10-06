@@ -1,0 +1,18 @@
+{
+  "request": {
+    "jsonrpc": "2.0",
+    "id": 0,
+    "method": "initialize",
+    "params": {
+      "protocolVersion": "2024-11-05",
+      "capabilities": {},
+      "clientInfo": {
+        "name": "wire-probe",
+        "version": "1"
+      }
+    }
+  },
+  "stdout": "",
+  "stderr": "/home/yang-zhi/\u6587\u6863/ChatGPT/\u4e91\u7ec4\u4f1a/workspaces/scp-env/lib/python3.12/site-packages/pydantic_settings/sources/utils.py:47: IncompleteFieldDefinitionWarning: Field 'lifespan' has an incomplete definition: its annotation contains an unresolved forward reference, so settings sources may fail to correctly resolve its value. Call `model_rebuild()` on the model where the field is defined, once all the referenced types are defined.\n  warnings.warn(\n",
+  "exit": -9
+}

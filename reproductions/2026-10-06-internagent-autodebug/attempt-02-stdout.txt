@@ -1,0 +1,9 @@
+Using device: cpu
+Generating synthetic data...
+Training MLP with hidden_dims=[64, 32], dropout=0.0
+Training completed in 2.51 seconds
+Test MSE: 260.3899
+Test R2: 0.9933
+Test MAE: 13.2379
+
+Results saved to: /home/yang-zhi/文档/ChatGPT/云组会/workspaces/internagent-autodebug/attempt-02/final_info.json
