@@ -27,11 +27,13 @@ HTTP 的非法长度和未知工具返回 500，错误正文为 Flask 页面，�
 
 原环境 Python 3.12.14；通过的版本包括 AnyIO 4.15.1、Pydantic 2.13.5、pydantic-settings 2.15.0，完整清单见 `environment-freeze.txt`。这是当前解析的依赖，不是作者论文环境。较早依赖另存 `compat-environment-freeze.txt`，不覆盖通过环境。
 
-复跑需要本地固定源码与隔离安装，使用新的输出目录或记录参数，避免覆盖已有尝试：
+复跑需要本地固定源码与隔离安装，使用 `--output-dir logs/my-scp-check` 或记录参数，避免覆盖已有尝试：
 
 ```bash
-timeout -k 3s 20s workspaces/scp-env/bin/python reproductions/check_scp_minimal.py --unrestricted
-timeout -k 3s 30s workspaces/scp-env/bin/python reproductions/check_scp_http.py
+timeout -k 3s 20s workspaces/scp-env/bin/python reproductions/check_scp_minimal.py --output-dir logs/my-scp-check
+timeout -k 3s 30s workspaces/scp-env/bin/python reproductions/check_scp_http.py --output-dir logs/my-scp-check
 ```
+
+新机器环境准备步骤见 [SETUP.md](SETUP.md)，原 freeze 中的本机路径保持原样另存，提供去掉该行的 portable requirements。
 
 当前保留为可选工具协议候选，不为 M1 模拟平台增加整套依赖。真正接入科学资源时，仍要对选中的每个工具核对输入输出、授权、超时、费用与恢复。Hub 代码还包含 Redis、对象存储及权限服务等路径，这次未运行，云端账号与工具可用性未知。README 许可徽标写 Apache 2.0，根 LICENSE 和 pyproject 写 MIT；实际集成前按所需文件再核对许可，不只看徽标。

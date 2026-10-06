@@ -86,6 +86,9 @@ def client():
 
 
 if __name__ == "__main__":
+    if "--output-dir" in sys.argv:
+        OUTPUT = Path(sys.argv[sys.argv.index("--output-dir")+1]).absolute()
+        OUTPUT.mkdir(parents=True, exist_ok=True)
     if "--server" in sys.argv:
         server()
     else:
