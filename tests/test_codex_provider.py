@@ -148,19 +148,27 @@ answer.write_text("broken" if behavior=="invalid" else json.dumps(result))
             +'time.sleep(20)\n')
         parent=subprocess.Popen([sys.executable,str(holder)],start_new_session=True)
         child=None
+        def child_is_running():
+            try:
+                # Reaping can remove /proc between any existence check and read.
+                stat=Path(f'/proc/{child}/stat').read_text()
+            except (FileNotFoundError, ProcessLookupError):
+                return False
+            return stat.rsplit(')',1)[1].split()[0]!='Z'
         try:
             deadline=time.monotonic()+3
             while not (self.root/'child.pid').exists() and time.monotonic()<deadline:time.sleep(.02)
             child=int((self.root/'child.pid').read_text())
             parent.kill();parent.wait(timeout=3)
             deadline=time.monotonic()+3
-            while Path(f'/proc/{child}/stat').exists() and time.monotonic()<deadline:
-                if Path(f'/proc/{child}/stat').read_text().split()[2]=='Z':break
+            while child_is_running() and time.monotonic()<deadline:
                 time.sleep(.02)
-            self.assertTrue(not Path(f'/proc/{child}/stat').exists() or Path(f'/proc/{child}/stat').read_text().split()[2]=='Z')
+            self.assertFalse(child_is_running(),'Codex process survived its parent')
         finally:
             if parent.poll() is None:os.killpg(parent.pid,signal.SIGKILL);parent.wait()
-            if child and Path(f'/proc/{child}/stat').exists() and Path(f'/proc/{child}/stat').read_text().split()[2]!='Z':os.kill(child,signal.SIGKILL)
+            if child and child_is_running():
+                try:os.kill(child,signal.SIGKILL)
+                except ProcessLookupError:pass
 
     def test_report_and_qa_schemas_have_required_boundary_fields(self):
         self.assertEqual(set(output_schema('research-meeting',None,False)['required']),{'answer','evidence_refs'})
