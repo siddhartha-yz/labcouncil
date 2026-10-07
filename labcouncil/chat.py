@@ -177,20 +177,22 @@ def execution_receipt(store,con,pid,waiting=False):
     if execution['mode']!='research' and not permissions['local_compute']:reasons.append('尚未授权本地计算')
     if reasons:return '安排已保存，但尚未启动：'+'；'.join(reasons)+'。已有资料仍可讨论，没有自动增加额度。'
     queued=con.execute("SELECT 1 FROM tasks WHERE project_id=? AND version=? AND status='queued'",(pid,p['version'])).fetchone()
-    if queued:return '安排已保存，任务已排队；worker启动后会留下执行记录。'
+    if queued:return '安排已保存，任务已排队；后台接到任务后，执行进展会出现在群里。'
     return '安排已保存，目前没有待启动任务，可以继续讨论或交代后续工作。'
 
 
-def local_control(store,p,message):
+def local_control(store,p,message,expected_proposal_id=None):
     raw=message.strip().rstrip('。！! ')
     pending=p['group_proposal']
+    if expected_proposal_id is not None and (not pending or pending['message_id']!=expected_proposal_id):
+        raise Conflict('安排已变化，请先看最新的消息再同意')
     prior=[m for m in p['group_messages'] if m['status']!='processing']
     clear_agreement=raw in {'按这个做','就按这个做','就这样执行','执行吧','确认'} or bool(prior and pending and prior[-1]['id']==pending['message_id'])
     if raw in AGREE and pending and clear_agreement:
         with store.connection(write=True) as con:
             current=store.row(con,'projects',p['id'])
             row=con.execute('SELECT * FROM group_proposals WHERE project_id=?',(p['id'],)).fetchone()
-            if not row or row['message_id']!=pending['message_id'] or row['version']!=current['version']:
+            if not row or row['message_id']!=pending['message_id'] or row['version']!=current['version'] or (expected_proposal_id is not None and row['message_id']!=expected_proposal_id):
                 raise Conflict('安排已变化，请先看最新的消息再同意')
             con.execute('UPDATE group_proposals SET approved=1 WHERE project_id=?',(p['id'],))
             con.execute('UPDATE projects SET paused=0 WHERE id=?',(p['id'],))
@@ -216,14 +218,16 @@ def proposal_answer(answer,b,direct=False):
     return answer+'\n我理解的工作安排：'+b['idea']+'\n投入上限：'+str(b['work_time']['duration_minutes'])+'分钟；允许：'+('、'.join(allowed) or '尚未授权执行')+'。'+('' if direct else '\n你觉得合适就说“按这个做”，也可以直接补充或改主意。')
 
 
-def send(store,pid,message,identifier,provider=None):
+def send(store,pid,message,identifier,provider=None,expected_proposal_id=None):
     message=text(message,'群聊消息')
+    if expected_proposal_id is not None and (message!='按这个做' or not isinstance(expected_proposal_id,str) or not re.fullmatch(r'[A-Za-z0-9_-]{8,80}',expected_proposal_id)):
+        raise ValueError('卡片确认需要对应的安排编号')
     turn,new=begin(store,pid,message,identifier)
     if not new:return turn
     request_id=None
     try:
         p=store.project(pid)
-        answer=local_control(store,p,message)
+        answer=local_control(store,p,message,expected_proposal_id)
         if answer:return finish(store,identifier,answer)
         explicit_context = bool(re.match(r'^(?:资源|可用资源|额外要求)\s*[：:]',message))
         if (explicit_context or permission_patch(message) or minutes_patch(message) is not None) and (not direct_assignment(message) or not p['current_inputs']['body']['permissions']['model_calls'] or p['execution']['mode']=='simulation'):

@@ -169,6 +169,17 @@ class HTTPTests(unittest.TestCase):
         for path in ("/../.env", "/.env", "/api/evidence/missing", "/workspaces/state.sqlite3"):
             self.assertEqual(self.request("GET", path)[0], 404)
 
+    def test_chat_card_scope_reaches_server_and_rejects_replaced_proposal(self):
+        pid=self.store.create_project('卡片确认 HTTP 验收','原目标')
+        path=f'/api/projects/{pid}/chat'
+        for identifier,condition in [('proposal-http-01','投入30分钟。'),('proposal-http-02','投入60分钟。')]:
+            self.assertEqual(self.request('POST',path,{'message':condition,'message_id':identifier})[0],200)
+        status,_,raw=self.request('POST',path,{'message':'按这个做','message_id':'approve-http-01','expected_proposal_id':'proposal-http-01'})
+        self.assertEqual(status,200)
+        self.assertEqual(json.loads(raw)['status'],'error')
+        self.assertEqual(self.store.project(pid)['version'],1)
+        self.assertFalse(self.store.project(pid)['group_proposal']['approved'])
+
     def test_static_ui_available_with_csp(self):
         status, headers, body = self.request("GET", "/")
         self.assertEqual(status, 200)

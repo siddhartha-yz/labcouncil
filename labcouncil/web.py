@@ -81,7 +81,7 @@ def handler(store):
                 if len(path) == 4 and path[:2] == ["api", "projects"]:
                     if path[3] == "chat":
                         from .chat import send
-                        return self.send(200, send(store, path[2], body.get('message'), body.get('message_id')))
+                        return self.send(200, send(store, path[2], body.get('message'), body.get('message_id'), expected_proposal_id=body.get('expected_proposal_id')))
                     if path[3] == "meeting":
                         return self.send(200, {"id": store.open_meeting(path[2])})
                     if path[3] == "configure":

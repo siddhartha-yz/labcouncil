@@ -37,6 +37,45 @@ class GroupChatTests(unittest.TestCase):
         b=normalize(None,'检查保存资料','research');b['permissions']['model_calls']=permission
         return self.store.create_project('离线真实后端fixture',b['idea'],mode='research',brief=b,api_budget=0)
 
+    def test_card_approval_targets_exact_proposal_and_replay_is_idempotent(self):
+        self.say('允许本地计算。投入30分钟。','proposal-card-01')
+        p=self.store.project(self.pid)
+        self.assertEqual(p['used'],0)
+        approved=send(self.store,self.pid,'按这个做','card-approval-01',expected_proposal_id='proposal-card-01')
+        self.assertEqual(approved['status'],'completed')
+        version=self.store.project(self.pid)['version']
+        replay=send(self.store,self.pid,'按这个做','card-approval-01',expected_proposal_id='proposal-card-01')
+        self.assertEqual(replay['id'],approved['id'])
+        self.assertEqual(self.store.project(self.pid)['version'],version)
+
+    def test_stale_card_cannot_approve_replacement_even_with_same_version(self):
+        self.say('允许本地计算。投入30分钟。','proposal-card-01')
+        self.say('禁止本地计算。投入60分钟。','proposal-card-02')
+        stale=send(self.store,self.pid,'按这个做','card-approval-01',expected_proposal_id='proposal-card-01')
+        self.assertEqual(stale['status'],'error')
+        self.assertIn('安排已变化',stale['answer'])
+        p=self.store.project(self.pid)
+        self.assertEqual(p['version'],1)
+        self.assertEqual(p['used'],0)
+        self.assertEqual(p['group_proposal']['message_id'],'proposal-card-02')
+        self.assertFalse(p['group_proposal']['approved'])
+
+    def test_card_scope_requires_explicit_agreement_not_an_unrelated_message(self):
+        with self.assertRaises(ValueError):
+            send(self.store,self.pid,'继续工作','card-approval-01',expected_proposal_id='proposal-card-01')
+        self.assertEqual(self.store.project(self.pid)['group_messages'],[])
+
+    def test_tool_selection_is_a_proposal_until_card_agreement(self):
+        pid=self.real(False)
+        message='本次工作条件：\n允许调用模型。\n禁止查询公开论文与仓库。\n允许本地计算。\n投入30分钟。'
+        self.say(message,'proposal-card-01',pid=pid)
+        p=self.store.project(pid)
+        self.assertEqual(p['used'],0)
+        self.assertEqual(p['model_requests'],[])
+        self.assertFalse(p['current_inputs']['body']['permissions']['model_calls'])
+        self.assertTrue(p['group_proposal']['brief']['permissions']['model_calls'])
+        self.assertFalse(p['group_proposal']['approved'])
+
     def test_chat_needs_no_meeting_or_evidence_and_old_dialogue_is_inherited(self):
         pid=self.real();fixture=ProviderFixture()
         reply=self.say('能先聊一下方向吗？',provider=fixture,pid=pid)

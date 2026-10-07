@@ -96,3 +96,36 @@ test("an acknowledged message is not made uncertain by a subsequent display refr
   assert.equal(ui.run('questionDrafts.get("one")'),"下一句");
   assert.equal(ui.run('sending.size'),0);
 });
+test("proposal scope and explicit timing are visible without opening the full answer", () => {
+  const ui=boot();
+  const html=ui.run('proposalCard({id:"one",group_messages:[],group_proposal:{message_id:"proposal-original",reset_clock:false,brief:{idea:"核对已有数据 <script>",resources:"自己的五个数据点",work_time:{duration_minutes:30},permissions:{model_calls:false,public_research:true,local_compute:false,retry_public_reads:false}}}})');
+  assert.match(html,/自己的五个数据点/);
+  assert.match(html,/30 分钟，沿用原截止时间/);
+  assert.match(html,/查公开论文与仓库/);
+  assert.doesNotMatch(html,/运行已接入的合成计算/);
+  assert.match(html,/data-approve-proposal="proposal-original"/);
+  assert.match(html,/&lt;script&gt;/);
+});
+test("tool choice generates explicit grants and revocations without execution intent", () => {
+  const ui=boot();
+  const text=ui.run('toolMessage({elements:{namedItem:name=>({model_calls:{checked:true},public_research:{checked:false},local_compute:{checked:true},minutes:{value:"30"}}[name])}})');
+  assert.match(text,/^本次工作条件：/);
+  assert.match(text,/允许调用模型。/);
+  assert.match(text,/禁止查询公开论文与仓库。/);
+  assert.match(text,/允许本地计算。/);
+  assert.match(text,/投入30分钟。/);
+});
+test("card approval keeps its original scope through an uncertain send and recovery", async () => {
+  const bodies=[];
+  const ui=boot(new Map(),async(path,options)=>{
+    bodies.push(JSON.parse(options.body));
+    if(bodies.length===1)throw new Error("reset");
+    return {ok:true,json:async()=>({})};
+  });
+  ui.run('const approval={message:"按这个做",message_id:"approval-original",expected_proposal_id:"proposal-original",created:1};');
+  await assert.rejects(ui.run('sendChat("one",approval)'));
+  await ui.run('sendChat("one",pendingSends.get("one"))');
+  assert.equal(bodies.length,2);
+  assert.deepEqual(bodies[0],bodies[1]);
+  assert.equal(bodies[1].expected_proposal_id,"proposal-original");
+});

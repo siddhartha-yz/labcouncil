@@ -43,7 +43,7 @@ The initial focus is computational research that can be checked through document
 
 ## Documents
 
-- [Dots 设计适配](docs/DOTS-DESIGN.md): official references, continuous chat, real activity records and current capability limits; [local UI acceptance](reproductions/2026-10-07-dots-ui/REPORT.md) and [three iteration rounds](reproductions/2026-10-07-dots-iterations/REPORT.md).
+- [Dots 设计适配](docs/DOTS-DESIGN.md): official references, continuous chat, real activity records and current capability limits; [local UI acceptance](reproductions/2026-10-07-dots-ui/REPORT.md) [three iteration rounds](reproductions/2026-10-07-dots-iterations/REPORT.md), and [first-use and review improvements](reproductions/2026-10-08-human-design/REPORT.md).
 - [Codex CLI 后台验收](reproductions/2026-10-07-codex-backend/REPORT.md): real two-round planning, saved experiment evidence and meeting Q&A with `gpt-6.1-sol / high`.
 - [测评分数卡](docs/SCORECARD.md): transparent 0–100 scores from saved runs, with separate unmeasured capabilities and public benchmark candidates.
 - [现有测评：题目、结果与缺口](docs/EVALUATION.md): inspect the two synthetic tasks, twelve runs, meeting cases and platform tests without confusing workflow checks with research quality.
@@ -61,7 +61,7 @@ The initial focus is computational research that can be checked through document
 
 ## 中文简介
 
-LabCouncil 已有本地持续研究群聊。直接发送 idea 建群，再在同一个对话中讨论、补充资源、明确授权、交代工作或反馈。界面参考 Dots：点名称或头像查看活动、上下文与设置，专业角色把进展和报告发回群里。网页新群默认 Codex CLI / gpt-6.1-sol / high，权限初始关闭；程序演示无需 key。既有输入、规划、证据、失败和讨论持续保留。当前研究工具能读公开摘要和固定提交 README、运行受控合成计算；任意仓库执行、完整论文实验复现和长周期自主研究尚未完成。
+LabCouncil 已有本地持续研究群聊。直接发送 idea 建群，再在同一个对话中讨论、补充资源、明确授权、交代工作或反馈。界面参考 Dots：点名称或头像查看进展、成果与资料、设置，专业角色把进展和报告发回群里。首页可一键起草；工具选择和待确认安排直接在群里操作，确认前不会启动。网页新群默认 Codex CLI / gpt-6.1-sol / high，权限初始关闭；程序演示无需 key。既有输入、规划、证据、失败和讨论持续保留。当前研究工具能读公开摘要和固定提交 README、运行受控合成计算；任意仓库执行、完整论文实验复现和长周期自主研究尚未完成。
 
 核心目标是验证：**人工组会能否让 agent 的下一轮工作更符合研究意图，并持续产出可检查的新证据。**
 

@@ -178,3 +178,64 @@ dialog::backdrop { background: #25331633; }
 #content { overflow-anchor: none; }
 #compose-area { position: relative; }
 .jump-latest { position: absolute; top: -32px; left: 50%; transform: translateX(-50%); padding: 5px 13px; border-radius: 20px; font-size: 12px; color: #566347; box-shadow: 0 3px 12px #0001; white-space: nowrap; }
+
+/* Friendly first use and visible decisions, within the existing chat layout. */
+#project-actions { display: flex; gap: 7px; }
+#project-actions .header-action { width: auto; min-height: 38px; padding: 6px 12px; border-radius: 20px; font-size: 12px; }
+#project-title, .project-copy small, .attachment small, .profile-heading p { font-size: 12px; color: #737d69; }
+.welcome { margin-top: clamp(12px,4vh,42px); max-width: 650px; }
+.welcome .dot-character { margin-bottom: 17px; }
+.welcome-eyebrow { display: block; font-size: 12px; letter-spacing: .12em; color: #697a4e; margin-bottom: 10px; }
+.welcome h2 { font-size: clamp(24px,3vw,30px); letter-spacing: -.04em; color: #2d3526; font-weight: 600; }
+.welcome p { font-size: 14px; color: #707868; line-height: 1.9; }
+.team-roster { display: flex; justify-content: center; gap: 16px; margin: 21px 0 26px; color: #67725b; font-size: 12px; }
+.team-roster span::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #8ca753; margin-right: 6px; }
+.team-roster span:nth-child(2)::before { background: #759eae; }
+.team-roster span:nth-child(3)::before { background: #c49858; }
+.team-roster span:nth-child(4)::before { background: #a88caf; }
+.starter-list { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; margin-top: 22px; }
+.starter-list button { position: relative; text-align: left; padding: 17px 14px; background: #fafbf7; border-color: #e6ebdc; border-radius: 18px; transition: background .15s, border-color .15s; }
+.starter-list button:hover { background: #f1f5e7; border-color: #b9ca99; }
+.starter-list span { display: block; font-size: 14px; font-weight: 550; margin-bottom: 7px; }
+.starter-list small { display: block; color: #77806b; font-size: 12px; line-height: 1.7; }
+.starter-list b { position: absolute; top: 13px; right: 13px; color: #8d9c74; font-size: 14px; font-weight: 400; }
+.welcome .welcome-foot { margin-top: 16px; font-size: 12px; color: #79836c; }
+.current-guide { margin: 20px 0 28px; }
+.decision-card { border: 1px solid #dce5ca; background: #f8faf2; border-radius: 22px; padding: 20px 23px; max-width: 640px; box-shadow: 0 4px 16px #33451405; }
+.card-eyebrow { color: #6b7d4d; font-size: 12px; }
+.decision-card h3 { font-size: 17px; font-weight: 550; margin: 7px 0 12px; }
+.decision-card p { line-height: 1.8; }
+.decision-card dl { grid-template-columns: 74px minmax(0,1fr); font-size: 13px; padding-top: 13px; border-top: 1px solid #e1e8d4; margin: 16px 0 12px; }
+.decision-card dt { color: #798469; }
+.card-caption { color: #737e66; font-size: 12px; }
+.card-actions { display: flex; flex-wrap: wrap; gap: 9px; margin: 17px 0 12px; }
+.card-actions button { border-radius: 18px; min-height: 40px; font-size: 13px; }
+.work-notice { display: flex; align-items: flex-start; gap: 10px; padding: 15px 17px; border: 1px solid #e7e9e2; border-radius: 18px; background: #fafbf8; color: #66715b; font-size: 12px; }
+.work-notice div { flex: 1; min-width: 0; }
+.work-notice strong { font-weight: 500; font-size: 13px; }
+.work-notice p { margin-top: 4px; }
+.work-notice button { border: 0; background: transparent; padding: 0; font-size: 12px; flex-shrink: 0; min-height: 32px; }
+.notice-dot { width: 6px; height: 6px; border-radius: 50%; background: #b7bcaa; margin-top: 8px; flex-shrink: 0; }
+.tool-choice { display: flex; align-items: flex-start; gap: 12px; border: 1px solid var(--line); border-radius: 16px; padding: 15px; font-size: 14px; background: #fafbf7; }
+.tool-choice input { width: 18px; height: 18px; margin-top: 3px; flex-shrink: 0; accent-color: #73964a; }
+.tool-choice strong { font-weight: 500; }
+.tool-choice small { display: block; margin-top: 5px; line-height: 1.65; font-size: 12px; color: #727d65; }
+.time-choice { margin-top: 22px; font-size: 14px; }
+.time-choice span { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+.time-choice input { width: 120px; margin: 0; }
+@media (max-width: 850px) {
+  #project-actions { gap: 4px; }
+  #project-actions .header-action { padding: 5px 9px; font-size: 12px; }
+  .profile-trigger { width: 45%; }
+  .welcome { padding: 0; margin: 16px auto 25px; }
+  .welcome h2 { font-size: 25px; }
+  .starter-list { grid-template-columns: 1fr; gap: 8px; }
+  .starter-list button { padding: 12px 16px; }
+  .starter-list span { margin-bottom: 2px; }
+  .starter-list b { top: 22px; right: 16px; }
+  .decision-card { padding: 17px; border-radius: 19px; }
+  .decision-card h3 { font-size: 16px; }
+  .work-notice { flex-wrap: wrap; }
+  .work-notice button { margin-left: 16px; }
+}
+.inline-action { border: 0; background: transparent; color: #526b35; font-size: 12px; padding: 0 5px; text-decoration: underline; text-underline-offset: 3px; }

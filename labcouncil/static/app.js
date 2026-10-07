@@ -199,7 +199,9 @@ function statusText(p) {
   if (ts.some(t => t.status === "running")) return p.paused || p.round_time?.expired ? "正在保存当前步骤" : "正在工作";
   if (p.paused) return "已暂停 · 随时聊聊";
   if (p.group_proposal && !p.group_proposal.approved) return "有个安排想和你确认";
-  if (p.round_time?.expired || p.used >= p.budget || p.work_blocker) return "等待你的安排 · 随时聊聊";
+  if (p.round_time?.expired) return "本次投入已结束 · 可以继续聊";
+  if (p.used >= p.budget) return "任务额度已用完 · 可以继续聊";
+  if (p.work_blocker) return !p.current_inputs.body.permissions.model_calls && p.execution.mode !== "simulation" ? "等你选择可用工具" : "暂未启动 · 查看进展";
   if (ts.some(t => t.status === "failed")) return "有一步没完成 · 记录已保存";
   if (ts.length && ts.every(t => t.status === "completed" || t.status === "cancelled")) return "已有结果 · 随时聊聊";
   return "工作已排队";
@@ -207,6 +209,55 @@ function statusText(p) {
 function shortText(value, length = 180) {
   const text = String(value || "");
   return text.length > length ? text.slice(0, length) + "…" : text;
+}
+function permissionSummary(brief) {
+  const labels={model_calls:"调用模型",public_research:"查公开论文与仓库",local_compute:"运行已接入的合成计算",retry_public_reads:"有限重试公开查询"};
+  return Object.entries(labels).filter(([key])=>brief.permissions[key]).map(([,label])=>label).join("、") || "暂不允许调用模型或工具";
+}
+function proposalCard(p) {
+  const proposal=p.group_proposal, b=proposal.brief;
+  const waiting=sending.has(p.id) || pendingSends.has(p.id) || p.group_messages.some(m=>m.status==="processing");
+  const requiredTool=p.execution?.mode === "simulation" ? "local_compute" : "model_calls";
+  const missing=!b.permissions[requiredTool];
+  return `<section class="decision-card" aria-label="待确认的工作安排"><span class="card-eyebrow">${proposal.approved ? "已同意 · 等当前步骤保存后交接" : "协调助手 · 想和你确认"}</span><h3>接下来这样做，可以吗？</h3><p class="prose">${esc(b.idea)}</p><dl><dt>投入上限</dt><dd>${b.work_time.duration_minutes} 分钟${proposal.reset_clock ? "，安排生效时开始计时" : "，沿用原截止时间"}</dd><dt>可以使用</dt><dd>${esc(permissionSummary(b))}</dd>${b.resources ? `<dt>可用资源</dt><dd>${esc(b.resources)}</dd>` : ""}</dl><p class="card-caption">任务与请求总额度继续沿用。已有成果和讨论会保留。</p>${missing ? `<p class="card-caption">还没有允许${requiredTool==="model_calls" ? "调用模型" : "本地计算"}，同意后也暂不会启动工作。<button class="inline-action" data-open-tools>调整工具 ›</button></p>` : ""}${!proposal.approved ? `<div class="card-actions"><button class="primary" data-approve-proposal="${esc(proposal.message_id)}" ${waiting ? "disabled" : ""}>同意这个安排</button><button data-edit-proposal>我想改一下</button></div>` : ""}</section>`;
+}
+function nextAction(p) {
+  if(p.group_proposal) return `<article class="current-guide" data-key="proposal-${esc(p.group_proposal.message_id)}">${proposalCard(p)}</article>`;
+  const permissions=p.current_inputs.body.permissions;
+  const needsTools=p.execution.mode === "simulation" ? !permissions.local_compute : !permissions.model_calls;
+  if(p.used===0 && needsTools && !p.paused)
+    return `<article class="current-guide" data-key="start-guide"><section class="decision-card start-card"><span class="card-eyebrow">协调助手</span><h3>想法记下了。让大家开始？</h3><p>先选可以使用的工具和投入时长。我们会把安排发到群里，等你点头后再做。</p><div class="card-actions"><button class="primary" data-open-tools>选择可用工具</button><button data-draft="先聊聊这个想法，我还没有决定执行。">先聊聊想法</button></div><p class="card-caption">当前还未执行。${p.execution.mode === "simulation" ? "这是固定程序演示，不调用模型。" : "模型权限开启前，只能记录条件和安排。"}</p></section></article>`;
+  if(p.paused || p.round_time?.expired || p.used>=p.budget || p.work_blocker)
+    return `<article class="current-guide" data-key="work-guide"><section class="work-notice"><span class="notice-dot" aria-hidden="true"></span><div><strong>${esc(statusText(p))}</strong><p>${esc(blockerText(p))}。${p.artifacts.length ? "已有报告可以继续看、继续讨论。" : "消息和工作安排都已保留。"}</p></div><button data-open-activity>查看原因 ›</button></section></article>`;
+  return "";
+}
+function putDraft(value) {
+  const text=document.querySelector("#chat-text"); if(!text)return;
+  const combined=text.value ? text.value+"\n"+value : value;
+  if(combined.length>4000) {announce("输入框已经写满，可以先发出草稿再补充。",true);return;}
+  text.value=combined; saveDraft(currentProject || "new",combined); text.focus();
+}
+async function postControl(p, message, expectedProposalId) {
+  if(sending.has(p.id) || pendingSends.has(p.id) || p.group_messages.some(m=>m.status==="processing")) return;
+  const send={message,message_id:crypto.randomUUID(),created:Date.now()/1000};
+  if(expectedProposalId) send.expected_proposal_id=expectedProposalId;
+  pendingSends.set(p.id,send);savePending();
+  updateTranscript(projectData,meetingData,true);
+  await sendChat(p.id,send);
+}
+function toolMessage(form) {
+  const permissions={model_calls:"调用模型",public_research:"查询公开论文与仓库",local_compute:"本地计算"};
+  return "本次工作条件：\n"+Object.entries(permissions).map(([key,label])=>(form.elements.namedItem(key).checked ? "允许" : "禁止")+label+"。").join("\n")+"\n投入"+form.elements.namedItem("minutes").value+"分钟。";
+}
+function openTools(p) {
+  const b=p.group_proposal?.brief || p.current_inputs.body, sim=p.execution.mode==="simulation";
+  const check=(key,title,description)=>`<label class="tool-choice"><input type="checkbox" name="${key}" ${b.permissions[key] ? "checked" : ""}><span><strong>${title}</strong><small>${description}</small></span></label>`;
+  showSheet("大家可以做哪些事？",`<p class="muted">针对这个研究群选择。提交后先看安排，再决定执行。</p><form id="choose-tools">${check("model_calls","调用模型讨论与规划",sim ? "程序演示群不会实际调用模型。" : "使用 "+backendLabel(p.execution.backend)+"；会消耗对应账号用量。")}${check("public_research","查公开论文与仓库","已接入的公开资料查询；仍受现有请求额度限制。")}${check("local_compute","运行合成数据的小实验","仅限已接入的计算工具，尚不支持任意代码或 GPU 训练。")}<label class="time-choice">这次最多投入多久？<span><input name="minutes" type="number" min="1" max="10080" value="${b.work_time.duration_minutes}" required> 分钟</span></label><p class="muted">时长是投入上限，不保证产出量。任务和请求总额度不会自动增加。</p><button class="primary" type="submit">把条件发到群里</button></form>`);
+  document.querySelector("#choose-tools").onsubmit=e=>action(e,async()=>{
+    const text=toolMessage(e.currentTarget);
+    await postControl(p,text);
+    document.querySelector("#settings").close();
+  });
 }
 function systemNote(key, text, control = "") {
   return `<article class="system-note" data-key="${esc(key)}"><p>${esc(text)}</p>${control}</article>`;
@@ -272,7 +323,7 @@ function transcript(p, meetings) {
     if (!pending.error) add(pending.created, 7, bubble(`pending-answer-${pending.message_id}`, "协调助手", '<p><span class="pending-dot" aria-hidden="true"></span>正在发送，等待服务确认…</p>', false, null, "", true));
   }
   if(pending?.error) add(pending.created,8,systemNote(`pending-error-${pending.message_id}`,`没有确认发送结果：${pending.error}。可以继续发送原消息；已保存的不会重新处理。`,`<button data-retry-send ${sending.has(p.id) ? "disabled" : ""}>恢复这条消息 ›</button>`));
-  return entries.sort((a, b) => a.time - b.time || a.rank - b.rank).map(e => e.html).join("");
+  return entries.sort((a, b) => a.time - b.time || a.rank - b.rank).map(e => e.html).join("")+nextAction(p);
 }
 function updateTranscript(p, meetings, forceBottom = false) {
   const html = transcript(p, meetings);
@@ -367,7 +418,7 @@ function setComposer(force = false) {
         if (text.value.trim() === value) saveDraft(key,"");
         else { saveDraft(result.id,text.value); saveDraft(key,""); }
         await showProject(result.id);
-        announce("群已建立。资源、权限和投入预算可以直接在聊天里补充。");
+        announce("群已建立。接下来选可用工具，或继续补充想法。");
         return;
       }
     } finally { sending.delete(key); setComposer(); }
@@ -378,7 +429,7 @@ async function sendChat(id,send) {
   sending.add(id); delete send.error; savePending(); setComposer(); announce("");
   let confirmed=false;
   try {
-    await api(`/api/projects/${id}/chat`,{message:send.message,message_id:send.message_id});
+    await api(`/api/projects/${id}/chat`,{message:send.message,message_id:send.message_id,...(send.expected_proposal_id ? {expected_proposal_id:send.expected_proposal_id} : {})});
     confirmed=true;
     pendingSends.delete(id); savePending();
     // Polling may already have shown the answer; do not pull the reader to the bottom.
@@ -395,7 +446,10 @@ async function sendChat(id,send) {
     }
     if(!pendingSends.has(id)) return;
     throw error;
-  } finally { sending.delete(id); setComposer(); }
+  } finally {
+    sending.delete(id); setComposer();
+    if(currentProject===id && projectData) updateTranscript(projectData,meetingData);
+  }
 }
 function bindEnter(form, text) {
   text.addEventListener("keydown", e => {
@@ -466,11 +520,11 @@ function activityView(p) {
 function contextView(p) {
   const b=p.current_inputs.body;
   const reports=[...p.artifacts].sort((a,b)=>b.created-a.created).map(a=>attachment("artifact",a.id,`${taskLabel(p.tasks.find(t=>t.id===a.task_id) || {id:a.task_id,role:a.role},p)} · 安排 ${a.version} · ${when(a.created)}`)).join("");
-  return `<section class="context-section"><h3>正在做什么</h3><p>${esc(b.idea)}</p></section><section class="context-section"><h3>可用资源</h3><p>${esc(b.resources || "还没有补充，可以直接在聊天里说。")}</p></section><section class="context-section"><h3>你的要求</h3><p>${esc(b.requirements || "还没有额外要求。")}</p></section><section class="context-section"><h3>工作安排</h3><p>${esc(p.current_inputs.plan.granularity)}</p><ol>${p.current_inputs.plan.steps.map(s=>`<li>${esc(s.replaceAll("等待组会","等你反馈"))}</li>`).join("")}</ol></section><section class="context-section"><h3>已保存的报告</h3>${reports || '<p class="profile-empty">还没有报告。</p>'}</section><p class="muted">这里来自已保存的项目记录。旧输入、完整报告和失败记录继续保留；每条答复使用的上下文仍可单独查看。</p>`;
+  return `<section class="context-section"><h3>已保存的成果 · ${p.artifacts.length} 份</h3>${reports || '<p class="profile-empty">还没有报告。完成后会出现在这里，也会发到群里。</p>'}</section><section class="context-section"><h3>正在做什么</h3><p>${esc(b.idea)}</p></section><section class="context-section"><h3>可用资源</h3><p>${esc(b.resources || "还没有补充，可以直接在聊天里说。")}</p></section><section class="context-section"><h3>你的要求</h3><p>${esc(b.requirements || "还没有额外要求。")}</p></section><section class="context-section"><h3>工作安排</h3><p>${esc(p.current_inputs.plan.granularity)}</p><ol>${p.current_inputs.plan.steps.map(s=>`<li>${esc(s.replaceAll("等待组会","等你反馈"))}</li>`).join("")}</ol></section><p class="muted">这里来自已保存的项目记录。旧输入、完整报告和失败记录继续保留；每条答复使用的上下文仍可单独查看。</p>`;
 }
 function settingsView(p) {
   const permissions=p.current_inputs.body.permissions;
-  return `<p class="muted badge">${p.execution.mode === "simulation" ? "本地模拟原型 · 不调用模型" : backendLabel(p.execution.backend)}</p><h3 class="section-label">工具与权限</h3><div class="tool-row"><span>模型调用</span><span>${permissions.model_calls ? "已允许" : "未授权"}</span></div><div class="tool-row"><span>公开论文与仓库查询</span><span>${permissions.public_research ? "已允许" : "未授权"}</span></div><div class="tool-row"><span>已接入的本地合成计算</span><span>${permissions.local_compute ? "已允许" : "未授权"}</span></div><p class="muted">需要改变权限时，在聊天里明确说明。任意代码执行、云电脑、语音和应用连接尚未接入。</p><h3 class="section-label">后台工作</h3><p class="muted">${esc(blockerText(p) || statusText(p))}。暂停会阻止新任务启动，当前步骤仍可保存结果。</p><button type="button" class="pause-action" id="profile-pause">${p.paused ? "恢复后台工作" : "暂停后台工作"}</button><details><summary>投入与定时设置</summary><form id="configure"><label>项目任务总上限<input name="budget" type="number" min="0" max="100" value="${p.budget}" required></label><label>定时整理材料<input name="meeting_at" type="datetime-local" value="${p.meeting_at ? esc(new Date(p.meeting_at*1000-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16)) : ""}"></label><button type="submit">保存</button></form></details>${requestDetails(p)}`;
+  return `<p class="muted badge">${p.execution.mode === "simulation" ? "本地模拟原型 · 不调用模型" : backendLabel(p.execution.backend)}</p><button type="button" id="profile-tools">选择可用工具与时长</button><h3 class="section-label">工具与权限</h3><div class="tool-row"><span>模型调用</span><span>${permissions.model_calls ? "已允许" : "未授权"}</span></div><div class="tool-row"><span>公开论文与仓库查询</span><span>${permissions.public_research ? "已允许" : "未授权"}</span></div><div class="tool-row"><span>已接入的本地合成计算</span><span>${permissions.local_compute ? "已允许" : "未授权"}</span></div><p class="muted">需要改变权限时，在聊天里明确说明。任意代码执行、云电脑、语音和应用连接尚未接入。</p><h3 class="section-label">后台工作</h3><p class="muted">${esc(blockerText(p) || statusText(p))}。暂停会阻止新任务启动，当前步骤仍可保存结果。</p><button type="button" class="pause-action" id="profile-pause">${p.paused ? "恢复后台工作" : "暂停后台工作"}</button><details><summary>投入与定时设置</summary><form id="configure"><label>项目任务总上限<input name="budget" type="number" min="0" max="100" value="${p.budget}" required></label><label>定时整理材料<input name="meeting_at" type="datetime-local" value="${p.meeting_at ? esc(new Date(p.meeting_at*1000-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16)) : ""}"></label><button type="submit">保存</button></form></details>${requestDetails(p)}`;
 }
 function renderProfile() {
   const panel=document.querySelector("#agent-panel");
@@ -493,6 +547,8 @@ function renderProfile() {
     if(e.target.closest("[data-proposal]")) showSheet("待讨论的工作安排",`${inputsSummary(p.group_proposal.brief)}<p class="muted">${p.group_proposal.approved ? "已同意，等待当前步骤保存结果后交接。" : "可以在聊天里修改，或者说‘按这个做’。"}</p>`);
     if(e.target.closest("[data-schedule]")) openProfile("settings");
   };
+  const tools=body.querySelector("#profile-tools");
+  if(tools)tools.onclick=()=>openTools(projectData);
   const pause=body.querySelector("#profile-pause");
   if(pause) pause.onclick=e=>action(e,async()=>{await api(`/api/projects/${p.id}/configure`,{paused:!p.paused,budget:p.budget,meeting_at:p.meeting_at});await refreshProject();renderProfile();announce(p.paused ? "已解除暂停；启动前仍检查时间、权限和额度。" : "已暂停新任务，当前步骤会保存结果。");});
   const form=body.querySelector("#configure");
@@ -562,7 +618,7 @@ async function showProject(id) {
   content.innerHTML = '<div id="transcript" class="transcript"></div><div id="setup-slot" class="transcript"></div>';
   document.querySelector("#compose-area").innerHTML = "";
   document.querySelector("#compose-area").dataset.context = "";
-  document.querySelector("#project-actions").innerHTML = '<button id="open-settings" aria-label="查看活动" title="查看活动">◷</button>';
+  document.querySelector("#project-actions").innerHTML = '<button id="open-results" class="header-action" aria-label="查看已保存的成果">成果</button><button id="open-settings" class="header-action" aria-label="查看进展">进展</button>';
   document.querySelector("#project-title").textContent = "正在读取项目…";
   announce("");
   document.querySelector("#work-status").textContent = "正在读取保存的报告与讨论…";
@@ -570,12 +626,21 @@ async function showProject(id) {
     const file = e.target.closest("[data-attachment]");
     if (file) showAttachment(file.dataset.attachment, file.dataset.id);
     if (e.target.closest("[data-open-activity]")) openProfile("activity");
+    if(e.target.closest("[data-open-tools]")) openTools(projectData);
+    const draft=e.target.closest("[data-draft]");if(draft)putDraft(draft.dataset.draft);
+    if(e.target.closest("[data-edit-proposal]")) putDraft("我想修改刚才的安排：");
+    const approve=e.target.closest("[data-approve-proposal]");
+    if(approve) {
+      const p=projectData;
+      postControl(p,"按这个做",approve.dataset.approveProposal).catch(error=>{if(currentProject===p.id)announce(error.message,true);});
+    }
     if (e.target.closest("[data-retry-send]")) {
       const id=currentProject, send=pendingSends.get(id);
       if(send) sendChat(id,send).catch(error=>{if(currentProject===id) announce(error.message,true);});
     }
   };
   document.querySelector("#open-settings").onclick = () => openSettings();
+  document.querySelector("#open-results").onclick = () => openProfile("context");
   // A previous project's in-flight refresh must finish before this navigation loads.
   while (refreshing) await new Promise(resolve => setTimeout(resolve, 30));
   if (id !== currentProject) return;
@@ -593,7 +658,7 @@ async function newConversation() {
   try { localStorage.setItem("labcouncil-project","new"); } catch (_) { /* Optional preference. */ }
   profileSignature="";
   closeProfile();
-  content.onclick = null;
+  content.onclick = e=>{const sample=e.target.closest("[data-draft]");if(sample)putDraft(sample.dataset.draft);};
   document.querySelector("#project-title").textContent = "新的研究群";
   document.querySelector("#work-status").textContent = "";
   document.querySelector("#project-actions").innerHTML = '<button id="new-settings" aria-label="群聊设置">···</button>';
@@ -606,7 +671,7 @@ async function newConversation() {
   };
   modeLabel((setupSettings.mode || "research") !== "simulation", (setupSettings.mode || "research") === "research", setupSettings.backend || "codex_cli");
   announce("");
-  content.innerHTML = '<div id="transcript" class="transcript"><section class="welcome"><span class="dot-character" aria-hidden="true"><i></i><i></i></span><h2>有什么想研究的？</h2><p>把想法发给大家。工作进展、你的反馈，都留在这里。</p></section></div><div id="setup-slot" class="transcript"></div>';
+  content.innerHTML = `<div id="transcript" class="transcript"><section class="welcome"><span class="dot-character" aria-hidden="true"><i></i><i></i></span><span class="welcome-eyebrow">你的研究小组</span><h2>一个想法，就能开始。</h2><p>不必先写一份完整计划。聊聊你想弄清什么，<br>大家会留下安排、进展和依据，你随时可以改主意。</p><div class="team-roster" aria-label="小组分工"><span>协调</span><span>研究</span><span>实验</span><span>复核</span></div><div class="starter-list"><button data-draft="我想研究一个方向："><span>查一查</span><small>了解论文和已有工作</small><b aria-hidden="true">↗</b></button><button data-draft="我有一个假设，想先验证："><span>验证一下</span><small>从可核对的小实验开始</small><b aria-hidden="true">↗</b></button><button data-draft="我想和大家一起打磨这个想法："><span>一起打磨</span><small>还没想清楚也可以聊</small><b aria-hidden="true">↗</b></button></div><p class="welcome-foot">点一个开头，或直接在下面写。消息发送后才会建群。</p></section></div><div id="setup-slot" class="transcript"></div>`;
   setComposer(true);
   await sidebar();
   closeProjects();
