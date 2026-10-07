@@ -31,7 +31,7 @@ Linux 上先安装 Codex CLI 并在终端完成 `codex login`。本机已验证 
 
 worker 每次通过参数数组运行 `codex exec`：`--model gpt-6.1-sol --config 'model_reasoning_effort="high"' --sandbox read-only --ignore-user-config --ignore-rules --ephemeral --json --output-schema ... --output-last-message ...`。提示由 stdin 传入；不改全局配置，不传入环境里的 API key，不保存原始 stderr。Codex 内置 shell、浏览器、插件、MCP apps、hooks 和子 agent 等能力关闭；它输出结构化参数，平台校验后执行原有有界工具。**这次是模型后端接入，不是开放任意仓库代码执行。** read-only 也不等于完整的文件读取隔离；以后开放代码执行需单独设计隔离工作区。
 
-每次 CLI 启动前在 SQLite 占一个调用槽；后台与组会分别计量。一次启动可能包含多个内部模型 turn，CLI 自身可能处理连接恢复；启动次数上限不等于 API 请求数、token 或费用硬预算。CLI 返回的 input/output/cache/reasoning usage 保存，缺失保留未知，费用未知。每次启动最多120秒；超时杀死进程组，失败占额度，不由平台自动重试或更换模型。Linux parent-death launcher 在 worker 消失时终止 CLI，租约过期按真实任务失败/未知处理。research 的 Codex 任务租约450秒、固定案例300秒，为两次CLI及原有短工具留出收尾时间。
+每次 CLI 启动前在 SQLite 占一个调用槽；后台与组会分别计量。一次启动可能包含多个内部模型 turn，CLI 自身可能处理连接恢复；启动次数上限不等于 API 请求数、token 或费用硬预算。CLI 返回的 input/output/cache/reasoning usage 保存，缺失保留未知，费用未知。规划和固定工具阶段最多120秒，研究报告与组会答复最多180秒；超时杀死进程组，失败占额度，不由平台自动重试或更换模型。Linux parent-death launcher 在 worker 消失时终止 CLI，租约过期按真实任务失败/未知处理。research 的 Codex 任务租约600秒、固定案例300秒，为两次CLI及原有短工具留出收尾时间。
 
 每次任务和追问根据本轮输入、旧报告和固定证据重新构造上下文；CLI 会话是 ephemeral，项目记忆仍由 LabCouncil 的 SQLite 管理，不依赖 `resume --last`。保存 `thread_id`、正常化事件、最终 JSON 和用量；当前事件流不能独立证明服务端实际模型，证据是显式参数且无降级逻辑。
 

@@ -323,7 +323,7 @@ class Store:
             execution=con.execute("SELECT mode,backend FROM project_execution WHERE project_id=?",(task["project_id"],)).fetchone()
             mode=execution["mode"] if execution else "simulation"
             owner = uuid.uuid4().hex
-            lease = (450 if mode=='research' else 300) if execution and execution['backend']=='codex_cli' and mode!='simulation' else (300 if mode=='research' else 180 if mode=='real_case' else lease_seconds)
+            lease = (600 if mode=='research' else 300) if execution and execution['backend']=='codex_cli' and mode!='simulation' else (300 if mode=='research' else 180 if mode=='real_case' else lease_seconds)
             if not task["charged"]:
                 con.execute("UPDATE projects SET used=used+1 WHERE id=?", (task["project_id"],))
             con.execute("UPDATE tasks SET status='running',charged=1,attempts=attempts+1,owner=?,lease_until=?,error=NULL WHERE id=?",

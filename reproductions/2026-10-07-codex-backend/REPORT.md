@@ -58,8 +58,10 @@ git diff --check
 
 Codex承担规划、工具参数和报告推理，平台承担允许的公开读取与受控合成计算。CLI采用ephemeral/read-only，关闭自身shell、浏览器、apps、插件、hooks和子agent，不允许自动扩展工具权限。read-only不是完整读文件隔离；本次没有引入任意仓库执行工作区。
 
-背景模型后端额度按CLI启动预占；失败/未知占额度，无平台自动重试或模型替换；CLI内部连接恢复与模型turn不是平台计数覆盖的API硬预算。每次启动120秒超时，CLI父进程随worker死亡终止。SQLite保留项目上下文，独立CLI会话不靠`resume --last`继承记忆。
+背景模型后端额度按CLI启动预占；失败/未知占额度，无平台自动重试或模型替换；CLI内部连接恢复与模型turn不是平台计数覆盖的API硬预算。初版验收使用每次120秒超时；当前新worker的研究报告/组会答复默认为180秒，research租约600秒，规划和固定工具阶段仍为120秒。CLI父进程随worker死亡终止。SQLite保留项目上下文，独立CLI会话不靠`resume --last`继承记忆。
 
 上海AI Lab候选、其他论文/仓库复现、公开benchmark和实际用户科研组会的原待办不变。这次实验不按原single/multi/human比较的同一条件运行，不加进66.7分比较，也不能把所有科研验收项目打勾。
 
 参考接口：[官方非交互模式](https://learn.chatgpt.com/docs/non-interactive-mode)、[官方CLI命令](https://learn.chatgpt.com/docs/developer-commands?surface=cli)、[gpt-6.1-sol官方模型页](https://developers.openai.com/api/docs/models/gpt-6.1-sol)。本机实际CLI help与版本用于核对具体参数。
+
+新增默认报告期限与任务租约余量回归后，当前82项平台测试、5项分数测试通过。

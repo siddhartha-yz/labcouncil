@@ -44,7 +44,12 @@ if behavior=="warning":print(json.dumps({{"type":"item.completed","item":{{"type
 print(json.dumps({{"type":"item.completed","item":{{"type":"agent_message"}}}}))
 print(json.dumps({{"type":"turn.completed","usage":{{"input_tokens":100,"cached_input_tokens":20,"output_tokens":7}}}}))
 answer=Path(args[args.index("--output-last-message")+1])
-answer.write_text("broken" if behavior=="invalid" else json.dumps({{"action":"prepare_meeting","value":"","plan":"整理已有结果","reason":"等待审查"}}))
+properties=json.loads(Path(args[args.index("--output-schema")+1]).read_text())["properties"]
+result={{"action":"prepare_meeting","value":"","plan":"整理已有结果","reason":"等待审查"}}
+if "summary" in properties:
+    result={{"summary":"fixture简报","limitations":["未调用真实模型"],"evidence_refs":["operation:fixture"]}}
+    if "next_step" in properties:result.update(next_step="人工审查",findings=[])
+answer.write_text("broken" if behavior=="invalid" else json.dumps(result))
 '''
         self.binary.write_text(script);self.binary.chmod(0o700)
 
@@ -161,6 +166,15 @@ answer.write_text("broken" if behavior=="invalid" else json.dumps({{"action":"pr
         self.assertEqual(set(output_schema('research-meeting',None,False)['required']),{'answer','evidence_refs'})
         self.assertEqual(set(output_schema('research-report',None,False)['required']),{'summary','limitations','evidence_refs','next_step','findings'})
         self.assertEqual(set(output_schema('executor-report',None,False)['required']),{'summary','limitations','evidence_refs'})
+
+    def test_default_report_deadline_has_headroom_in_task_lease(self):
+        self.provider.timeout=None
+        task=self.store.claim()
+        self.assertGreater(task['lease_until']-time.time(),590)
+        self.provider.call(self.store,self.pid,'background','research-report',
+            [{'role':'system','content':'JSON only'}],task=task)
+        self.assertEqual(self.request()['request']['timeout_seconds'],180)
+        self.assertEqual(self.request()['status'],'completed')
 
 
 if __name__=='__main__':unittest.main()
