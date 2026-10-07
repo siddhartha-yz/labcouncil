@@ -79,6 +79,19 @@ class HTTPTests(unittest.TestCase):
             self.assertEqual(status, 403)
         self.assertEqual(self.store.projects(), [])
 
+    def test_backend_selected_through_http_and_invalid_value_atomic(self):
+        status,_,raw=self.request('POST','/api/projects',{'title':'CLI HTTP fixture','idea':'保留模型配置','mode':'research','backend':'codex_cli'})
+        self.assertEqual(status,201)
+        pid=json.loads(raw)['id']
+        status,_,raw=self.request('GET',f'/api/projects/{pid}')
+        execution=json.loads(raw)['execution']
+        self.assertEqual(execution['backend'],'codex_cli')
+        self.assertEqual(execution['model'],'gpt-6.1-sol')
+        self.assertEqual(execution['reasoning_effort'],'high')
+        self.assertEqual(self.store.projects()[0]['backend'],'codex_cli')
+        self.assertEqual(self.request('POST','/api/projects',{'title':'invalid','idea':'不能换型号','backend':'unknown'})[0],400)
+        self.assertEqual(len(self.store.projects()),1)
+
     def test_five_inputs_travel_through_http_draft_and_confirmation(self):
         from labcouncil.brief import normalize
         brief=normalize(None,'第一轮目标','simulation')

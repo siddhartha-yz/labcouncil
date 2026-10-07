@@ -10,7 +10,15 @@ from reproductions.check_deepseek_connectivity import ENDPOINT, load_config, red
 ROOT=Path(__file__).resolve().parents[1]
 
 
+def for_project(store, project_id):
+    if store.project(project_id)['execution'].get('backend') == 'codex_cli':
+        from .codex_provider import CodexProvider
+        return CodexProvider()
+    return Provider()
+
+
 class Provider:
+    label = 'DeepSeek Flash'
     def __init__(self, config=None, endpoint=ENDPOINT, timeout=40):
         self.config=config if config is not None else load_config(ROOT/'.env')
         if self.config.get('DEEPSEEK_MODEL')!='deepseek-flash':

@@ -1,0 +1,89 @@
+{
+  "project_id": "5e9a3696c52b4f918c8c204fdd2ef018",
+  "version": 2,
+  "scenario": "outlier",
+  "counts": {
+    "tasks": 6,
+    "artifacts": 6,
+    "meetings": 2,
+    "decisions": 1,
+    "model_requests": 0,
+    "source_requests": 0,
+    "discussion": 2
+  },
+  "tasks": [
+    {
+      "version": 1,
+      "role": "researcher",
+      "status": "completed"
+    },
+    {
+      "version": 1,
+      "role": "executor",
+      "status": "completed"
+    },
+    {
+      "version": 1,
+      "role": "reviewer",
+      "status": "completed"
+    },
+    {
+      "version": 2,
+      "role": "researcher",
+      "status": "completed"
+    },
+    {
+      "version": 2,
+      "role": "executor",
+      "status": "completed"
+    },
+    {
+      "version": 2,
+      "role": "reviewer",
+      "status": "completed"
+    }
+  ],
+  "inputs": [
+    {
+      "version": 1,
+      "brief": {
+        "idea": "【群聊工程验收】比较拟合直线与只猜均值，再检查异常点。",
+        "permissions": {
+          "local_compute": true,
+          "model_calls": false,
+          "public_research": false,
+          "retry_public_reads": false
+        },
+        "requirements": "这是工程演示，保留第一轮证据，下一轮继续用异常点。",
+        "resources": "仅用平台自带数据和本机计算，不调用模型，不查询外网。",
+        "work_time": {
+          "all_day": true,
+          "end": "18:00",
+          "start": "09:00",
+          "timezone": "Asia/Shanghai"
+        }
+      }
+    },
+    {
+      "version": 2,
+      "brief": {
+        "idea": "第二轮加入异常点，继续核对误差，并保留第一轮讨论。",
+        "permissions": {
+          "local_compute": true,
+          "model_calls": false,
+          "public_research": false,
+          "retry_public_reads": false
+        },
+        "requirements": "这是工程演示，保留第一轮证据，下一轮继续用异常点。",
+        "resources": "仅用平台自带数据和本机计算，不调用模型，不查询外网。",
+        "work_time": {
+          "all_day": true,
+          "end": "18:00",
+          "start": "09:00",
+          "timezone": "Asia/Shanghai"
+        }
+      }
+    }
+  ],
+  "scope": "Group-chat UI engineering fixture with simulation; not model capability or human research review"
+}

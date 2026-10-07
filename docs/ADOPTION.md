@@ -1,5 +1,26 @@
 # 首轮复现后的采用决定
 
+## 2026-10-07：具体吸收了什么
+
+**当前正式运行后台没有接入这些上游科研框架。我们吸收了部分设计和负面经验，自行实现对应机制；其他内容仍是计划。** 下表是设计参考与功能的对应关系，不声称相关算法或作者科研结果已复现，也不把一般工程做法归为某篇论文的独有贡献。
+
+| 来源 | 对应的设计参考或试用教训 | 当前平台落实 | 没有吸收或未验证 |
+|---|---|---|---|
+| Virtual Lab | 议程、角色讨论、总结带入下次；批评角色仍会提出错误实验建议 | `real_case`有准备/执行/复核三个串行角色；固定会议快照、单独讨论和确认决定；研究模式传入前轮证据 | 没有采用上游会议函数为正式后端；研究模式不是固定三角色会议；纳米抗体计算/湿实验结果未复现 |
+| freephdlabor | 人工在步骤边界改变方向、持续记忆；试用暴露恢复字段缺失和重复计算 | 输入与计划按轮次保存；确认后派新轮；工具结果独立落盘；跨轮操作去重；旧失败保留 | 没有采用TCP callback或其记忆序列化；真实外部实验的崩溃去重和多日运行未验证 |
+| Agent Laboratory | 用人工反馈比较效果，注意模型自评分与人工评价不同 | 原12次试验设置single/multi/human；保存真实反馈，人工耗时未知；独立检查数据 | 没有运行其整套科研流程；用户反馈效果没有获得普遍优势结论；尚无可靠的可读性/事实正确率评分 |
+| InternAgentS | 工作台、执行服务、checkpoint与审批；试用发现连续审批转发失败、token预算不停止 | 输入/草稿/决定分开保存；平台自行做调用前请求额度预留与失败记账 | 未采用工作台或runtime；连续审批和token硬预算仍未交付；其正常重启不能证明崩溃恢复 |
+| InternAgent 1.5 | 提出方案、检查证据、再迭代的设计；基线与Flash短连接试用 | 研究模式逐步选择动作、执行工具、看结果再规划；独立核验已有合成工具 | 未移植其AutoDebug、MLEvolve、记忆模块或科学任务；完整代码修改/发现循环未验收 |
+| SCP | 工具发现和调用的统一接口；原SDK的stdio/本机HTTP小工具试用通过 | 本地试用证据保留，仍为工具接入候选 | 当前平台直接调用自有Python函数，没有接入SCP SDK/Hub、云端科学工具或权限体系 |
+| autoresearch | 有限改动、计算预算、指标反馈和回退的设计参考 | 当前只有任务/请求上限与指标验收，属于部分边界落实 | 没有修改训练代码、固定五分钟训练、按指标保留/回退的真实优化循环 |
+| AI Scientist-v2、Google Co-Scientist | 实验分支、假设候选、筛选与失败记录的设计参考 | 失败记录保留；实验树、候选假设排名仍未实现 | 未采用树搜索或假设演化；作者科研结果未复现 |
+
+实现定位：[任务和预算](../labcouncil/store.py)、[逐步研究及上下文](../labcouncil/research.py)、[受控三角色计算](../labcouncil/case.py)、[请求适配器](../labcouncil/provider.py)。本地试用材料在下文对应链接；运行平台没有因此增加上述框架依赖。
+
+本次补上[可复算分数卡](SCORECARD.md)和[公开测评选择](PUBLIC-BENCHMARKS.md)。新发现的ResearchClawBench与ResearchHarness尚未本地运行，不能填入“已采用”；公开科研题接入、Codex执行器、完整论文复现和真实人工评审仍是缺口。
+
+## 以下保留此前采用记录
+
 更新：2026-10-06。现阶段不把 Virtual Lab 或 freephdlabor 整套接入平台。
 
 上海 AI Lab 的 InternAgentS 工作台、InternAgent 1.5 实验模块及 SCP 工具生态已加入候选。[源码检查](../reproductions/2026-10-05-shanghai-lab/REPORT.md)后，[2026-10-06 实际试用](../reproductions/2026-10-06-internagents-runtime/REPORT.md)确认 DeepSeek Flash 小计算和正常停止重启持久化；连续审批经协调服务转发失败，token 预算未实际停止续跑，报告也有术语与字数自查错误。暂不整套采用；界面交互、崩溃恢复和论文科研结果仍未验证。
@@ -29,3 +50,7 @@
 详细证据：[规则](REPRODUCTION.md)、[历史版本](../reproductions/2026-10-04-source-mapping/REPORT.md)、[Virtual Lab](../reproductions/2026-10-04-virtual-lab-meeting/REPORT.md)、[freephdlabor](../reproductions/2026-10-04-freephdlabor-agent/REPORT.md)、[等预算比较](../reproductions/2026-10-05-comparison/REPORT.md)。
 
 新增 [平台完整合成案例](../reproductions/2026-10-06-complete-case/REPORT.md)：实际 Flash 与自有受控工具完成两轮及组会确认循环，数值复算通过，但计算、复核报告错误地把异常点数据称为干净数据。这支持采用明确的状态、额度和工具证据管理，不能支持“多角色复核能保证报告正确”的主张。未额外采用上游后端；报告上下文修订只经离线检查，尚待新的有预算实际验证。
+
+## Codex CLI 作为模型后端
+
+采用官方 `codex exec` 非交互接口、JSON schema 和事件账本，将其适配到既有有界工具与组会流程；实际验证指定 `gpt-6.1-sol / high` 两轮闭环。未采用“任意仓库执行”“CLI会话即项目记忆”或“进程次数即token预算”等假设。具体证据和首次适配错误见 [记录](../reproductions/2026-10-07-codex-backend/REPORT.md)。上海AI Lab候选与公开评测的采用状态不因这项替换自动升级。

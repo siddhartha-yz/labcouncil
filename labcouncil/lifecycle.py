@@ -134,5 +134,5 @@ def start(database, port):
             for record in reversed(created):
                 stop_process(record)
             raise
-        return {"url":f"http://127.0.0.1:{port}","default_mode":"simulation","supports_real_case":True,"supports_research":True,
+        return {"url":f"http://127.0.0.1:{port}","default_mode":"simulation","supports_real_case":True,"supports_research":True,"supports_codex_cli":True,
                 "services":{command:{**record,"running":owned(record)} for command,record in records.items()}}

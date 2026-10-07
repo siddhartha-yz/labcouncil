@@ -8,7 +8,7 @@ import json
 import math
 import random
 import statistics
-from .provider import Provider
+from .provider import for_project
 from .store import Conflict, encode, text
 
 
@@ -104,7 +104,7 @@ def perform_tool(store,task,prior):
 
 
 def execute(store,task,provider=None):
-    provider=provider or Provider()
+    provider=provider or for_project(store,task['project_id'])
     role=task['role'];spec=parameters(task['scenario'])
     prior=store.dependency_artifact(task)
     if role=='researcher':expected=spec;name='prepare_synthetic_data'
@@ -137,7 +137,7 @@ def execute(store,task,provider=None):
     summary=text(report.get('summary'),'模型报告',500)
     if any(c.isdigit() for c in summary):raise ValueError('简报包含协议禁止的数值；请读原始响应，不自动重试')
     if report.get('evidence_refs')!=[reference] or not isinstance(report.get('limitations'),list) or not report['limitations'] or not all(isinstance(x,str) and x.strip() for x in report['limitations']):raise ValueError('报告缺少有效证据引用或限制')
-    return {'simulation':False,'synthetic':True,'source':'真实 DeepSeek Flash + 本地受控工具','role':role,'task_id':task['id'],'plan_version':task['version'],
+    return {'simulation':False,'synthetic':True,'source':getattr(provider,'label','DeepSeek Flash') + ' + 本地受控工具','role':role,'task_id':task['id'],'plan_version':task['version'],
         'direction':task['instruction'],'summary':summary,'report':report,'operation':operation,'model_request_ids':[first,second],
         'limitation':'合成课题、固定工具和输入场景；未检索文献，未自动写代码，未证明真实科研效果。',**details}
 
@@ -149,11 +149,11 @@ def answer_meeting(store,meeting_id,question,provider=None):
     evidence=[{'id':a['id'],'role':a['role'],'summary':a['body']['summary'],'parameters':a['body'].get('parameters'),'results':compact_results(a['body'].get('results',[])),'verification':a['body'].get('checks'),'limitations':a['body'].get('report',{}).get('limitations')} for a in artifacts]
     messages=[{'role':'system','content':'只依据固定快照用普通中文回答追问，解释观察、限制和未完成工作。不生成或确认下一轮任务，不声称查阅论文。输出JSON：answer（最多六百字）、evidence_refs（引用提供的真实证据ID，非空）。'},
         {'role':'user','content':encode({'question':question,'evidence':evidence,'snapshot_notice':m['snapshot']['notice']})}]
-    response,_=(provider or Provider()).call(store,m['project_id'],'qa','meeting-question',messages,meeting_id=meeting_id)
+    response,_=(provider or for_project(store,m['project_id'])).call(store,m['project_id'],'qa','meeting-question',messages,meeting_id=meeting_id)
     result=json.loads(response.get('content',''))
     answer=text(result.get('answer'),'组会答复',1000)
     refs=result.get('evidence_refs')
     if not isinstance(refs,list) or not refs or not all(isinstance(x,str) and x in ids for x in refs):raise ValueError('组会答复缺少有效快照证据引用')
-    answer='【真实 Flash · 合成案例】'+answer+'\n证据：'+', '.join(refs)
+    answer='【'+('Codex CLI · gpt-6.1-sol · high' if store.project(m['project_id'])['execution'].get('backend')=='codex_cli' else '真实 Flash')+' · 合成案例】'+answer+'\n证据：'+', '.join(refs)
     store.append_real_answer(meeting_id,question,answer)
     return answer

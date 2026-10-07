@@ -90,7 +90,8 @@ CREATE TABLE IF NOT EXISTS events (
 );
 CREATE TABLE IF NOT EXISTS project_execution (
  project_id TEXT PRIMARY KEY REFERENCES projects(id), mode TEXT NOT NULL,
- api_budget INTEGER NOT NULL, qa_api_budget INTEGER NOT NULL, source_budget INTEGER NOT NULL DEFAULT 24
+ api_budget INTEGER NOT NULL, qa_api_budget INTEGER NOT NULL, source_budget INTEGER NOT NULL DEFAULT 24,
+ backend TEXT NOT NULL DEFAULT 'deepseek'
 );
 CREATE TABLE IF NOT EXISTS model_requests (
  id TEXT PRIMARY KEY, project_id TEXT NOT NULL REFERENCES projects(id),
@@ -150,6 +151,8 @@ class Store:
             con.execute('BEGIN IMMEDIATE')
             if 'source_budget' not in [row[1] for row in con.execute('PRAGMA table_info(project_execution)')]:
                 con.execute('ALTER TABLE project_execution ADD COLUMN source_budget INTEGER NOT NULL DEFAULT 24')
+            if 'backend' not in [row[1] for row in con.execute('PRAGMA table_info(project_execution)')]:
+                con.execute("ALTER TABLE project_execution ADD COLUMN backend TEXT NOT NULL DEFAULT 'deepseek'")
             con.commit()
 
     @contextmanager
@@ -189,11 +192,13 @@ class Store:
             previous = identifier
 
     def create_project(self, title, idea, selected="clean", budget=9, qa_budget=6, meeting_at=None,
-                       mode="simulation", api_budget=18, qa_api_budget=3, brief=None, source_budget=24):
+                       mode="simulation", api_budget=18, qa_api_budget=3, brief=None, source_budget=24, backend="deepseek"):
         title, idea = text(title, "项目名称", 120), text(idea, "研究想法")
         selected, budget, qa_budget = scenario(selected), quota(budget), quota(qa_budget)
         if mode not in ("simulation", "real_case", "research"):
             raise ValueError("运行模式无效")
+        if backend not in ('deepseek', 'codex_cli'):
+            raise ValueError('模型后台无效')
         api_budget, qa_api_budget = quota(api_budget), quota(qa_api_budget)
         source_budget = quota(source_budget)
         if source_budget>24: raise ValueError('公开HTTP请求上限不得超过24')
@@ -204,15 +209,18 @@ class Store:
         with self.connection(write=True) as con:
             con.execute("INSERT INTO projects(id,title,idea,version,scenario,budget,qa_budget,meeting_at,created) VALUES(?,?,?,?,?,?,?,?,?)",
                         (identifier, title, idea, 1, selected, budget, qa_budget, meeting_at, time.time()))
-            self.save_inputs(con, identifier, 1, brief, mode)
+            self.save_inputs(con, identifier, 1, brief, mode, backend)
             self.add_round(con, identifier, 1, brief['idea'], selected, mode)
-            con.execute("INSERT INTO project_execution(project_id,mode,api_budget,qa_api_budget,source_budget) VALUES(?,?,?,?,?)",(identifier,mode,api_budget if mode!="simulation" else 0,qa_api_budget if mode!="simulation" else 0,source_budget))
+            con.execute("INSERT INTO project_execution(project_id,mode,api_budget,qa_api_budget,source_budget,backend) VALUES(?,?,?,?,?,?)",(identifier,mode,api_budget if mode!="simulation" else 0,qa_api_budget if mode!="simulation" else 0,source_budget,backend))
             self.event(con, identifier, "project_created", {"simulation": mode=="simulation"})
         return identifier
 
-    def save_inputs(self, con, project_id, version, brief, mode):
+    def save_inputs(self, con, project_id, version, brief, mode, backend=None):
+        if backend is None:
+            execution = con.execute('SELECT backend FROM project_execution WHERE project_id=?', (project_id,)).fetchone()
+            backend = execution['backend'] if execution else 'deepseek'
         con.execute('INSERT INTO round_inputs VALUES(?,?,?,?,?)',
-                    (project_id, version, encode(brief), encode(make_plan(brief, mode)), time.time()))
+                    (project_id, version, encode(brief), encode(make_plan(brief, mode, backend)), time.time()))
 
     def inputs(self, con, project, version=None):
         version = project['version'] if version is None else version
@@ -227,7 +235,7 @@ class Store:
 
     def projects(self):
         with self.connection() as con:
-            return [dict(r) for r in con.execute("SELECT p.*,COALESCE(e.mode,'simulation') AS mode FROM projects p LEFT JOIN project_execution e ON e.project_id=p.id ORDER BY p.created DESC")]
+            return [dict(r) for r in con.execute("SELECT p.*,COALESCE(e.mode,'simulation') AS mode,COALESCE(e.backend,'deepseek') AS backend FROM projects p LEFT JOIN project_execution e ON e.project_id=p.id ORDER BY p.created DESC")]
 
     def project(self, identifier):
         with self.connection() as con:
@@ -242,6 +250,8 @@ class Store:
                 operation["body"]=json.loads(operation["body"])
             execution = con.execute("SELECT * FROM project_execution WHERE project_id=?",(identifier,)).fetchone()
             result["execution"] = dict(execution) if execution else {"mode":"simulation","api_budget":0,"qa_api_budget":0}
+            result['execution'].update({'model': 'gpt-6.1-sol' if execution and execution['backend']=='codex_cli' else 'deepseek-flash',
+                'reasoning_effort': 'high' if execution and execution['backend']=='codex_cli' else None})
             result['current_inputs'] = self.inputs(con, result)
             result['input_history'] = [{**dict(r), 'body': json.loads(r['body']), 'plan': json.loads(r['plan'])}
                 for r in con.execute('SELECT * FROM round_inputs WHERE project_id=? ORDER BY version', (identifier,))]
@@ -310,13 +320,14 @@ class Store:
             if not rows:
                 return None
             task = dict(rows[0])
-            execution=con.execute("SELECT mode FROM project_execution WHERE project_id=?",(task["project_id"],)).fetchone()
+            execution=con.execute("SELECT mode,backend FROM project_execution WHERE project_id=?",(task["project_id"],)).fetchone()
             mode=execution["mode"] if execution else "simulation"
             owner = uuid.uuid4().hex
+            lease = (450 if mode=='research' else 300) if execution and execution['backend']=='codex_cli' and mode!='simulation' else (300 if mode=='research' else 180 if mode=='real_case' else lease_seconds)
             if not task["charged"]:
                 con.execute("UPDATE projects SET used=used+1 WHERE id=?", (task["project_id"],))
             con.execute("UPDATE tasks SET status='running',charged=1,attempts=attempts+1,owner=?,lease_until=?,error=NULL WHERE id=?",
-                        (owner, now+(300 if mode=="research" else 180 if mode=="real_case" else lease_seconds), task["id"]))
+                        (owner, now+lease, task["id"]))
             self.event(con, task["project_id"], "task_started", {"task_id": task["id"], "attempt": task["attempts"]+1})
             return {**self.row(con, "tasks", task["id"]),"mode":mode}
 
@@ -557,7 +568,8 @@ class Store:
         with self.connection(write=True) as con:
             m=self.row(con,"meetings",meeting_id)
             con.execute("INSERT INTO discussion VALUES(?,?,?,?,?)",(uuid.uuid4().hex,meeting_id,question,answer,time.time()))
-            self.event(con,m["project_id"],"meeting_question",{"meeting_id":meeting_id,"source":"deepseek-flash"})
+            execution = con.execute('SELECT backend FROM project_execution WHERE project_id=?',(m['project_id'],)).fetchone()
+            self.event(con,m["project_id"],"meeting_question",{"meeting_id":meeting_id,"source":"codex_cli" if execution and execution['backend']=='codex_cli' else "deepseek-flash"})
 
     def confirm(self, meeting_id, expected_version, instruction, selected, brief=None):
         instruction, selected = text(instruction, "下一轮方向"), scenario(selected)

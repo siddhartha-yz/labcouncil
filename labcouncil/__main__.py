@@ -8,7 +8,7 @@ from .web import make_server
 
 
 def main():
-    parser = argparse.ArgumentParser(description="LabCouncil 本地组会；默认模拟，真实合成案例模式使用本地 DeepSeek key")
+    parser = argparse.ArgumentParser(description="LabCouncil 本地组会；默认模拟，真实后台可选本机 Codex CLI 或 DeepSeek key")
     parser.add_argument("command", choices=["serve", "worker", "demo", "start", "status", "stop"])
     parser.add_argument("--database", default="workspaces/labcouncil/state.sqlite3")
     parser.add_argument("--port", type=int, default=8765)

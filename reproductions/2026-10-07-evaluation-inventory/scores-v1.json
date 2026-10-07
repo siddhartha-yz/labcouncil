@@ -1,0 +1,244 @@
+{
+  "scorecard_version": "retrospective-v1",
+  "scope": "Two synthetic tasks, three workflows, two repetitions. Not a general research score.",
+  "formula": "dimension = 100 * passing runs / 4; evidence_index = equal mean of three dimensions",
+  "weights_selected_after_original_runs": true,
+  "unmeasured": [
+    "semantic accuracy rate",
+    "report readability",
+    "scientific novelty",
+    "human time efficiency",
+    "public benchmark performance",
+    "Codex CLI performance"
+  ],
+  "groups": [
+    {
+      "arm": "single",
+      "dimensions": {
+        "numbers_and_refs": {
+          "passed": 4,
+          "total": 4,
+          "score": 100.0
+        },
+        "full_experiment_coverage": {
+          "passed": 2,
+          "total": 4,
+          "score": 50.0
+        },
+        "agent_evidence_verification": {
+          "passed": 2,
+          "total": 4,
+          "score": 50.0
+        }
+      },
+      "evidence_index": 66.7,
+      "known_requests": 24,
+      "unknown_request_runs": 0
+    },
+    {
+      "arm": "multi",
+      "dimensions": {
+        "numbers_and_refs": {
+          "passed": 4,
+          "total": 4,
+          "score": 100.0
+        },
+        "full_experiment_coverage": {
+          "passed": 4,
+          "total": 4,
+          "score": 100.0
+        },
+        "agent_evidence_verification": {
+          "passed": 0,
+          "total": 4,
+          "score": 0.0
+        }
+      },
+      "evidence_index": 66.7,
+      "known_requests": 20,
+      "unknown_request_runs": 0
+    },
+    {
+      "arm": "human",
+      "dimensions": {
+        "numbers_and_refs": {
+          "passed": 4,
+          "total": 4,
+          "score": 100.0
+        },
+        "full_experiment_coverage": {
+          "passed": 4,
+          "total": 4,
+          "score": 100.0
+        },
+        "agent_evidence_verification": {
+          "passed": 0,
+          "total": 4,
+          "score": 0.0
+        }
+      },
+      "evidence_index": 66.7,
+      "known_requests": 20,
+      "unknown_request_runs": 0
+    }
+  ],
+  "runs": [
+    {
+      "run": "clean-single-1",
+      "status": "completed",
+      "host_integrity_passed": true,
+      "passes": {
+        "numbers_and_refs": true,
+        "full_experiment_coverage": false,
+        "agent_evidence_verification": true
+      },
+      "requests": 6,
+      "verification_claim_supported": true,
+      "arm": "single"
+    },
+    {
+      "run": "clean-single-2",
+      "status": "completed",
+      "host_integrity_passed": true,
+      "passes": {
+        "numbers_and_refs": true,
+        "full_experiment_coverage": true,
+        "agent_evidence_verification": false
+      },
+      "requests": 6,
+      "verification_claim_supported": true,
+      "arm": "single"
+    },
+    {
+      "run": "outliers-single-1",
+      "status": "completed",
+      "host_integrity_passed": true,
+      "passes": {
+        "numbers_and_refs": true,
+        "full_experiment_coverage": false,
+        "agent_evidence_verification": true
+      },
+      "requests": 6,
+      "verification_claim_supported": true,
+      "arm": "single"
+    },
+    {
+      "run": "outliers-single-2",
+      "status": "completed",
+      "host_integrity_passed": true,
+      "passes": {
+        "numbers_and_refs": true,
+        "full_experiment_coverage": true,
+        "agent_evidence_verification": false
+      },
+      "requests": 6,
+      "verification_claim_supported": true,
+      "arm": "single"
+    },
+    {
+      "run": "clean-multi-1",
+      "status": "completed",
+      "host_integrity_passed": true,
+      "passes": {
+        "numbers_and_refs": true,
+        "full_experiment_coverage": true,
+        "agent_evidence_verification": false
+      },
+      "requests": 5,
+      "verification_claim_supported": true,
+      "arm": "multi"
+    },
+    {
+      "run": "clean-multi-2",
+      "status": "completed",
+      "host_integrity_passed": true,
+      "passes": {
+        "numbers_and_refs": true,
+        "full_experiment_coverage": true,
+        "agent_evidence_verification": false
+      },
+      "requests": 5,
+      "verification_claim_supported": true,
+      "arm": "multi"
+    },
+    {
+      "run": "outliers-multi-1",
+      "status": "completed",
+      "host_integrity_passed": true,
+      "passes": {
+        "numbers_and_refs": true,
+        "full_experiment_coverage": true,
+        "agent_evidence_verification": false
+      },
+      "requests": 5,
+      "verification_claim_supported": true,
+      "arm": "multi"
+    },
+    {
+      "run": "outliers-multi-2",
+      "status": "completed",
+      "host_integrity_passed": true,
+      "passes": {
+        "numbers_and_refs": true,
+        "full_experiment_coverage": true,
+        "agent_evidence_verification": false
+      },
+      "requests": 5,
+      "verification_claim_supported": true,
+      "arm": "multi"
+    },
+    {
+      "run": "clean-human-1",
+      "status": "completed",
+      "host_integrity_passed": true,
+      "passes": {
+        "numbers_and_refs": true,
+        "full_experiment_coverage": true,
+        "agent_evidence_verification": false
+      },
+      "requests": 5,
+      "verification_claim_supported": true,
+      "arm": "human"
+    },
+    {
+      "run": "clean-human-2",
+      "status": "completed",
+      "host_integrity_passed": true,
+      "passes": {
+        "numbers_and_refs": true,
+        "full_experiment_coverage": true,
+        "agent_evidence_verification": false
+      },
+      "requests": 5,
+      "verification_claim_supported": true,
+      "arm": "human"
+    },
+    {
+      "run": "outliers-human-1",
+      "status": "completed",
+      "host_integrity_passed": true,
+      "passes": {
+        "numbers_and_refs": true,
+        "full_experiment_coverage": true,
+        "agent_evidence_verification": false
+      },
+      "requests": 5,
+      "verification_claim_supported": true,
+      "arm": "human"
+    },
+    {
+      "run": "outliers-human-2",
+      "status": "completed",
+      "host_integrity_passed": true,
+      "passes": {
+        "numbers_and_refs": true,
+        "full_experiment_coverage": true,
+        "agent_evidence_verification": false
+      },
+      "requests": 5,
+      "verification_claim_supported": true,
+      "arm": "human"
+    }
+  ],
+  "scorer_sha256": "d496a7c09d69cecff3a7bacc2b4e538b18d76fbdd5dc247d5c497e70448bf5fb"
+}

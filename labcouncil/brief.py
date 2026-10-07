@@ -65,7 +65,8 @@ def start_blocker(brief, mode, now):
     return None
 
 
-def make_plan(brief, mode):
+def make_plan(brief, mode, backend='deepseek'):
+    executor = 'Codex CLI · gpt-6.1-sol · high' if backend == 'codex_cli' else '真实Flash'
     if mode == 'research':
         hours = brief['work_time']
         return {'source': 'platform research boundaries; actual agent plan in each artifact', 'objective': brief['idea'],
@@ -74,7 +75,7 @@ def make_plan(brief, mode):
             'resources': brief['resources'], 'requirements': brief['requirements'],
             'steps': ['agent根据输入规划下一步', '保存公开资料或受控计算证据', '依据已有证据继续，达到边界后等组会'],
             'unavailable': ['任意仓库代码执行', '完整论文全文阅读和论文实验复现', '任意GPU训练'],
-            'executor': '真实Flash与有界研究工具'}
+            'executor': executor+'与有界研究工具'}
     # This is a transparent bounded executor plan, not model-generated research.
     hours = brief['work_time']
     window = '每天全天' if hours['all_day'] else f"每天{hours['start']}–{hours['end']}（{hours['timezone']}）"
@@ -83,4 +84,4 @@ def make_plan(brief, mode):
         'work_window': window, 'resources': brief['resources'], 'requirements': brief['requirements'],
         'steps': ['准备本轮输入与数据', '执行计算，保存实验数据和指标', '独立复算，整理报告，等待组会'],
         'unavailable': ['论文和仓库自动探索', '任意实验代码生成', '根据剩余资源自主规划并持续研究'],
-        'executor': '真实Flash与固定工具' if mode != 'simulation' else '固定程序流程演示'}
+        'executor': executor+'与固定工具' if mode != 'simulation' else '固定程序流程演示'}

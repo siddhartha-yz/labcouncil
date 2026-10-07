@@ -4,7 +4,7 @@
 
 LabCouncil is an open-source prototype for personal research groups made up of AI agents and a human researcher. The intended loop has three steps: enter an idea, resources, permissions, daily work hours and requirements; agents plan and investigate within those constraints; open a meeting, review plain-language reports and update the five inputs for the next round. The same project retains its plans, experiments, evidence and decisions.
 
-**Status: local meeting platform with a tested two-round synthetic case.** Default mode is a deterministic simulation. Opt-in real-case mode uses DeepSeek Flash for tool requests, reports and meeting questions, with saved data and independent arithmetic checks. Versioned five-field inputs, daily task-start windows and meeting-to-input continuity are implemented. Opt-in research mode now lets Flash choose bounded steps, read arXiv abstracts and pinned GitHub READMEs, and prepare a meeting. Running arbitrary upstream experiments and sustained scientific iteration remain M2 work. The actual case exposed incorrect model descriptions of the input, even when numerical verification passed; see the [complete case record](reproductions/2026-10-06-complete-case/REPORT.md).
+**Status: local meeting platform with a tested two-round synthetic case.** Default mode is a deterministic simulation. Opt-in real-case mode uses Codex CLI (`gpt-6.1-sol`, `high`) or DeepSeek Flash for tool requests, reports and meeting questions, with saved data and independent arithmetic checks. Versioned five-field inputs, daily task-start windows and meeting-to-input continuity are implemented. Opt-in research mode now lets the selected backend choose bounded steps, read arXiv abstracts and pinned GitHub READMEs, and prepare a meeting. Running arbitrary upstream experiments and sustained scientific iteration remain M2 work. The actual case exposed incorrect model descriptions of the input, even when numerical verification passed; see the [complete case record](reproductions/2026-10-06-complete-case/REPORT.md).
 
 ## Try the local meeting
 
@@ -14,9 +14,9 @@ From the repository root, with Python 3.11+ on Linux:
 python3 -m labcouncil start
 ```
 
-Open [http://127.0.0.1:8765](http://127.0.0.1:8765). Enter the five research inputs, review the current plan and one plain-language report, open a meeting and return to the input form to confirm the next round. No API key is needed for this simulation. It does not implement arbitrary ideas as experiments.
+Open [http://127.0.0.1:8765](http://127.0.0.1:8765). Start a research group chat with an idea. The coordinator collects resources, permissions, daily work hours and requirements one step at a time. Research, computation and verification roles post named messages; reports and data open as message attachments. Send a question to discuss a fixed snapshot, or click “开组会” to open it explicitly. Use “下一轮方向” to draft and confirm the next inputs. No API key is needed for this simulation. It does not implement arbitrary ideas as experiments.
 
-[运行说明](docs/RUNNING.md) includes stop/restart, budgets and limitations. [M1 acceptance record](reproductions/2026-10-06-m1-prototype/REPORT.md) includes actual browser checks and durable synthetic evidence. Choose “真实 Flash：合成研究案例” to use the ignored local `.env` configuration. This makes potentially billable requests: defaults are 12 background attempts and 1 meeting attempt, with no retries; token and monetary hard budgets are not implemented. The [complete case record](reproductions/2026-10-06-complete-case/REPORT.md) preserves 13 actual responses, two rounds, the review fixture, restart checks and report errors.
+[运行说明](docs/RUNNING.md) includes stop/restart, budgets and limitations. [M1 acceptance record](reproductions/2026-10-06-m1-prototype/REPORT.md) includes actual browser checks and durable synthetic evidence. Choose “固定计算” and the DeepSeek backend to use the ignored local `.env` configuration; choose Codex CLI to reuse local `codex login`. This makes potentially billable requests: defaults are 12 background attempts and 1 meeting attempt, with no retries; token and monetary hard budgets are not implemented. The [complete case record](reproductions/2026-10-06-complete-case/REPORT.md) preserves 13 actual responses, two rounds, the review fixture, restart checks and report errors.
 
 ## The research loop
 
@@ -45,6 +45,11 @@ The initial focus is computational research that can be checked through document
 
 ## Documents
 
+- [Codex CLI 后台验收](reproductions/2026-10-07-codex-backend/REPORT.md): real two-round planning, saved experiment evidence and meeting Q&A with `gpt-6.1-sol / high`.
+- [测评分数卡](docs/SCORECARD.md): transparent 0–100 scores from saved runs, with separate unmeasured capabilities and public benchmark candidates.
+- [现有测评：题目、结果与缺口](docs/EVALUATION.md): inspect the two synthetic tasks, twelve runs, meeting cases and platform tests without confusing workflow checks with research quality.
+- [微信群聊式界面验收](reproductions/2026-10-07-group-chat/REPORT.md): role avatars, guided setup, evidence attachments and a complete two-round simulation workflow.
+- [聊天界面验收](reproductions/2026-10-07-chat-ui/REPORT.md): two-round browser workflow, durable drafts, retained discussion and simulation-only checks.
 - [三步产品流程 / Product flow](docs/PRODUCT.md): the user-confirmed loop and current implementation boundaries.
 - [实施计划 / Project plan](docs/PLAN.md): scope, architecture, milestones, and acceptance criteria.
 - [本地运行 / Running](docs/RUNNING.md): start the platform, select simulation or real case, and understand its limits.

@@ -1,0 +1,66 @@
+{
+  "checked_on": "2026-10-07",
+  "scope": "Offline recheck of saved records and test inventory; no model calls, no HTTP requests, no execution of platform test suite.",
+  "comparison": {
+    "runs": 12,
+    "saved_artifacts_recomputed": 22,
+    "saved_csv_files_checked": 42,
+    "requests_in_historical_runs": 64,
+    "groups": {
+      "single": {
+        "runs": 4,
+        "numeric_and_refs_valid": 4,
+        "full_seed_and_metric_coverage": 2,
+        "agent_verified_all_report_evidence": 2,
+        "requests": 24
+      },
+      "multi": {
+        "runs": 4,
+        "numeric_and_refs_valid": 4,
+        "full_seed_and_metric_coverage": 4,
+        "agent_verified_all_report_evidence": 0,
+        "requests": 20
+      },
+      "human": {
+        "runs": 4,
+        "numeric_and_refs_valid": 4,
+        "full_seed_and_metric_coverage": 4,
+        "agent_verified_all_report_evidence": 0,
+        "requests": 20
+      }
+    }
+  },
+  "platform_test_inventory": {
+    "test_brief.py": 7,
+    "test_http.py": 5,
+    "test_lifecycle.py": 3,
+    "test_real_case.py": 9,
+    "test_research.py": 13,
+    "test_source_recovery.py": 8,
+    "test_synthesis.py": 7,
+    "test_workflow.py": 16
+  },
+  "platform_test_count": 68,
+  "saved_record_audits": {
+    "complete_case": {
+      "status": "passed",
+      "script": "reproductions/2026-10-06-complete-case/audit_saved_case.py"
+    },
+    "network_recovery": {
+      "status": "passed",
+      "script": "reproductions/2026-10-06-network-recovery/audit_saved_run.py"
+    },
+    "meeting_synthesis": {
+      "status": "passed",
+      "script": "reproductions/2026-10-07-meeting-synthesis/audit_saved_run.py"
+    }
+  },
+  "not_measured": [
+    "scientific generalization",
+    "report semantic accuracy rate",
+    "Codex CLI execution quality",
+    "multi-day stability",
+    "human time efficiency"
+  ],
+  "platform_discovered_test_count": 68
+}

@@ -3,16 +3,21 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>LabCouncil · 我的研究组</title>
+  <title>LabCouncil · 研究群</title>
   <link rel="stylesheet" href="./style.css">
   <script src="./app.js" defer></script>
 </head>
 <body>
-  <header class="topbar"><a href="/" class="brand"><span class="mark">LC</span> LabCouncil</a><span class="badge">本地模拟原型</span></header>
   <div class="layout">
-    <aside><div class="aside-top"><h2>我的研究项目</h2><button id="new-project" class="small">＋ 新建</button></div><nav id="projects" aria-label="项目列表"></nav><p class="aside-note">设定本轮 → 后台工作 → 开组会<br>同一个项目，保留上下文继续。</p></aside>
-    <main><div id="message" role="status" aria-live="polite"></div><div id="content"><section class="hero"><h1>打开本地研究组</h1><p>这个 HTML 文件需要连接后台服务。请先运行启动命令，再打开下面的地址。</p><a href="http://127.0.0.1:8765">打开 LabCouncil 本地服务 ↗</a></section></div></main>
+    <aside id="sidebar"><div class="sidebar-header"><a href="/" class="brand">LabCouncil</a><button id="new-project" aria-label="新建研究群" title="新建研究群">＋</button></div><label class="sr-only" for="group-search">搜索研究群</label><input id="group-search" type="search" placeholder="搜索研究群"><nav id="projects" aria-label="研究群列表"></nav></aside>
+    <main>
+      <header class="topbar"><button id="toggle-projects" aria-controls="sidebar" aria-expanded="false">‹ 群聊</button><div class="heading"><h1 id="project-title">新的研究群</h1><div class="group-status"><span class="badge">本地模拟原型</span><span id="work-status"></span></div></div><div id="project-actions"></div></header>
+      <div id="message" role="status" aria-live="polite"></div>
+      <div id="content"><p>请通过本地服务打开研究群。</p></div>
+      <div id="compose-area"></div>
+      <footer>讨论不会改变执行计划，下一轮需明确确认。</footer>
+    </main>
   </div>
-  <footer>当前角色和答复由固定程序模拟。没有模型调用、文献检索或真实科研结论。</footer>
+  <dialog id="settings" aria-labelledby="settings-title"><div class="dialog-heading"><h2 id="settings-title">群聊设置</h2><button id="close-settings" aria-label="关闭详情">关闭</button></div><div id="settings-body"></div></dialog>
 </body>
 </html>

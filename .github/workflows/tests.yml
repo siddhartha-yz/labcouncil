@@ -25,3 +25,5 @@ jobs:
         run: python -W error::ResourceWarning -m unittest discover -s tests -v
       - name: Check browser JavaScript
         run: node --check labcouncil/static/app.js
+      - name: Verify evidence score computation (no model calls)
+        run: python -W error::ResourceWarning -m unittest discover -s reproductions -p test_score_comparison.py -v

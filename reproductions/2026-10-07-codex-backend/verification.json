@@ -1,0 +1,97 @@
+{
+  "artifact_hashes_verified": true,
+  "operation_hashes_verified": true,
+  "recomputed": [
+    {
+      "value": "clean",
+      "verification": {
+        "verified": true,
+        "checks": [
+          {
+            "seed": 7,
+            "passed": true,
+            "recomputed_metrics": {
+              "linear": {
+                "mse": 0.1704689586101377,
+                "mae": 0.31271792820150335,
+                "median_absolute_error": 0.2408423803545101
+              },
+              "baseline": {
+                "mse": 12.888358499556563,
+                "mae": 3.0910699422731613,
+                "median_absolute_error": 3.1412061139149094
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "value": "outlier",
+      "verification": {
+        "verified": true,
+        "checks": [
+          {
+            "seed": 7,
+            "passed": true,
+            "recomputed_metrics": {
+              "linear": {
+                "mse": 10.15567041903633,
+                "mae": 1.2783887001074266,
+                "median_absolute_error": 0.2711382071999348
+              },
+              "baseline": {
+                "mse": 23.951894598705934,
+                "mae": 3.866588615503053,
+                "median_absolute_error": 3.5262360242088477
+              }
+            }
+          },
+          {
+            "seed": 19,
+            "passed": true,
+            "recomputed_metrics": {
+              "linear": {
+                "mse": 10.271588316845678,
+                "mae": 1.282535409023489,
+                "median_absolute_error": 0.2817988812709308
+              },
+              "baseline": {
+                "mse": 19.705700590219234,
+                "mae": 3.5847470742208656,
+                "median_absolute_error": 3.0843445557618776
+              }
+            }
+          },
+          {
+            "seed": 31,
+            "passed": true,
+            "recomputed_metrics": {
+              "linear": {
+                "mse": 10.212571668611693,
+                "mae": 1.2471163775439722,
+                "median_absolute_error": 0.21018718335695707
+              },
+              "baseline": {
+                "mse": 20.61376480434217,
+                "mae": 3.571814067026869,
+                "median_absolute_error": 3.0392012138461078
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "platform_tests": 81,
+  "score_tests": 5,
+  "desktop_width": 840,
+  "mobile_width": 425,
+  "ui_permission_fixture": {
+    "project_id": "6472e89761e64ea0a7bebe26f7ed95a7",
+    "requests": 0,
+    "used": 0
+  },
+  "normal_service_restart_preserved_state": true,
+  "requests_after_restart": 9
+}
