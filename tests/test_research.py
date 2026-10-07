@@ -57,7 +57,7 @@ class ResearchTests(unittest.TestCase):
             self.run_step(provider);self.assertIsNone(self.store.claim());self.assertEqual(net.call_count,1)
         m=self.store.open_meeting(self.pid)
         answer_meeting(self.store,m,'复现了吗？',provider)
-        with self.assertRaises(Conflict): answer_meeting(self.store,m,'再次问',provider)
+        answer_meeting(self.store,m,'再次问',provider)
         new=deepcopy(self.brief);new['idea']='沿用原证据，再检查计划'
         self.store.confirm(m,1,new['idea'],'clean',new)
         restarted=Store(self.store.database)
@@ -67,7 +67,7 @@ class ResearchTests(unittest.TestCase):
         self.assertEqual(context['known_sources'][0]['id'],'owner/research')
         self.assertEqual(context['previous_steps'][0]['version'],1)
         self.assertEqual(context['confirmed_inputs_excerpt']['idea'],new['idea'])
-        self.assertEqual(len(self.store.project(self.pid)['model_requests']),7)
+        self.assertEqual(len(self.store.project(self.pid)['model_requests']),8)
     def test_duplicate_action_across_rounds_never_reexecutes(self):
         provider=FixtureProvider([('synthetic_regression','outlier')]*2)
         b=deepcopy(self.brief);b['permissions']['local_compute']=True

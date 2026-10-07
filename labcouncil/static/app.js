@@ -128,7 +128,7 @@ function scenarioOptions(s = "clean", real = false) {
 }
 function executorSettings(p = null) {
   const real = p ? p.execution.mode !== "simulation" : false;
-  return `<details><summary>当前执行器与实验设置</summary><p class="muted">研究模式：每步由所选模型根据输入与已保存资料选择检索、读摘要、读仓库 README 或准备组会，每轮最多六步。仅支持已接入的本地合成计算，不会运行任意仓库代码。固定案例保留用于比较。</p>${ !p ? "<label>项目名称（可选）<input name=\"title\" maxlength=\"120\" placeholder=\"留空时使用 idea 开头\"></label>" : "" }${ p ? `<p>${ p.execution.mode === "research" ? backendLabel(p.execution.backend) + "逐步研究" : real ? backendLabel(p.execution.backend) + "与固定工具" : "固定程序流程演示" }；执行器在项目创建时选择。</p>` : `<label>执行器<select name="mode"><option value="simulation">流程演示，不调用模型</option><option value="real_case">固定合成计算</option><option value="research">逐步研究</option></select></label>${backendSelect()}` }<label ${p?.execution.mode === "research" ? "hidden" : ""}>本轮计算输入<select name="scenario">${ scenarioOptions(p?.scenario, real) }</select></label>${ !p ? "<div class=\"form-grid\"><label>项目后台模型请求总上限<input type=\"number\" name=\"api_budget\" value=\"12\" min=\"0\" max=\"100\" required></label><label>项目组会模型请求总上限<input type=\"number\" name=\"qa_api_budget\" value=\"1\" min=\"0\" max=\"100\" required></label></div><label>项目公开HTTP请求总上限<input type=\"number\" name=\"source_budget\" value=\"24\" min=\"0\" max=\"24\" required></label><p class=\"muted\">研究模式每步2次模型请求、每轮最多6步；固定案例每轮通常6次请求。上限包含失败尝试。模型请求不重试；公开连接仅在勾选允许时有限重试。Codex 按 CLI 启动计数，内部可能有多个模型 turn；这不是 token 或人民币预算。</p>" : "" }</details>`;
+  return `<details><summary>当前执行器与实验设置</summary><p class="muted">研究模式：每步由所选模型根据输入与已保存资料选择检索、读摘要、读仓库 README 或准备组会，每轮最多六步。仅支持已接入的本地合成计算，不会运行任意仓库代码。固定案例保留用于比较。</p>${ !p ? "<label>项目名称（可选）<input name=\"title\" maxlength=\"120\" placeholder=\"留空时使用 idea 开头\"></label>" : "" }${ p ? `<p>${ p.execution.mode === "research" ? backendLabel(p.execution.backend) + "逐步研究" : real ? backendLabel(p.execution.backend) + "与固定工具" : "固定程序流程演示" }；执行器在项目创建时选择。</p>` : `<label>执行器<select name="mode"><option value="simulation">流程演示，不调用模型</option><option value="real_case">固定合成计算</option><option value="research">逐步研究</option></select></label>${backendSelect()}` }<label ${p?.execution.mode === "research" ? "hidden" : ""}>本轮计算输入<select name="scenario">${ scenarioOptions(p?.scenario, real) }</select></label>${ !p ? "<div class=\"form-grid\"><label>项目后台模型请求总上限<input type=\"number\" name=\"api_budget\" value=\"12\" min=\"0\" max=\"100\" required></label></div><label>项目公开HTTP请求总上限<input type=\"number\" name=\"source_budget\" value=\"24\" min=\"0\" max=\"24\" required></label><p class=\"muted\">研究模式每步2次模型请求、每轮最多6步；固定案例每轮通常6次请求。后台请求上限包含失败尝试；组会问答不设次数上限。模型请求不重试；公开连接仅在勾选允许时有限重试。Codex 按 CLI 启动计数，内部可能有多个模型 turn；这不是 token 或人民币预算。</p>" : "" }</details>`;
 }
 function inputsSummary(b) {
   const w = b.work_time;
@@ -179,7 +179,7 @@ function researchReport(artifacts, operations) {
 
 function requestDetails(p) {
   const real = p.execution.mode !== "simulation", rs = p.model_requests, known = rs.filter(r => r.usage && Number.isFinite(r.usage.total_tokens));
-  return `<details><summary>执行状态、额度与调用明细</summary>${p.execution.backend === "codex_cli" && real ? `<p>模型后台：${esc(backendLabel(p.execution.backend))}。以下请求次数按 CLI 启动计数，内部模型 turn 未设硬上限；token 为 CLI 返回的用量。平台工具受原权限限制。</p>` : ""}<p>角色任务已用 ${ p.used }/${ p.budget }；问答已用 ${ p.qa_used }/${ p.qa_budget }。${ real ? `后台真实请求 ${ rs.filter(r => r.category === "background").length }/${ p.execution.api_budget }；公开资料请求 ${(p.source_requests || []).length}/${p.execution.source_budget ?? 24}；组会真实请求 ${ rs.filter(r => r.category === "qa").length }/${ p.execution.qa_api_budget }。已知 ${ known.reduce((n, r) => n + r.usage.total_tokens, 0) } tokens；${ rs.length - known.length } 次用量未知。人民币费用未知，没有 token 硬上限。` : "角色与问答为固定程序，不调用模型。" }</p><ul>${ p.tasks.map(t => `<li>第 ${ t.version } 轮 · ${ esc(roles[t.role] || t.role.replace("research_step_", "研究步骤 ")) } · ${ esc(states[t.status]) }${ t.error ? `：${ esc(t.error) }` : "" }</li>`).join("") }</ul>${ real ? `<h3>实际模型请求</h3><ul>${ rs.map(r => `<li><a href="/api/model-requests/${ esc(r.id) }" target="_blank" rel="noopener">${ esc(r.phase) } · ${ esc(r.status) }</a></li>`).join("") }</ul><h3>公开来源请求</h3><ul>${(p.source_requests || []).map(r => `<li><a href="/api/source-requests/${esc(r.id)}" target="_blank" rel="noopener">${esc(r.url)} · ${esc(r.status)} · HTTP ${r.http_status ?? "未知"} · ${esc(r.transport || "原记录")} · 第 ${r.attempt_number ?? 1} 次尝试</a></li>`).join("") || "<li>无公开来源请求</li>"}</ul><h3>独立保存的工具结果</h3><ul>${ p.tool_operations.map(o => `<li><a href="/api/tool-operations/${ esc(o.id) }" target="_blank" rel="noopener">${ esc(o.body.tool || researchActions[o.body.action] || o.body.action) }</a></li>`).join("") || "<li>早期工具结果保存在角色证据内。</li>" }</ul>` : "" }</details>`;
+  return `<details><summary>执行状态、额度与调用明细</summary>${p.execution.backend === "codex_cli" && real ? `<p>模型后台：${esc(backendLabel(p.execution.backend))}。以下请求次数按 CLI 启动计数，内部模型 turn 未设硬上限；token 为 CLI 返回的用量。平台工具受原权限限制。</p>` : ""}<p>角色任务已用 ${ p.used }/${ p.budget }；问答已用 ${ p.qa_used } 次（不限次数）。${ real ? `后台真实请求 ${ rs.filter(r => r.category === "background").length }/${ p.execution.api_budget }；公开资料请求 ${(p.source_requests || []).length}/${p.execution.source_budget ?? 24}；组会真实请求 ${ rs.filter(r => r.category === "qa").length } 次（不限次数）。已知 ${ known.reduce((n, r) => n + r.usage.total_tokens, 0) } tokens；${ rs.length - known.length } 次用量未知。人民币费用未知，没有 token 硬上限。` : "角色与问答为固定程序，不调用模型。" }</p><ul>${ p.tasks.map(t => `<li>第 ${ t.version } 轮 · ${ esc(roles[t.role] || t.role.replace("research_step_", "研究步骤 ")) } · ${ esc(states[t.status]) }${ t.error ? `：${ esc(t.error) }` : "" }</li>`).join("") }</ul>${ real ? `<h3>实际模型请求</h3><ul>${ rs.map(r => `<li><a href="/api/model-requests/${ esc(r.id) }" target="_blank" rel="noopener">${ esc(r.phase) } · ${ esc(r.status) }</a></li>`).join("") }</ul><h3>公开来源请求</h3><ul>${(p.source_requests || []).map(r => `<li><a href="/api/source-requests/${esc(r.id)}" target="_blank" rel="noopener">${esc(r.url)} · ${esc(r.status)} · HTTP ${r.http_status ?? "未知"} · ${esc(r.transport || "原记录")} · 第 ${r.attempt_number ?? 1} 次尝试</a></li>`).join("") || "<li>无公开来源请求</li>"}</ul><h3>独立保存的工具结果</h3><ul>${ p.tool_operations.map(o => `<li><a href="/api/tool-operations/${ esc(o.id) }" target="_blank" rel="noopener">${ esc(o.body.tool || researchActions[o.body.action] || o.body.action) }</a></li>`).join("") || "<li>早期工具结果保存在角色证据内。</li>" }</ul>` : "" }</details>`;
 }
 
 function bubble(key, speaker, body, user = false, time = null) {
@@ -205,8 +205,6 @@ function qaBlocker(p, m) {
   const real = p.execution.mode !== "simulation", s = m?.snapshot;
   if (!(s ? s.artifacts.length || (s.tool_operations || []).length : p.artifacts.some(a => a.version === p.version) || p.tool_operations.some(o => p.tasks.some(t => t.id === o.task_id && t.version === p.version)))) return s ? "本场固定材料还没有证据，可查看后续报告或调整下一轮。" : "还没有可讨论的证据，先等研究员保存结果。";
   if (real && !p.current_inputs.body.permissions.model_calls) return "未授权模型调用，可先查看报告或调整下一轮。";
-  if (real && p.model_requests.filter(r => r.category === "qa").length >= p.execution.qa_api_budget) return "群聊模型请求额度已用完，仍可开组会、查看材料和调整下一轮。";
-  if (p.qa_used >= p.qa_budget) return "群聊问答次数已用完，仍可调整下一轮。";
   return null;
 }
 function artifactMessage(a, p) {
@@ -437,7 +435,7 @@ async function confirmWizard() {
     await api(`/api/meetings/${w.m.id}/confirm`, {expected_version: w.m.version, instruction: b.idea, scenario: w.scenario, brief: b});
     drafts.delete(w.m.id);
   } else {
-    const result = await api("/api/projects", {title: w.settings.title || b.idea.slice(0,40), idea: b.idea, brief: b, mode: w.settings.mode || "simulation", backend: w.settings.backend || "codex_cli", scenario: w.scenario, budget: 9, qa_budget: 6, api_budget: Number(w.settings.api_budget ?? 12), qa_api_budget: Number(w.settings.qa_api_budget ?? 1), source_budget: Number(w.settings.source_budget ?? 24)});
+    const result = await api("/api/projects", {title: w.settings.title || b.idea.slice(0,40), idea: b.idea, brief: b, mode: w.settings.mode || "simulation", backend: w.settings.backend || "codex_cli", scenario: w.scenario, budget: 9, api_budget: Number(w.settings.api_budget ?? 12), source_budget: Number(w.settings.source_budget ?? 24)});
     id = result.id; setupDraft = null; setupSettings = {}; questionDrafts.delete("new");
   }
   wizard = null; editing = false; await showProject(id);
@@ -457,7 +455,7 @@ function editExecutor() {
   form.elements.namedItem("scenario").value = w.scenario;
   form.onsubmit = e => action(e, async () => {
     const f = new FormData(form); w.scenario = f.get("scenario");
-    for (const key of ["mode", "backend", "title", "api_budget", "qa_api_budget", "source_budget"]) if (f.has(key)) w.settings[key] = f.get(key);
+    for (const key of ["mode", "backend", "title", "api_budget", "source_budget"]) if (f.has(key)) w.settings[key] = f.get(key);
     rememberWizard(); document.querySelector("#settings").close(); renderWizard();
   });
 }
@@ -537,10 +535,10 @@ function openSettings() {
   const at = p.meeting_at ? new Date(p.meeting_at * 1000) : null;
   const local = at ? new Date(at.getTime() - at.getTimezoneOffset() * 60000).toISOString().slice(0,16) : "";
   document.querySelector("#settings-title").textContent = "群聊设置";
-  document.querySelector("#settings-body").innerHTML = `<p class="muted">每日工作时间、资源与权限在组会后调整下一轮时修改。额度是整个项目累计上限。</p><form id="configure"><div class="form-grid"><label>项目任务总上限<input name="budget" type="number" min="0" max="100" value="${p.budget}" required></label><label>项目问答总上限<input name="qa_budget" type="number" min="0" max="100" value="${p.qa_budget}" required></label></div><label>后台状态<select name="paused"><option value="false" ${!p.paused ? "selected" : ""}>继续</option><option value="true" ${p.paused ? "selected" : ""}>暂停启动新任务</option></select></label><label>下次准备组会材料时间（本机时区）<input name="meeting_at" type="datetime-local" value="${local}"><span class="muted">留空取消定时安排。</span></label><button class="primary" type="submit">保存设置</button></form>${requestDetails(p)}`;
+  document.querySelector("#settings-body").innerHTML = `<p class="muted">每日工作时间、资源与权限在组会后调整下一轮时修改。后台任务额度是整个项目累计上限；组会问答不设次数上限。</p><form id="configure"><div class="form-grid"><label>项目任务总上限<input name="budget" type="number" min="0" max="100" value="${p.budget}" required></label></div><label>后台状态<select name="paused"><option value="false" ${!p.paused ? "selected" : ""}>继续</option><option value="true" ${p.paused ? "selected" : ""}>暂停启动新任务</option></select></label><label>下次准备组会材料时间（本机时区）<input name="meeting_at" type="datetime-local" value="${local}"><span class="muted">留空取消定时安排。</span></label><button class="primary" type="submit">保存设置</button></form>${requestDetails(p)}`;
   document.querySelector("#configure").onsubmit = e => action(e, async () => {
     const f = new FormData(e.currentTarget);
-    await api(`/api/projects/${p.id}/configure`, {paused: f.get("paused") === "true", budget: Number(f.get("budget")), qa_budget: Number(f.get("qa_budget")), meeting_at: f.get("meeting_at") ? new Date(f.get("meeting_at")).getTime()/1000 : null});
+    await api(`/api/projects/${p.id}/configure`, {paused: f.get("paused") === "true", budget: Number(f.get("budget")), meeting_at: f.get("meeting_at") ? new Date(f.get("meeting_at")).getTime()/1000 : null});
     document.querySelector("#settings").close();
     await refreshProject();
     announce("工作设置已保存。");

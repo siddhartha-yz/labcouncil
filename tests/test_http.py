@@ -79,6 +79,22 @@ class HTTPTests(unittest.TestCase):
             self.assertEqual(status, 403)
         self.assertEqual(self.store.projects(), [])
 
+    def test_unlimited_qa_and_settings_without_legacy_qa_budget(self):
+        _,_,raw=self.request('POST','/api/projects',{'title':'问答不限次数','idea':'保留历史','qa_budget':0})
+        pid=json.loads(raw)['id']
+        while step(self.store):pass
+        _,_,raw=self.request('POST',f'/api/projects/{pid}/meeting',{})
+        mid=json.loads(raw)['id']
+        for i in range(8):
+            self.assertEqual(self.request('POST',f'/api/meetings/{mid}/ask',{'question':f'追问{i}'})[0],200)
+        self.assertEqual(self.request('POST',f'/api/projects/{pid}/configure',{'paused':True,'budget':9})[0],200)
+        _,_,raw=self.request('GET',f'/api/projects/{pid}')
+        p=json.loads(raw)
+        self.assertTrue(p['execution']['qa_unlimited'])
+        self.assertEqual(p['qa_used'],8)
+        self.assertEqual(p['qa_budget'],0)
+        self.assertTrue(p['paused'])
+
     def test_backend_selected_through_http_and_invalid_value_atomic(self):
         status,_,raw=self.request('POST','/api/projects',{'title':'CLI HTTP fixture','idea':'保留模型配置','mode':'research','backend':'codex_cli'})
         self.assertEqual(status,201)

@@ -73,8 +73,30 @@ class RealCaseTests(unittest.TestCase):
         self.assertEqual(context['current_inputs_excerpt']['idea'],'增加异常点和重复次数')
         self.assertEqual(len(context['previous_round_reports_excerpt']),3)
         self.assertEqual(context['previous_plans_excerpt'][0]['version'],1)
-        with self.assertRaises(Conflict):answer_meeting(self.store,self.store.open_meeting(self.project),'额度用完',self.provider)
-        self.assertEqual(len(self.server.seen),13)
+        answer_meeting(self.store,self.store.open_meeting(self.project),'后台额度用完后仍能追问吗？',self.provider)
+        self.assertEqual(len(self.server.seen),14)
+        self.assertEqual(self.store.project(self.project)['qa_used'],2)
+
+    def test_unlimited_qa_preserves_background_limit_and_closed_meeting_guard(self):
+        self.finish_round()
+        self.store.configure(self.project, False, 9, 0)
+        with self.store.connection(write=True) as con:
+            con.execute('UPDATE project_execution SET api_budget=0,qa_api_budget=0 WHERE project_id=?',(self.project,))
+        m=self.store.open_meeting(self.project)
+        snapshot=self.store.meeting(m)['snapshot']
+        for i in range(8):
+            answer_meeting(self.store,m,f'连续追问{i}',self.provider)
+        p=Store(self.path).project(self.project)
+        self.assertTrue(p['execution']['qa_unlimited'])
+        self.assertEqual(p['qa_used'],8)
+        self.assertEqual(sum(r['category']=='qa' for r in p['model_requests']),8)
+        self.assertEqual(self.store.meeting(m)['snapshot'],snapshot)
+        with self.assertRaises(Conflict):
+            self.provider.call(self.store,self.project,'background','executor-report',[{'role':'user','content':'JSON'}])
+        self.assertEqual(len(self.server.seen),14)
+        self.store.confirm(m,1,'保留证据，继续讨论','clean')
+        with self.assertRaises(Conflict):answer_meeting(self.store,m,'已结束的组会',self.provider)
+        self.assertEqual(len(self.server.seen),14)
     def test_tool_not_executed_before_or_without_valid_model_call(self):
         self.server.reply_status=429;task=self.store.claim()
         with patch('labcouncil.case.perform_tool') as tool:

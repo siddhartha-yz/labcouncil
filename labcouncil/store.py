@@ -250,6 +250,8 @@ class Store:
                 operation["body"]=json.loads(operation["body"])
             execution = con.execute("SELECT * FROM project_execution WHERE project_id=?",(identifier,)).fetchone()
             result["execution"] = dict(execution) if execution else {"mode":"simulation","api_budget":0,"qa_api_budget":0}
+            # Legacy QA budget fields remain stored for compatibility, not enforcement.
+            result["execution"]["qa_unlimited"] = True
             result['execution'].update({'model': 'gpt-6.1-sol' if execution and execution['backend']=='codex_cli' else 'deepseek-flash',
                 'reasoning_effort': 'high' if execution and execution['backend']=='codex_cli' else None})
             result['current_inputs'] = self.inputs(con, result)
@@ -270,14 +272,18 @@ class Store:
                     if key in body: request[key] = body[key]
             return result
 
-    def configure(self, identifier, paused, budget, qa_budget, meeting_at=None):
+    def configure(self, identifier, paused, budget, qa_budget=None, meeting_at=None):
         if type(paused) is not bool:
             raise ValueError("暂停状态必须为布尔值")
-        budget, qa_budget = quota(budget), quota(qa_budget)
+        budget = quota(budget)
+        if qa_budget is not None:
+            qa_budget = quota(qa_budget)
         if meeting_at is not None and (type(meeting_at) not in (int, float) or not 0 < meeting_at < 4102444800):
             raise ValueError("组会时间无效")
         with self.connection(write=True) as con:
-            self.row(con, "projects", identifier)
+            p = self.row(con, "projects", identifier)
+            if qa_budget is None:
+                qa_budget = p["qa_budget"]
             con.execute("UPDATE projects SET paused=?,budget=?,qa_budget=?,meeting_at=? WHERE id=?",
                         (paused, budget, qa_budget, meeting_at, identifier))
             self.event(con, identifier, "project_configured", {"paused": paused, "budget": budget, "qa_budget": qa_budget, "meeting_at": meeting_at})
@@ -485,13 +491,11 @@ class Store:
             if meeting["status"] == "closed":
                 raise Conflict("这场组会已结束，请在新一轮组会追问")
             p = self.row(con, "projects", meeting["project_id"])
-            if p["qa_used"] >= p["qa_budget"]:
-                raise Conflict("组会模拟问答预算已用完；可在项目设置中增加")
             snapshot = json.loads(meeting["snapshot"])
             count = len(snapshot["artifacts"])
             by_role = {a["role"]: a for a in snapshot["artifacts"]}
             if any(word in question for word in ("预算", "费用", "停止")):
-                detail = f"后台模拟任务已用 {p['used']}/{p['budget']}；本次答复后问答已用 {p['qa_used']+1}/{p['qa_budget']}。达到上限就停止启动对应任务。这些计数不是 API token 或费用。"
+                detail = f"后台模拟任务已用 {p['used']}/{p['budget']}；本次答复后问答累计 {p['qa_used']+1} 次，不设次数上限。后台任务达到上限就停止启动。这些计数不是 API token 或费用。"
             elif any(word in question for word in ("复核", "核验", "可信", "证据", "验证")):
                 review = by_role.get("reviewer")
                 detail = review["body"]["summary"] if review else "快照中还没有复核产物，不能声称结果已经核验。"
@@ -517,7 +521,7 @@ class Store:
             if not self.inputs(con,p)['body']['permissions']['model_calls']:
                 raise Conflict('本轮未授权模型调用')
             count=con.execute("SELECT COUNT(*) FROM model_requests WHERE project_id=? AND category=?",(project_id,category)).fetchone()[0]
-            if count>=execution["api_budget" if category=="background" else "qa_api_budget"]:
+            if category=="background" and count>=execution["api_budget"]:
                 raise Conflict("真实模型请求次数预算已用完；不会自动重试")
             if task:
                 current=self.row(con,"tasks",task["id"])
@@ -527,7 +531,6 @@ class Store:
             if category=="qa":
                 m=self.row(con,"meetings",meeting_id)
                 if m["project_id"]!=project_id or m["status"]=="closed":raise Conflict("组会已经结束")
-                if p["qa_used"]>=p["qa_budget"]:raise Conflict("组会问答次数已用完")
                 con.execute("UPDATE projects SET qa_used=qa_used+1 WHERE id=?",(project_id,))
             con.execute("INSERT INTO model_requests(id,project_id,task_id,meeting_id,category,phase,status,request,created) VALUES(?,?,?,?,?,?,'started',?,?)",
                 (identifier,project_id,task["id"] if task else None,meeting_id,category,phase,encode(payload),time.time()))

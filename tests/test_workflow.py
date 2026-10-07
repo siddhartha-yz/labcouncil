@@ -79,9 +79,9 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual(len(p["artifacts"]), 1)
         self.assertEqual(p["tasks"][1]["attempts"], 0)
         meeting = self.store.open_meeting(self.project)
-        self.store.ask(meeting, "问题一")
-        with self.assertRaises(Conflict):
-            self.store.ask(meeting, "问题二")
+        for i in range(8):
+            self.store.ask(meeting, f"问题{i}")
+        self.assertEqual(self.store.project(self.project)["qa_used"], 8)
         self.assertEqual(self.store.project(self.project)["used"], 1)
         self.store.configure(self.project, False, 3, 1)
         self.finish_round()
