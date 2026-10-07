@@ -25,5 +25,7 @@ jobs:
         run: python -W error::ResourceWarning -m unittest discover -s tests -v
       - name: Check browser JavaScript
         run: node --check labcouncil/static/app.js
+      - name: Verify draft isolation and explicit send recovery (no model calls)
+        run: node tests/test_frontend.js
       - name: Verify evidence score computation (no model calls)
         run: python -W error::ResourceWarning -m unittest discover -s reproductions -p test_score_comparison.py -v

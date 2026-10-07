@@ -163,3 +163,18 @@ dialog::backdrop { background: #25331633; }
 @media (max-width: 850px) { #agent-panel { width: min(360px,92vw); position: absolute; right: 0; top: 0; bottom: 0; z-index: 10; box-shadow: -10px 0 30px #0001; } #sidebar { position: absolute; top: 0; bottom: 0; left: 0; width: min(290px,90vw); z-index: 10; box-shadow: 10px 0 30px #0001; } #drawer-backdrop:not([hidden]) { display: block; position: fixed; inset: 0; z-index: 9; border: 0; border-radius: 0; background: #25331622; } .topbar { padding: 18px 18px 4px; } .transcript { padding-left: 22px; padding-right: 22px; } #compose-area { padding-left: 18px; padding-right: 18px; } }
 @media (max-width: 520px) { .topbar { min-height: 133px; padding: 16px 15px 4px; } .profile-trigger { top: 13px; } .dot-character { width: 48px; height: 45px; } .dot-character::after { left: 20px; bottom: 10px; } .identity-pill { font-size: 13px; } #project-title { max-width: 88%; font-size: 10px; } .transcript { padding: 18px 16px 8px; } .chat-message { margin-bottom: 22px; } .message-column { max-width: 91%; } .message-body { font-size: 13px; padding: 11px 14px; border-radius: 18px; } .message-meta { font-size: 10px; } #compose-area { padding: 9px 12px 15px; } #composer { gap: 5px; padding: 8px; } #composer textarea { font-size: 13px; } .composer-hint { font-size: 9px; } #message { top: 132px; } .welcome h2 { font-size: 22px; } }
 @media (prefers-reduced-motion: reduce) { .pending-dot { animation: none !important; } }
+
+/* Keep secondary information legible without turning the chat into a dashboard. */
+#work-status { font-size: 12px; color: #66715d; }
+.message-meta, .message-foot { font-size: 11px; color: #68745d; }
+.section-label { font-size: 12px; color: #68745d; }
+.activity-copy strong { font-size: 13px; }
+.activity-copy small { font-size: 12px; color: #647257; line-height: 1.6; }
+.activity-copy .activity-date { font-size: 11px; color: #77836b; }
+.activity-status { font-size: 11px; color: #647257; }
+.readable-report li { margin-bottom: 14px; }
+.readable-report .muted { color: #657057; }
+
+#content { overflow-anchor: none; }
+#compose-area { position: relative; }
+.jump-latest { position: absolute; top: -32px; left: 50%; transform: translateX(-50%); padding: 5px 13px; border-radius: 20px; font-size: 12px; color: #566347; box-shadow: 0 3px 12px #0001; white-space: nowrap; }

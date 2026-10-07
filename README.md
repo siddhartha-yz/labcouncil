@@ -43,7 +43,7 @@ The initial focus is computational research that can be checked through document
 
 ## Documents
 
-- [Dots 设计适配](docs/DOTS-DESIGN.md): official references, continuous chat, real activity records and current capability limits; [local UI acceptance](reproductions/2026-10-07-dots-ui/REPORT.md).
+- [Dots 设计适配](docs/DOTS-DESIGN.md): official references, continuous chat, real activity records and current capability limits; [local UI acceptance](reproductions/2026-10-07-dots-ui/REPORT.md) and [three iteration rounds](reproductions/2026-10-07-dots-iterations/REPORT.md).
 - [Codex CLI 后台验收](reproductions/2026-10-07-codex-backend/REPORT.md): real two-round planning, saved experiment evidence and meeting Q&A with `gpt-6.1-sol / high`.
 - [测评分数卡](docs/SCORECARD.md): transparent 0–100 scores from saved runs, with separate unmeasured capabilities and public benchmark candidates.
 - [现有测评：题目、结果与缺口](docs/EVALUATION.md): inspect the two synthetic tasks, twelve runs, meeting cases and platform tests without confusing workflow checks with research quality.
