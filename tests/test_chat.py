@@ -208,5 +208,38 @@ class GroupChatTests(unittest.TestCase):
         self.assertGreater(p['round_time']['started_at'],clock)
         self.assertEqual(p['round_time']['deadline_at']-p['round_time']['started_at'],600)
 
+    def test_acceptance_with_exhausted_budgets_reports_saved_not_started(self):
+        pid=self.real();self.store.configure(self.pid,True,30);self.store.configure(pid,False,0)
+        fixture=ProviderFixture('propose','整理已保存资料')
+        self.say('我在想接下来整理资料','message-0001',fixture,pid)
+        result=self.say('按这个做','message-0002',fixture,pid)
+        self.assertIsNone(result['request_id'])
+        self.assertIn('安排已保存，但尚未启动',result['answer'])
+        self.assertIn('任务额度已用完（0/0）',result['answer'])
+        self.assertIn('后台模型额度不足（已用0/0）',result['answer'])
+        self.assertEqual(fixture.calls,1)
+        self.assertIsNone(self.store.claim())
+        self.assertEqual(self.store.project(pid)['used'],0)
+
+    def test_direct_assignment_receipt_does_not_claim_work_started_when_blocked(self):
+        pid=self.real();self.store.configure(self.pid,True,30);fixture=ProviderFixture('propose','整理已保存资料')
+        result=self.say('接下来先整理资料',provider=fixture,pid=pid)
+        self.assertIn('安排已保存，但尚未启动',result['answer'])
+        self.assertEqual(self.store.project(pid)['version'],2)
+        self.assertEqual(fixture.calls,1)
+        self.assertIsNone(self.store.claim())
+
+    def test_expired_budget_receipt_does_not_renew_time_or_charge_a_task(self):
+        while step(self.store):pass
+        p=self.store.project(self.pid);clock=p['round_time']['started_at']
+        from unittest.mock import patch
+        with patch('time.time',return_value=clock+7201):
+            self.say('我在想接下来核对资料')
+            result=self.say('按这个做','message-0002')
+            self.assertIn('投入时间已到期',result['answer'])
+            self.assertIn('尚未启动',result['answer'])
+            self.assertIsNone(self.store.claim())
+        self.assertEqual(self.store.project(self.pid)['used'],3)
+
 
 if __name__=='__main__':unittest.main()

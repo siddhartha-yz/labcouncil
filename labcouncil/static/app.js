@@ -200,7 +200,7 @@ function transcript(p, meetings) {
     add(task.finished || task.created, 4, bubble(`failure-${task.id}`, "LabCouncil · 任务失败", `<p>第 ${task.version} 轮的${esc(roles[task.role] || task.role.replace("research_step_", "研究步骤 "))}没有完成。已保存的其他证据仍可审查。</p>${attachment("failure", task.id, "失败记录")}`));
   }
   for (const event of p.events || []) {
-    if (!["research_stopped", "round_time_expired", "group_plan_applied", "group_plan_stale"].includes(event.kind)) continue;
+    if (!["research_stopped", "round_time_expired", "group_plan_applied", "group_plan_stale", "execution_status_notice"].includes(event.kind)) continue;
     const data = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
     add(event.created, 4, bubble(`stopped-${event.id || event.created}`, "LabCouncil · 本轮停止原因", `<p>${esc(data.reason)}</p>${event.kind === "group_plan_applied" ? attachment("inputs", data.version, "已记下的工作安排") : ""}`));
   }
@@ -215,8 +215,10 @@ function transcript(p, meetings) {
   }
   for (const m of p.group_messages || []) {
     add(m.created, 6, bubble(`group-user-${m.id}`, "你", `<p class="prose">${esc(m.user_text)}</p>`, true, m.created));
+    const request=p.model_requests.find(r=>r.id===m.request_id);
+    const origin=m.request_id ? `模型请求：${backendLabel(p.execution.backend)} · ${request?.elapsed === null || request?.elapsed === undefined ? "耗时未知" : request.elapsed.toFixed(2) + "秒"}` : p.execution.mode === "simulation" ? "程序演示 · 未调用模型" : "本机系统回执 · 未调用模型";
     add(m.finished || m.created, 7, bubble(`group-answer-${m.id}`, m.speaker,
-      `<p class="prose">${esc(m.answer || "正在看你的消息…")}</p>${m.request_id ? attachment("chat-context", m.id, "这条答复的依据") : ""}`, false, m.finished));
+      `<p class="prose">${esc(m.answer || "正在看你的消息…")}</p>${m.answer ? `<p class="muted">${esc(origin)}${!m.request_id && p.execution.mode !== "simulation" ? "。回执不代表研究已启动；执行状态以任务记录为准。" : ""}</p>` : ""}${m.request_id ? attachment("chat-context", m.id, "这条答复的依据") : ""}`, false, m.finished));
   }
   return entries.sort((a, b) => a.time - b.time || a.rank - b.rank).map(e => e.html).join("");
 }

@@ -3,7 +3,7 @@ from copy import deepcopy
 import json
 import re
 import time
-from .brief import normalize
+from .brief import normalize, round_time
 from .provider import for_project
 from .research import condensed, prompt_content
 from .store import Conflict, encode, text
@@ -139,7 +139,7 @@ def finish(store,identifier,answer,speaker='协调助手',request_id=None,status
                 con.execute('UPDATE projects SET paused=0 WHERE id=?',(p['id'],))
                 running=con.execute("SELECT 1 FROM tasks WHERE project_id=? AND status='running'",(p['id'],)).fetchone()
                 activate_approved(store,con)
-                answer+='\n'+('当前步骤保存后接着执行这项安排。' if running else '已经按你的交代接着安排工作。')
+                answer+='\n'+execution_receipt(store,con,p['id'],bool(running))
                 answer+=('新时间预算从安排生效时起算。' if reset_clock else '沿用当前投入截止时间，不重新计时。')
         con.execute('UPDATE group_messages SET answer=?,speaker=?,request_id=COALESCE(?,request_id),status=?,finished=? WHERE id=?',
             (answer,speaker,request_id,status,time.time(),identifier))
@@ -158,7 +158,27 @@ def activate_approved(store,con):
         if not row['reset_clock']:
             store.event(con,pid,'chat_budget_carried',{'version':decision['to_version'],'started_at':clock.get('budget_started_at',clock['created'])})
         con.execute('DELETE FROM group_proposals WHERE project_id=?',(pid,))
-        store.event(con,pid,'group_plan_applied',{'reason':'已经接着安排工作：'+brief['idea'],'version':decision['to_version'],'message_id':row['message_id']})
+        store.event(con,pid,'group_plan_applied',{'reason':'工作安排已保存：'+brief['idea'],'version':decision['to_version'],'message_id':row['message_id']})
+
+
+def execution_receipt(store,con,pid,waiting=False):
+    if waiting:
+        return '安排已保存，等待当前步骤保存结果。交接时会检查权限和剩余预算，再决定能否启动。'
+    p=store.row(con,'projects',pid)
+    execution=con.execute('SELECT * FROM project_execution WHERE project_id=?',(pid,)).fetchone()
+    inputs=store.inputs(con,p);permissions=inputs['body']['permissions'];reasons=[]
+    if round_time(inputs,time.time())['expired']:reasons.append('投入时间已到期')
+    if p['paused']:reasons.append('后台已暂停')
+    if p['used']>=p['budget']:reasons.append(f"项目任务额度已用完（{p['used']}/{p['budget']}）")
+    if execution['mode']!='simulation':
+        if not permissions['model_calls']:reasons.append('尚未授权模型调用')
+        used=con.execute("SELECT COUNT(*) FROM model_requests WHERE project_id=? AND category='background'",(pid,)).fetchone()[0]
+        if execution['api_budget']-used<2:reasons.append(f"后台模型额度不足（已用{used}/{execution['api_budget']}）")
+    if execution['mode']!='research' and not permissions['local_compute']:reasons.append('尚未授权本地计算')
+    if reasons:return '安排已保存，但尚未启动：'+'；'.join(reasons)+'。已有资料仍可讨论，没有自动增加额度。'
+    queued=con.execute("SELECT 1 FROM tasks WHERE project_id=? AND version=? AND status='queued'",(pid,p['version'])).fetchone()
+    if queued:return '安排已保存，任务已排队；worker启动后会留下执行记录。'
+    return '安排已保存，目前没有待启动任务，可以继续讨论或交代后续工作。'
 
 
 def local_control(store,p,message):
@@ -176,13 +196,15 @@ def local_control(store,p,message):
             con.execute('UPDATE projects SET paused=0 WHERE id=?',(p['id'],))
             running=con.execute("SELECT 1 FROM tasks WHERE project_id=? AND status='running'",(p['id'],)).fetchone()
             activate_approved(store,con)
-        return '安排记下了。当前步骤保存后接着做，原有资料和讨论都会保留。' if running else '好，已经按刚才的安排接着工作。原有资料和讨论都会保留。'
+            answer=execution_receipt(store,con,p['id'],bool(running))
+        return answer
     if raw in PAUSE or (raw in RESUME and p['paused']):
         paused=raw in PAUSE
         with store.connection(write=True) as con:
             con.execute('UPDATE projects SET paused=? WHERE id=?',(paused,p['id']))
             store.event(con,p['id'],'group_work_control',{'paused':paused,'message':message})
-        return '好，先不启动新任务。已经开始的步骤会保存结果，你可以继续在群里讨论。' if paused else '好，恢复按已有安排工作。原时间预算继续计时；如果已经到期，需要商量新的安排。'
+            answer=execution_receipt(store,con,p['id']) if not paused else None
+        return '好，先不启动新任务。已经开始的步骤会保存结果，你可以继续在群里讨论。' if paused else '暂停已解除，原时间预算继续计时。'+answer
     if raw in CANCEL:
         with store.connection(write=True) as con:con.execute('DELETE FROM group_proposals WHERE project_id=?',(p['id'],))
         return '好，撤回刚才待执行的安排。已经保存的工作和讨论都保留。'
