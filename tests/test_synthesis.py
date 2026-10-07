@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 from labcouncil.brief import normalize
-from labcouncil.research import execute,answer_meeting,checked_findings,prompt_content,meeting_materials
+from labcouncil.research import execute,answer_meeting,checked_findings,prompt_content,meeting_materials,meeting_evidence,format_meeting_answer
 from labcouncil.store import Store,encode
 from tests.test_research import FixtureProvider
 
@@ -92,6 +92,38 @@ class SynthesisTests(unittest.TestCase):
         context=json.loads(provider.seen[-1][-1]['content'])
         self.assertIn('operation:'+first['id'],[i['id'] for i in context['evidence']])
         self.assertEqual(self.s.meeting(m)['snapshot'],snapshot)
+
+    def test_qa_accepts_tool_operation_even_when_its_report_is_saved(self):
+        provider=FixtureProvider([('prepare_meeting','')])
+        task,_=self.step(provider)
+        m=self.s.open_meeting(self.pid)
+        before=deepcopy(self.s.meeting(m)['snapshot'])
+        reference='operation:'+task['id']
+        original_call=provider.call
+        def cite_tool(*args,**kwargs):
+            _,rid=original_call(*args,**kwargs)
+            return {'content':encode({'answer':'这条工具记录已保存在快照。','evidence_refs':[reference]})},rid
+        with patch.object(provider,'call',side_effect=cite_tool):
+            answer=answer_meeting(self.s,m,'原始工具证据在哪？',provider)
+        self.assertIn(reference,answer)
+        context=json.loads(provider.seen[-1][-1]['content'])
+        self.assertIn(reference,context['allowed_evidence_refs'])
+        self.assertIn(reference,[e['id'] for e in context['evidence']])
+        self.assertEqual(self.s.meeting(m)['snapshot'],before)
+        self.assertEqual(len(self.s.meeting(m)['discussion']),1)
+
+    def test_qa_rejects_missing_foreign_and_post_snapshot_references(self):
+        provider=FixtureProvider([('search_repositories','first'),('prepare_meeting','')])
+        with patch('labcouncil.sources._network',return_value=(b'{"items":[]}',200)):
+            self.step(provider)
+        m=self.s.open_meeting(self.pid)
+        later,_=self.step(provider)
+        evidence=meeting_evidence(self.s.meeting(m)['snapshot'])
+        for refs in (None,[],['operation:fake'],['operation:'+later['id']]):
+            with self.subTest(refs=refs),self.assertRaises(ValueError):
+                format_meeting_answer({'answer':'不能用快照外的证据。','evidence_refs':refs},evidence,'codex_cli')
+        self.assertNotIn('operation:'+later['id'],[e['id'] for e in evidence])
+        self.assertEqual(self.s.meeting(m)['discussion'],[])
     def test_report_is_told_when_its_own_request_exhausts_budget(self):
         self.s.configure(self.pid,True,9,6)
         pid=self.s.create_project('last pair','fixture',mode='research',brief=self.brief,api_budget=2,source_budget=0)
