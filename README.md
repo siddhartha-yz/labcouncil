@@ -2,9 +2,9 @@
 
 **Set the research inputs. Let agents work. Review and steer the next round.**
 
-LabCouncil is an open-source prototype for personal research groups made up of AI agents and a human researcher. The intended loop has three steps: enter an idea, resources, permissions, daily work hours and requirements; agents plan and investigate within those constraints; open a meeting, review plain-language reports and update the five inputs for the next round. The same project retains its plans, experiments, evidence and decisions.
+LabCouncil is an open-source prototype for a personal research group with AI agents and a human researcher. The main interface is a continuous group chat: share an idea, discuss progress, add resources or constraints, and agree on work in the conversation. Agents save reports, tool results and failed attempts. The project retains its inputs, plans, evidence and discussion as work changes.
 
-**Status: local meeting platform with a tested two-round synthetic case.** Default mode is a deterministic simulation. Opt-in real-case mode uses Codex CLI (`gpt-6.1-sol`, `high`) or DeepSeek Flash for tool requests, reports and meeting questions, with saved data and independent arithmetic checks. Versioned five-field inputs, daily task-start windows and meeting-to-input continuity are implemented. Opt-in research mode now lets the selected backend choose bounded steps, read arXiv abstracts and pinned GitHub READMEs, and prepare a meeting. Running arbitrary upstream experiments and sustained scientific iteration remain M2 work. The actual case exposed incorrect model descriptions of the input, even when numerical verification passed; see the [complete case record](reproductions/2026-10-06-complete-case/REPORT.md).
+**Status: local group-chat platform with a tested two-round synthetic case.** The browser defaults to a Codex CLI research group (`gpt-6.1-sol`, `high`), with model and tool permissions initially off. The API retains its deterministic simulation default. Opt-in real-case and research modes use Codex CLI or DeepSeek Flash; research tools read arXiv abstracts, pinned GitHub READMEs and run a bounded in-house synthetic calculation. Arbitrary upstream experiments and sustained scientific iteration remain incomplete. Numerical checks cannot certify every model claim; see the [complete case record](reproductions/2026-10-06-complete-case/REPORT.md).
 
 ## Try the local meeting
 
@@ -14,23 +14,21 @@ From the repository root, with Python 3.11+ on Linux:
 python3 -m labcouncil start
 ```
 
-Open [http://127.0.0.1:8765](http://127.0.0.1:8765). Start a research group chat with an idea. The coordinator collects resources, permissions, daily work hours and requirements one step at a time. Research, computation and verification roles post named messages; reports and data open as message attachments. Send a question to discuss a fixed snapshot, or click “开组会” to open it explicitly. Use “下一轮方向” to draft and confirm the next inputs. No API key is needed for this simulation. It does not implement arbitrary ideas as experiments.
+Open [http://127.0.0.1:8765](http://127.0.0.1:8765). Send an idea to create a group, then talk to it directly. Questions do not need a meeting mode. Clear work instructions proceed within existing permissions and budgets. Tentative ideas become a coordinator proposal; agree or revise it in conversation. Say “暂停一下” or “恢复工作” to control new task starts. Resources, time and requirements can be added in chat; explicit permission statements such as “允许模型调用” are repeated for agreement before execution. Reports and original evidence open from message attachments; the ellipsis menu retains executor settings and consumption records.
 
-[运行说明](docs/RUNNING.md) includes stop/restart, budgets and limitations. [M1 acceptance record](reproductions/2026-10-06-m1-prototype/REPORT.md) includes actual browser checks and durable synthetic evidence. Choose “固定计算” and the DeepSeek backend to use the ignored local `.env` configuration; choose Codex CLI to reuse local `codex login`. This makes potentially billable requests: the default background cap is 12 attempts with no retries, while meeting questions have no cumulative attempt cap; token and monetary hard budgets are not implemented. The [complete case record](reproductions/2026-10-06-complete-case/REPORT.md) preserves 13 actual responses, two rounds, the review fixture, restart checks and report errors.
+[运行说明](docs/RUNNING.md) covers service lifecycle, conversation controls and limitations. [持续群聊的执行约定](docs/CONTINUOUS-CHAT.md) explains evidence freshness, agreement, mid-step handover and failure records. Choose simulation in a new group's optional settings to test without model calls. Codex CLI reuses local `codex login`; DeepSeek uses the ignored local `.env`. Model calls may consume paid or account usage. Background requests remain bounded and are not retried automatically; conversation requests have no cumulative cap. Hard token, monetary and GPU budgets are not implemented. Earlier dated acceptance records document the interface that existed at the time, including its former meeting buttons and guided setup.
 
 ## The research loop
 
 ```mermaid
 flowchart TD
-    I[Idea and research objective] --> P[Plan and assign bounded tasks]
-    P --> W[Agents investigate and run experiments]
-    W --> E[Save evidence and progress reports]
-    E --> M[Scheduled meeting with the human researcher]
-    M --> D[Review, questions, and confirmed decisions]
-    D --> N[Versioned next-round tasks]
-    N --> W
-    W --> B[Wait when blocked or out of budget]
-    B --> M
+    C[Continuous group conversation] --> P[Coordinator proposes bounded work]
+    P --> A[Human agrees in chat]
+    A --> W[Agents investigate within permissions and budgets]
+    W --> E[Save evidence and plain-language reports]
+    E --> C
+    W --> B[Pause at resource or time limits]
+    B --> C
 ```
 
 ## What we want to build

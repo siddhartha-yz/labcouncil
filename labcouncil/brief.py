@@ -60,7 +60,7 @@ def normalize(value, idea, mode):
 
 def round_time(inputs, now):
     minutes = duration_minutes(inputs['body'])
-    started = inputs['created']
+    started = inputs.get('budget_started_at',inputs['created'])
     deadline = started + minutes*60
     return {'duration_minutes':minutes,'started_at':started,'deadline_at':deadline,
         'remaining_seconds':max(0,deadline-now),'expired':now>=deadline,
@@ -74,17 +74,17 @@ def start_blocker(brief, mode, now, started_at=None):
     if mode != 'simulation' and not brief['permissions']['model_calls']:
         return '未授权模型调用，等待组会调整'
     if started_at is not None and now>=started_at+duration_minutes(brief)*60:
-        return '本轮工作时长已到，等待组会；确认下一轮后重新计时'
+        return '投入时间已到；需要新预算时直接在群里说明'
     return None
 
 
 def make_plan(brief, mode, backend='deepseek'):
     executor = 'Codex CLI · gpt-6.1-sol · high' if backend == 'codex_cli' else '真实Flash'
     duration = duration_minutes(brief)
-    window = f'本轮最多{duration}分钟；从确认起计时，到时不再启动新步骤，已启动步骤可保存结果'
+    window = f'本轮最多{duration}分钟；截止以项目保存的投入窗口为准，到时不再启动新步骤，已启动步骤可保存结果'
     if mode == 'research':
         return {'source':'platform research boundaries; actual agent plan in each artifact','objective':brief['idea'],
-            'granularity':'每步选择一个可核验的查询或计算，依据剩余时间和资源安排；最多六步后等组会',
+            'granularity':'每步选择一个可核验的查询或计算，依据剩余时间和资源安排；最多六步后向你汇报',
             'work_window':window,'resources':brief['resources'],'requirements':brief['requirements'],
             'steps':['agent根据输入规划下一步','保存公开资料或受控计算证据','依据已有证据继续，达到时间或资源边界后等组会'],
             'unavailable':['任意仓库代码执行','完整论文全文阅读和论文实验复现','任意GPU训练'],

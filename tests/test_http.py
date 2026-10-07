@@ -108,6 +108,25 @@ class HTTPTests(unittest.TestCase):
         self.assertEqual(p['round_time']['deadline_at']-p['round_time']['started_at'],2700)
         self.assertIn('45分钟',p['current_inputs']['plan']['work_window'])
 
+    def test_group_chat_can_discuss_and_arrange_work_without_meeting_controls(self):
+        _,_,raw=self.request('POST','/api/projects',{'title':'持续群聊','idea':'原目标'})
+        pid=json.loads(raw)['id']
+        def say(message,mid):
+            status,_,raw=self.request('POST',f'/api/projects/{pid}/chat',{'message':message,'message_id':mid})
+            self.assertEqual(status,200)
+            return json.loads(raw)
+        say('现在进度怎么样？','http-chat-0001')
+        self.assertEqual(self.store.project(pid)['meetings'],[])
+        say('我在想接下来先核对原始数据','http-chat-0002')
+        self.assertEqual(self.store.project(pid)['version'],1)
+        first=say('按这个做','http-chat-0003')
+        self.assertEqual(first,say('按这个做','http-chat-0003'))
+        p=self.store.project(pid)
+        self.assertEqual(p['version'],2)
+        self.assertEqual(len(p['group_messages']),3)
+        self.assertEqual(p['input_history'][0]['body']['idea'],'原目标')
+        self.assertEqual(p['current_inputs']['body']['idea'],'我在想接下来先核对原始数据')
+
     def test_backend_selected_through_http_and_invalid_value_atomic(self):
         status,_,raw=self.request('POST','/api/projects',{'title':'CLI HTTP fixture','idea':'保留模型配置','mode':'research','backend':'codex_cli'})
         self.assertEqual(status,201)

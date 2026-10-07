@@ -79,6 +79,9 @@ def handler(store):
                     identifier = store.create_project(body.get("title"), body.get("idea"), body.get("scenario", "clean"), body.get("budget", 9), body.get("qa_budget", 6), body.get("meeting_at"),body.get("mode","simulation"),body.get("api_budget",18),body.get("qa_api_budget",3),body.get('brief'),source_budget=body.get('source_budget',24),backend=body.get('backend','deepseek'))
                     return self.send(201, {"id": identifier})
                 if len(path) == 4 and path[:2] == ["api", "projects"]:
+                    if path[3] == "chat":
+                        from .chat import send
+                        return self.send(200, send(store, path[2], body.get('message'), body.get('message_id')))
                     if path[3] == "meeting":
                         return self.send(200, {"id": store.open_meeting(path[2])})
                     if path[3] == "configure":

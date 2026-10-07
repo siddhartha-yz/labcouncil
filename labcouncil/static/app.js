@@ -1,11 +1,12 @@
 "use strict";
 const content = document.querySelector("#content"), message = document.querySelector("#message");
-let currentProject = null, currentMeeting = null, navigation = 0;
-let projectData = null, meetingData = [], editing = false, refreshing = false, busy = false;
-let transcriptSignature = "", setupDraft = null, setupSettings = {};
+let currentProject = null, navigation = 0;
+let projectData = null, meetingData = [], refreshing = false, busy = false;
+let transcriptSignature = "", setupSettings = {};
 const questionDrafts = new Map();
-let wizard = null, noticeTimer = null;
-const drafts = new Map();
+let noticeTimer = null;
+const pendingSends = new Map();
+
 const esc = x => String(x ?? "").replace(/[&<>"']/g, c => ({
   "&": "&amp;",
   "<": "&lt;",
@@ -13,7 +14,6 @@ const esc = x => String(x ?? "").replace(/[&<>"']/g, c => ({
   "\"": "&quot;",
   "'": "&#39;"
 }[c]));
-const roundDuration = b => b.work_time?.duration_minutes ?? 120;
 const when = t => new Date(t * 1000).toLocaleString("zh-CN");
 const states = {
   queued: "等待",
@@ -53,7 +53,7 @@ function backendSelect() {
 }
 function modeLabel(real, research = false, backend = "deepseek") {
   document.querySelector(".badge").textContent = research ? backendLabel(backend) + " · 研究群" : real ? backendLabel(backend) + " · 实验群" : "程序演示群 · 不调用模型";
-  document.querySelector("footer").textContent = "讨论不会改变执行计划，下一轮需明确确认。";
+  document.querySelector("footer").textContent = "";
 }
 async function api(path, body) {
   const response = await fetch(path, body === undefined ? { cache: "no-store" } : {
@@ -81,7 +81,7 @@ async function action(e, work) {
     announce(error.message, true);
   } finally {
     b.disabled = false;
-    if (b.isConnected && b.closest("#composer") && !editing) setComposer();
+    if (b.isConnected && b.closest("#composer")) setComposer();
   }
 }
 async function sidebar() {
@@ -94,25 +94,6 @@ async function sidebar() {
 function filterGroups() {
   const query = document.querySelector("#group-search").value.trim().toLowerCase();
   document.querySelectorAll(".project-link").forEach(b => { b.hidden = !b.textContent.toLowerCase().includes(query); });
-}
-function briefFields(b) {
-  const minutes = roundDuration(b);
-  return `<label>Idea：这一轮想解决什么？<textarea name="idea" maxlength="4000" required placeholder="写清楚你想知道什么、希望得到什么结果">${ esc(b.idea) }</textarea></label><label>可调用资源<textarea name="resources" maxlength="4000" placeholder="例如：可用模型和调用额度、本机算力、已有数据、论文或仓库地址。不要填写密钥。">${ esc(b.resources) }</textarea></label><fieldset><legend>权限：允许 agent 做什么？</legend><label class="check"><input type="checkbox" name="model_calls" ${ b.permissions.model_calls ? "checked" : "" }>调用已配置的模型（可能产生费用）</label><label class="check"><input type="checkbox" name="local_compute" ${ b.permissions.local_compute ? "checked" : "" }>运行已接入的本地计算工具</label><label class="check"><input type="checkbox" name="public_research" ${ b.permissions.public_research ? "checked" : "" }>查询公开论文与仓库</label><label class="check"><input type="checkbox" name="retry_public_reads" ${b.permissions.retry_public_reads ? "checked" : ""}>公开资料连接失败后，允许最多再试两次（每次留记录并计入额度）</label><p class="muted">这些勾选不授权任意 shell、安装依赖、公开发布或访问其他私人文件。</p></fieldset><fieldset><legend>本轮研究预算：最多工作多久？</legend><label>本轮工作时长（分钟）<input name="duration_minutes" type="number" min="1" max="10080" step="1" value="${esc(minutes)}" required></label><p class="muted">确认后开始计时，暂停和服务离线也计入。到时不启动新步骤，已启动的步骤可保存结果。任务完成或资源用完可以提前停止；时长不是完成量。</p></fieldset><label>额外要求<textarea name="requirements" maxlength="4000" placeholder="例如：先复现再采用；保留失败记录；报告用大白话；不要重复已有实验。">${ esc(b.requirements) }</textarea></label>`;
-}
-function readBrief(form) {
-  const f = new FormData(form);
-  return {
-    idea: f.get("idea"),
-    resources: f.get("resources"),
-    requirements: f.get("requirements"),
-    permissions: {
-      model_calls: f.has("model_calls"),
-      local_compute: f.has("local_compute"),
-      public_research: f.has("public_research"),
-      retry_public_reads: f.has("retry_public_reads")
-    },
-    work_time: { duration_minutes: Number(f.get("duration_minutes")) }
-  };
 }
 function scenarioOptions(s = "clean", real = false) {
   return `<option value="clean" ${ s === "clean" ? "selected" : "" }>${ real ? "干净测试数据，一次重复" : "平稳数据" }</option><option value="outlier" ${ s === "outlier" ? "selected" : "" }>${ real ? "测试标签约一成异常，三次重复" : "含异常点" }</option>`;
@@ -185,19 +166,12 @@ function attachment(kind, id, label) {
 function statusText(p) {
   const ts = p.tasks.filter(t => t.version === p.version);
   if (ts.some(t => t.status === "running")) return p.round_time?.expired ? "本轮时长已到，正在保存当前步骤的结果" : `后台正在工作 · 剩余约${Math.ceil((p.round_time?.remaining_seconds ?? 0)/60)}分钟`;
-  if (p.events.some(e => e.kind === "round_time_expired" && JSON.parse(e.body).version === p.version)) return "本轮工作时长已到，等待你开组会";
-  if (ts.some(t => t.status === "failed")) return "本轮有任务失败，可以开组会审查已保存结果";
+  if (p.events.some(e => e.kind === "round_time_expired" && JSON.parse(e.body).version === p.version)) return "投入时间已到，可以讨论接下来怎么做";
+  if (ts.some(t => t.status === "failed")) return "有步骤未完成，记录已保存，可以继续讨论";
   if (p.paused) return "后台已暂停启动新任务";
-  if (ts.length && ts.every(t => t.status === "completed" || t.status === "cancelled")) return "本轮工作已结束，可以开组会";
+  if (ts.length && ts.every(t => t.status === "completed" || t.status === "cancelled")) return "当前工作已结束，随时聊进展或安排后续";
   if (p.used >= p.budget) return "任务额度已用完，可以审查已有结果";
-  return p.work_blocker || "后台按本轮时间预算和当前权限安排工作";
-}
-function qaBlocker(p, m) {
-  if (m?.status === "closed") return "这场组会已结束。点“开组会”回到当前轮次。";
-  const real = p.execution.mode !== "simulation", s = m?.snapshot;
-  if (!(s ? s.artifacts.length || (s.tool_operations || []).length : p.artifacts.some(a => a.version === p.version) || p.tool_operations.some(o => p.tasks.some(t => t.id === o.task_id && t.version === p.version)))) return s ? "本场固定材料还没有证据，可查看后续报告或调整下一轮。" : "还没有可讨论的证据，先等研究员保存结果。";
-  if (real && !p.current_inputs.body.permissions.model_calls) return "未授权模型调用，可先查看报告或调整下一轮。";
-  return null;
+  return p.work_blocker?.replaceAll("等待组会调整", "可以在群里补充安排").replaceAll("等待组会", "可以继续在群里讨论") || "后台按投入预算和当前权限安排工作";
 }
 function artifactMessage(a, p) {
   const b = a.body;
@@ -210,9 +184,11 @@ function artifactMessage(a, p) {
 function transcript(p, meetings) {
   const entries = [];
   const add = (time, rank, html) => entries.push({time: time || p.created, rank, html});
+  const chatVersions = new Set((p.events || []).filter(e => e.kind === "group_plan_applied").map(e => JSON.parse(e.body).version));
   for (const input of p.input_history.length ? p.input_history : [p.current_inputs]) {
+    if (chatVersions.has(input.version)) continue;
     add(input.created, 0, `<div class="round-marker" data-key="round-${input.version}">第 ${input.version} 轮</div>`);
-    add(input.created, 1, bubble(`input-${input.version}`, "你 · 已确认的本轮输入", `<p class="prose">${esc(input.body.idea)}</p>${attachment("inputs", input.version, "本轮工作条件")}`, true, input.created));
+    add(input.created, 1, bubble(`input-${input.version}`, "你 · 已确认的本轮输入", `<p class="prose">${esc(input.body.idea)}</p>${attachment("inputs", input.version, "已记录的资源与权限")}`, true, input.created));
     add(input.created, 2, bubble(`plan-${input.version}`, "LabCouncil · 工作安排", `<p>${esc(input.plan.granularity)}</p>${attachment("plan", input.version, "工作安排")}`));
   }
   for (const a of p.artifacts) add(a.created, 3, artifactMessage(a, p));
@@ -224,18 +200,23 @@ function transcript(p, meetings) {
     add(task.finished || task.created, 4, bubble(`failure-${task.id}`, "LabCouncil · 任务失败", `<p>第 ${task.version} 轮的${esc(roles[task.role] || task.role.replace("research_step_", "研究步骤 "))}没有完成。已保存的其他证据仍可审查。</p>${attachment("failure", task.id, "失败记录")}`));
   }
   for (const event of p.events || []) {
-    if (!["research_stopped", "round_time_expired"].includes(event.kind)) continue;
+    if (!["research_stopped", "round_time_expired", "group_plan_applied", "group_plan_stale"].includes(event.kind)) continue;
     const data = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
-    add(event.created, 4, bubble(`stopped-${event.id || event.created}`, "LabCouncil · 本轮停止原因", `<p>第 ${data.version} 轮：${esc(data.reason)}</p>`));
+    add(event.created, 4, bubble(`stopped-${event.id || event.created}`, "LabCouncil · 本轮停止原因", `<p>${esc(data.reason)}</p>${event.kind === "group_plan_applied" ? attachment("inputs", data.version, "已记下的工作安排") : ""}`));
   }
   for (const m of meetings) {
     const s = m.snapshot, real = !s.simulation;
-    add(m.created, 5, bubble(`meeting-${m.id}`, `LabCouncil · 第 ${m.version} 轮组会`, `<p>本场材料截止 ${esc(when(s.cutoff))}。${s.tasks.some(t => t.status !== "completed") ? "当时有任务尚未完成，材料不完整。" : "已保存当时的报告。"} 后续结果不会自动加入本场。</p>${attachment("meeting", m.id, `第 ${m.version} 轮组会材料`)}<button class="small" data-meeting="${esc(m.id)}">${m.status === "closed" ? "回看这场组会" : "进入这场组会"}</button>${m.status !== "closed" ? '<p class="muted">开组会不会自动暂停后台；需要暂停时可在工作设置中调整。</p>' : ""}`));
+    if (!p.events.some(e => e.kind === "group_plan_applied" && JSON.parse(e.body).version === m.version + 1)) add(m.created, 5, bubble(`meeting-${m.id}`, "LabCouncil · 保存的讨论材料", `${attachment("meeting", m.id, `历史材料 · ${when(s.cutoff)}`)}`));
     (m.discussion || []).forEach((d, i) => {
       add(d.created, 6, bubble(`question-${m.id}-${i}`, `你 · 第 ${m.version} 轮组会`, `<p class="prose">${esc(d.question)}</p>`, true, d.created));
       add(d.created, 7, bubble(`answer-${m.id}-${i}`, real ? "研究员 · " + backendLabel(p.execution.backend) + " 依据本场快照答复" : "研究员 · 模板答复，程序演示", `<p class="prose">${esc(d.answer)}</p>`));
     });
-    if (m.decision) add(m.decision.created || m.created, 8, bubble(`decision-${m.id}`, "LabCouncil · 组会决定已保存", `<p>已确认第 ${m.decision.to_version} 轮方向：${esc(m.decision.instruction)}</p><p class="muted">此前输入、规划、报告与讨论继续保留。</p>`));
+    if (m.decision && !chatVersions.has(m.decision.to_version)) add(m.decision.created || m.created, 8, bubble(`decision-${m.id}`, "LabCouncil · 组会决定已保存", `<p>已确认第 ${m.decision.to_version} 轮方向：${esc(m.decision.instruction)}</p><p class="muted">此前输入、规划、报告与讨论继续保留。</p>`));
+  }
+  for (const m of p.group_messages || []) {
+    add(m.created, 6, bubble(`group-user-${m.id}`, "你", `<p class="prose">${esc(m.user_text)}</p>`, true, m.created));
+    add(m.finished || m.created, 7, bubble(`group-answer-${m.id}`, m.speaker,
+      `<p class="prose">${esc(m.answer || "正在看你的消息…")}</p>${m.request_id ? attachment("chat-context", m.id, "这条答复的依据") : ""}`, false, m.finished));
   }
   return entries.sort((a, b) => a.time - b.time || a.rank - b.rank).map(e => e.html).join("");
 }
@@ -251,206 +232,48 @@ function updateTranscript(p, meetings, forceBottom = false) {
     if (article?.querySelectorAll("details")[index]) article.querySelectorAll("details")[index].open = true;
   }
   transcriptSignature = html;
-  content.scrollTop = forceBottom || (nearBottom && !editing) ? content.scrollHeight : top;
+  content.scrollTop = forceBottom || (nearBottom) ? content.scrollHeight : top;
 }
-function selectedMeeting() { return meetingData.find(m => m.id === currentMeeting); }
 function setComposer(force = false) {
-  if (editing) { wizardComposer(); return; }
-  const area = document.querySelector("#compose-area"), p = projectData, m = selectedMeeting();
-  const blocker = p ? qaBlocker(p, m) : null;
-  if (!force && area.dataset.context === `${currentProject}:${currentMeeting}`) {
-    area.querySelector("#composer-help").textContent = busy ? "正在等待答复…" : blocker || "Enter 发送，Shift+Enter 换行";
-    area.querySelector("textarea").disabled = Boolean(blocker) || busy;
-    area.querySelector("button[type=submit]").disabled = Boolean(blocker) || busy;
+  const area = document.querySelector("#compose-area"), p = projectData;
+  const key = currentProject || "new";
+  if (!force && area.dataset.context === key && area.querySelector("textarea")) {
+    area.querySelector("#composer-help").textContent = busy ? "正在等待答复…" : "Enter 发送，Shift+Enter 换行";
+    area.querySelector("textarea").disabled = busy;
+    area.querySelector("button[type=submit]").disabled = busy;
     return;
   }
-  const wasTyping = area.contains(document.activeElement) && document.activeElement.id === "chat-text";
-  const selection = wasTyping ? [document.activeElement.selectionStart, document.activeElement.selectionEnd] : null;
-  area.dataset.context = `${currentProject}:${currentMeeting}`;
-  const draftKey = currentProject || "new";
-  area.innerHTML = `<div class="chat-tools">${p ? '<button id="composer-meeting">开组会</button><button id="next-inputs">下一轮方向</button><button id="conditions">工作条件</button>' : '<span>研究员、实验员、复核员和你一起工作</span>'}<span class="chat-context">${m?.status === "in_review" ? `第 ${m.version} 轮组会` : ""}</span></div><form id="composer"><label class="sr-only" for="chat-text">群聊消息</label><textarea id="chat-text" name="question" rows="2" maxlength="${p ? 1000 : 4000}" placeholder="${p ? "发消息，和大家讨论…" : "先告诉大家，你想研究什么…"}" required ${blocker || busy ? "disabled" : ""}>${esc(questionDrafts.get(draftKey) || "")}</textarea><div class="send-row"><span id="composer-help">${esc(blocker || "Enter 发送，Shift+Enter 换行")}</span><button type="submit" ${blocker || busy ? "disabled" : ""}>发送</button></div></form>`;
+  area.dataset.context = key;
+  area.innerHTML = `<form id="composer"><label class="sr-only" for="chat-text">群聊消息</label><textarea id="chat-text" rows="2" maxlength="4000" placeholder="${p ? "发消息，和大家讨论或安排工作…" : "先告诉大家，你想研究什么…"}" required ${busy ? "disabled" : ""}>${esc(questionDrafts.get(key) || "")}</textarea><div class="send-row"><span id="composer-help">Enter 发送，Shift+Enter 换行</span><button type="submit" ${busy ? "disabled" : ""}>发送</button></div></form>`;
   const form = area.querySelector("form"), text = form.querySelector("textarea");
   bindEnter(form, text);
-  if (wasTyping && !text.disabled) { text.focus(); text.setSelectionRange(...selection); }
-  text.addEventListener("input", () => questionDrafts.set(draftKey, text.value));
+  text.addEventListener("input", () => questionDrafts.set(key, text.value));
   form.onsubmit = e => action(e, async () => {
     const value = text.value.trim();
     if (!value || busy) return;
-    if (!p) {
-      setupDraft = {...(setupDraft || defaultBrief()), idea: value};
-      startWizard("resources");
-      return;
-    }
-    if (qaBlocker(projectData, selectedMeeting())) return;
     busy = true; setComposer();
     try {
-      let meeting = selectedMeeting();
-      if (!meeting || meeting.status === "closed") {
-        const result = await api(`/api/projects/${p.id}/meeting`, {});
-        currentMeeting = result.id;
-        meeting = await api(`/api/meetings/${result.id}`);
+      if (!p) {
+        const brief = {...defaultBrief(), idea:value, permissions:{model_calls:false,local_compute:false,public_research:false,retry_public_reads:false}};
+        const result = await api("/api/projects", {title:setupSettings.title || value.slice(0,60), idea:value, brief,
+          mode:setupSettings.mode || "research", backend:setupSettings.backend || "codex_cli",
+          scenario:setupSettings.scenario || "clean", api_budget:Number(setupSettings.api_budget ?? 12), source_budget:Number(setupSettings.source_budget ?? 24)});
+        questionDrafts.delete(key); await showProject(result.id);
+        announce("群已建立。资源、权限和投入预算可以直接在聊天里补充。");
+        return;
       }
-      const blocked = qaBlocker(projectData, meeting);
-      if (blocked) throw new Error(blocked);
-      await api(`/api/meetings/${meeting.id}/ask`, {question: value});
-      questionDrafts.delete(draftKey); text.value = "";
+      const saved = pendingSends.get(p.id);
+      const send = saved?.message === value ? saved : {message:value,message_id:crypto.randomUUID()};
+      pendingSends.set(p.id,send);
+      await api(`/api/projects/${p.id}/chat`,send);
+      pendingSends.delete(p.id); questionDrafts.delete(key); text.value="";
       if (currentProject === p.id) await refreshProject(true);
-    } finally { busy = false; setComposer(); }
+    } finally { busy=false; setComposer(); }
   });
-  area.querySelector("#composer-meeting")?.addEventListener("click", e => action(e, () => openMeeting()));
-  area.querySelector("#next-inputs")?.addEventListener("click", e => action(e, async () => { await ensureCurrentMeeting(); startWizard("idea"); }));
-  area.querySelector("#conditions")?.addEventListener("click", () => showAttachment("inputs", p.version));
 }
 function bindEnter(form, text) {
   text.addEventListener("keydown", e => {
     if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); form.requestSubmit(); }
-  });
-}
-async function ensureCurrentMeeting() {
-  if (busy) throw new Error("请等当前答复完成。");
-  const m = selectedMeeting();
-  if (m && m.status !== "closed" && m.version === projectData.version) return m;
-  const result = await api(`/api/projects/${currentProject}/meeting`, {});
-  currentMeeting = result.id;
-  await refreshProject(true);
-  return selectedMeeting();
-}
-async function openMeeting() {
-  if (editing || busy) throw new Error("请先完成当前输入或等待答复。");
-  await ensureCurrentMeeting();
-  setComposer(true);
-}
-function startWizard(step) {
-  const p = projectData, m = selectedMeeting();
-  if (p && (!m || m.status === "closed" || m.version !== p.version)) return;
-  const saved = m ? drafts.get(m.id) || m.draft : null;
-  const brief = JSON.parse(JSON.stringify(saved?.brief || p?.current_inputs.body || setupDraft || defaultBrief()));
-  brief.work_time = {duration_minutes: roundDuration(brief)};
-  wizard = {p, m, brief, settings: {...setupSettings}, scenario: saved?.scenario || p?.scenario || "clean", revision: saved?.revision || 0, step: saved ? "review" : step, messages: []};
-  editing = true;
-  if (!p) content.querySelector("#transcript").innerHTML = bubble("initial-idea", "你", `<p class="prose">${esc(brief.idea)}</p>`, true);
-  renderWizard();
-}
-const wizardPrompts = {
-  idea: "下一轮想让大家解决什么？原有资料和讨论都会接着用。",
-  resources: "你手头有哪些资源？例如本机算力、已有数据、可用模型，或者想研究的论文和仓库。不要发密钥。",
-  permissions: "开始前，明确一下我们能做哪些事。权限和执行方式由你选择。",
-  hours: "这一轮最多让大家工作多久？这是投入上限，完成任务或资源用完可提前停；到时等你开组会。",
-  requirements: "还有其他要求吗？例如先复现再采用、保留失败记录，或者报告尽量简短。",
-  review: "条件整理好了。你确认后，我们就按这些条件开始这一轮。"
-};
-function renderWizard() {
-  if (!wizard) return;
-  const w = wizard, b = w.brief;
-  let controls = "";
-  if (w.step === "permissions") controls = `<form id="permission-step"><label class="check"><input type="checkbox" name="model_calls" ${b.permissions.model_calls ? "checked" : ""}>调用已配置的模型</label><label class="check"><input type="checkbox" name="local_compute" ${b.permissions.local_compute ? "checked" : ""}>运行已接入的本地计算</label><label class="check"><input type="checkbox" name="public_research" ${b.permissions.public_research ? "checked" : ""}>查公开论文与仓库</label><label class="check"><input type="checkbox" name="retry_public_reads" ${b.permissions.retry_public_reads ? "checked" : ""}>公开连接失败后最多再试两次</label>${!w.p ? `<label>执行方式<select name="mode"><option value="simulation">程序演示 · 不调用模型</option><option value="research">逐步研究</option><option value="real_case">固定计算</option></select></label>${backendSelect()}` : ""}<button class="small" type="submit">按这些权限继续</button><button class="small" type="button" id="executor-options">执行设置</button></form>`;
-  if (w.step === "hours") controls = `<form id="hours-step"><label>本轮工作时长（分钟）<input type="number" name="duration_minutes" min="1" max="10080" step="1" value="${esc(roundDuration(b))}" required></label><p class="muted">确认后计时；暂停和服务离线也计入。已启动步骤可收尾保存，不保证凑满时长。</p><button class="small" type="submit">按这个预算继续</button></form>`;
-  if (w.step === "review") controls = `${inputsSummary(b)}<div class="actions"><button id="confirm-round" class="primary">${w.p ? "确认下一轮" : "开始工作"}</button>${w.p ? '<button id="save-wizard">保存草稿</button>' : ""}<button id="edit-conditions">调整条件</button></div><p class="muted">${w.p ? "草稿不会启动任务，确认后才进入下一轮。" : "当前执行：" + ((w.settings.mode || "simulation") === "simulation" ? "程序演示，不调用模型。" : backendLabel(w.settings.backend || "codex_cli") + "，使用本机登录的额度或对应 key。")}</p>`;
-  const intro = w.messages.length ? w.messages.join("") : "";
-  document.querySelector("#setup-slot").innerHTML = intro + bubble("wizard-prompt", "协调助手", `<p>${esc(wizardPrompts[w.step])}</p>${controls}`);
-  const permissions = document.querySelector("#permission-step");
-  if (permissions) {
-    if (permissions.elements.namedItem("mode")) permissions.elements.namedItem("mode").value = w.settings.mode || "simulation";
-    if (permissions.elements.namedItem("backend")) permissions.elements.namedItem("backend").value = w.settings.backend || "codex_cli";
-    permissions.onsubmit = e => action(e, async () => {
-      const f = new FormData(permissions);
-      b.permissions = Object.fromEntries(["model_calls", "local_compute", "public_research", "retry_public_reads"].map(key => [key, f.has(key)]));
-      if (f.has("mode")) w.settings.mode = f.get("mode");
-      if (f.has("backend")) w.settings.backend = f.get("backend");
-      advanceWizard(b.permissions.model_calls ? "已选择权限，允许模型调用。" : "已选择权限，不调用模型。", "hours");
-    });
-    document.querySelector("#executor-options").onclick = () => {
-      const f = new FormData(permissions);
-      b.permissions = Object.fromEntries(["model_calls", "local_compute", "public_research", "retry_public_reads"].map(key => [key, f.has(key)]));
-      if (f.has("mode")) w.settings.mode = f.get("mode");
-      if (f.has("backend")) w.settings.backend = f.get("backend");
-      rememberWizard(); editExecutor();
-    };
-  }
-  document.querySelector("#hours-step")?.addEventListener("submit", e => action(e, async () => {
-    const f = new FormData(e.currentTarget);
-    const minutes = Number(f.get("duration_minutes"));
-    if (!Number.isInteger(minutes) || minutes < 1 || minutes > 10080) throw new Error("请输入1–10080分钟的整数。");
-    b.work_time = {duration_minutes: minutes};
-    advanceWizard(`本轮最多工作${minutes}分钟，之后等组会。`, "requirements");
-  }));
-  document.querySelector("#confirm-round")?.addEventListener("click", e => action(e, () => confirmWizard()));
-  document.querySelector("#save-wizard")?.addEventListener("click", e => action(e, async () => {
-    const result = await api(`/api/meetings/${w.m.id}/draft`, {expected_revision: w.revision, instruction: b.idea, scenario: w.scenario, brief: b});
-    w.revision = result.revision; drafts.set(w.m.id, result);
-    announce("草稿已保存，尚未启动下一轮。");
-  }));
-  document.querySelector("#edit-conditions")?.addEventListener("click", () => editConditions());
-  wizardComposer();
-  content.scrollTop = content.scrollHeight;
-}
-function advanceWizard(answer, next) {
-  const w = wizard;
-  w.messages.push(bubble(`guide-${w.messages.length}`, "协调助手", `<p>${esc(wizardPrompts[w.step])}</p>`));
-  w.messages.push(bubble(`guide-${w.messages.length}`, "你", `<p class="prose">${esc(answer)}</p>`, true));
-  w.step = next;
-  rememberWizard(); renderWizard();
-}
-function rememberWizard() {
-  const w = wizard;
-  if (w.p) drafts.set(w.m.id, {brief: w.brief, scenario: w.scenario, revision: w.revision});
-  else { setupDraft = w.brief; setupSettings = {...w.settings}; }
-}
-function wizardComposer() {
-  if (!wizard) return;
-  const area = document.querySelector("#compose-area"), w = wizard;
-  const textStep = ["idea", "resources", "requirements", "review"].includes(w.step);
-  const key = `wizard:${w.p?.id || "new"}:${w.step}`;
-  if (area.dataset.context === key) return;
-  area.dataset.context = key;
-  area.innerHTML = `<div class="chat-tools"><button id="leave-wizard">${w.p ? "返回群聊" : "收起草稿"}</button>${["idea", "resources", "requirements"].includes(w.step) ? `<button id="skip-step">${w.step === "idea" ? "沿用原目标" : "沿用已有条件 / 跳过"}</button>` : ""}</div><form id="composer"><label class="sr-only" for="chat-text">群聊消息</label><textarea id="chat-text" rows="2" maxlength="4000" placeholder="${textStep ? (w.step === "review" ? "还想补充什么要求…" : "回复协调助手…") : "先在上方选择条件…"}" ${textStep ? "required" : "disabled"}></textarea><div class="send-row"><span id="composer-help">${w.step === "review" ? "点击上方按钮，确认后才开始工作" : "Enter 发送，Shift+Enter 换行"}</span><button type="submit" ${textStep ? "" : "disabled"}>发送</button></div></form>`;
-  const form = area.querySelector("form"), text = form.querySelector("textarea"); bindEnter(form, text);
-  form.onsubmit = e => action(e, async () => {
-    const value = text.value.trim(); if (!value) return;
-    if (w.step === "idea") { w.brief.idea = value; advanceWizard(value, "resources"); }
-    else if (w.step === "resources") { w.brief.resources = value; advanceWizard(value, "permissions"); }
-    else if (w.step === "requirements") { w.brief.requirements = value; advanceWizard(value, "review"); }
-    else { w.brief.requirements = [w.brief.requirements, value].filter(Boolean).join("\n").slice(0,4000); text.value = ""; advanceWizard(value, "review"); }
-  });
-  area.querySelector("#skip-step")?.addEventListener("click", () => {
-    const field = w.step === "idea" ? "idea" : w.step === "resources" ? "resources" : "requirements";
-    advanceWizard(w.brief[field] || "暂不补充。", {idea: "resources", resources: "permissions", requirements: "review"}[w.step]);
-  });
-  area.querySelector("#leave-wizard").onclick = () => {
-    rememberWizard(); wizard = null; editing = false;
-    document.querySelector("#setup-slot").innerHTML = ""; setComposer(true);
-  };
-  if (textStep) text.focus();
-}
-async function confirmWizard() {
-  const w = wizard, b = w.brief;
-  let id = w.p?.id;
-  if (w.p) {
-    await api(`/api/meetings/${w.m.id}/confirm`, {expected_version: w.m.version, instruction: b.idea, scenario: w.scenario, brief: b});
-    drafts.delete(w.m.id);
-  } else {
-    const result = await api("/api/projects", {title: w.settings.title || b.idea.slice(0,40), idea: b.idea, brief: b, mode: w.settings.mode || "simulation", backend: w.settings.backend || "codex_cli", scenario: w.scenario, budget: 9, api_budget: Number(w.settings.api_budget ?? 12), source_budget: Number(w.settings.source_budget ?? 24)});
-    id = result.id; setupDraft = null; setupSettings = {}; questionDrafts.delete("new");
-  }
-  wizard = null; editing = false; await showProject(id);
-}
-function editConditions() {
-  const w = wizard;
-  showSheet("本轮工作条件", `<form id="condition-edit">${briefFields(w.brief)}<button class="primary" type="submit">保存条件，返回群聊</button></form>`);
-  document.querySelector("#condition-edit").onsubmit = e => action(e, async () => {
-    w.brief = readBrief(e.currentTarget); rememberWizard(); document.querySelector("#settings").close(); renderWizard();
-  });
-}
-function editExecutor() {
-  const w = wizard;
-  showSheet("执行设置", `<form id="executor-edit">${executorSettings(w.p)}<button type="submit">保存设置</button></form>`);
-  const form = document.querySelector("#executor-edit"); form.querySelector("details").open = true;
-  for (const [key,value] of Object.entries(w.settings)) if (form.elements.namedItem(key)) form.elements.namedItem(key).value = value;
-  form.elements.namedItem("scenario").value = w.scenario;
-  form.onsubmit = e => action(e, async () => {
-    const f = new FormData(form); w.scenario = f.get("scenario");
-    for (const key of ["mode", "backend", "title", "api_budget", "source_budget"]) if (f.has(key)) w.settings[key] = f.get(key);
-    rememberWizard(); document.querySelector("#settings").close(); renderWizard();
   });
 }
 function showSheet(title, body) {
@@ -467,6 +290,9 @@ function showAttachment(kind, id) {
     const a = p.artifacts.find(x => x.id === id); if (!a) return;
     const b = a.body;
     showSheet("报告与证据", b.kind === "research" ? `${researchReport([a], [])}<a href="/api/evidence/${esc(id)}" target="_blank" rel="noopener">原始证据 ↗</a>` : report(p.artifacts.filter(x => x.version === a.version), p.execution.mode === "simulation"));
+  } else if (kind === "chat-context") {
+    const m = p.group_messages.find(x => x.id === id); if (!m) return;
+    showSheet("这条答复的依据", `<p class="muted">消息到达时保存：${esc(when(m.context.cutoff))}。后续进展会在新的答复中使用；旧答复不改写。</p>${m.context.evidence.map(e => `<p>${esc(e.summary)}</p><a href="${e.id.startsWith("operation:") ? "/api/tool-operations/" + esc(e.id.slice(10)) : "/api/evidence/" + esc(e.id)}" target="_blank" rel="noopener">原始证据 ↗</a>`).join("") || "<p>当时还没有研究证据，答复只讨论状态或工作安排。</p>"}<p><a href="/api/model-requests/${esc(m.request_id)}" target="_blank" rel="noopener">模型调用记录 ↗</a></p>`);
   } else if (kind === "meeting") {
     const m = meetingData.find(x => x.id === id); if (!m) return;
     const s = m.snapshot;
@@ -483,18 +309,19 @@ async function refreshProject(forceBottom = false) {
     const p = await api(`/api/projects/${id}`);
     const meetings = await Promise.all(p.meetings.map(m => api(`/api/meetings/${m.id}`)));
     if (ticket !== navigation || id !== currentProject) return;
+    const oldVersion=projectData?.version;
     projectData = p; meetingData = meetings;
-    if (!currentMeeting) currentMeeting = meetings.filter(m => m.version === p.version && m.status !== "closed").at(-1)?.id || null;
     document.querySelector("#project-title").textContent = p.title;
-    document.querySelector("#work-status").textContent = `第 ${p.version} 轮 · ${statusText(p)}`;
+    document.querySelector("#work-status").textContent = statusText(p);
     modeLabel(p.execution.mode !== "simulation", p.execution.mode === "research", p.execution.backend);
     updateTranscript(p, meetings, forceBottom);
     setComposer();
+    if (oldVersion && oldVersion !== p.version) await sidebar();
   } finally { refreshing = false; }
 }
 async function showProject(id) {
   navigation++;
-  currentProject = id; currentMeeting = null; editing = false; wizard = null; transcriptSignature = "";
+  currentProject = id; transcriptSignature = "";
   projectData = null; meetingData = [];
   content.innerHTML = '<div id="transcript" class="transcript"></div><div id="setup-slot" class="transcript"></div>';
   document.querySelector("#compose-area").innerHTML = "";
@@ -505,13 +332,8 @@ async function showProject(id) {
   document.querySelector("#work-status").textContent = "正在读取保存的报告与讨论…";
   content.onclick = e => {
     const file = e.target.closest("[data-attachment]");
-    if (file) { showAttachment(file.dataset.attachment, file.dataset.id); return; }
-    const button = e.target.closest("[data-meeting]");
-    if (!button || editing || busy) return;
-    currentMeeting = button.dataset.meeting;
-    setComposer(true);
-    document.querySelector("#chat-text")?.focus();
-    announce(selectedMeeting()?.status === "closed" ? "这是已结束的组会。要继续项目，请开当前轮次的组会。" : "追问将依据这场组会的固定材料作答。");
+    if (file) showAttachment(file.dataset.attachment, file.dataset.id);
+
   };
   document.querySelector("#open-settings").onclick = () => openSettings();
   // A previous project's in-flight refresh must finish before this navigation loads.
@@ -529,7 +351,7 @@ function openSettings() {
   const at = p.meeting_at ? new Date(p.meeting_at * 1000) : null;
   const local = at ? new Date(at.getTime() - at.getTimezoneOffset() * 60000).toISOString().slice(0,16) : "";
   document.querySelector("#settings-title").textContent = "群聊设置";
-  document.querySelector("#settings-body").innerHTML = `<p class="muted">本轮工作时长、资源与权限在组会后调整下一轮时修改。后台任务额度是整个项目累计上限；组会问答不设次数上限。</p><form id="configure"><div class="form-grid"><label>项目任务总上限<input name="budget" type="number" min="0" max="100" value="${p.budget}" required></label></div><label>后台状态<select name="paused"><option value="false" ${!p.paused ? "selected" : ""}>继续</option><option value="true" ${p.paused ? "selected" : ""}>暂停启动新任务</option></select></label><label>下次准备组会材料时间（本机时区）<input name="meeting_at" type="datetime-local" value="${local}"><span class="muted">留空取消定时安排。</span></label><button class="primary" type="submit">保存设置</button></form>${requestDetails(p)}`;
+  document.querySelector("#settings-body").innerHTML = `<p class="muted">工作目标、资源和投入预算可以直接在群里商量。权限由你明确授权，工作安排经你同意后执行。这里保留后台消耗与暂停设置。</p><form id="configure"><div class="form-grid"><label>项目任务总上限<input name="budget" type="number" min="0" max="100" value="${p.budget}" required></label></div><label>后台状态<select name="paused"><option value="false" ${!p.paused ? "selected" : ""}>继续</option><option value="true" ${p.paused ? "selected" : ""}>暂停启动新任务</option></select></label><label>下次准备组会材料时间（本机时区）<input name="meeting_at" type="datetime-local" value="${local}"><span class="muted">留空取消定时安排。</span></label><button class="primary" type="submit">保存设置</button></form>${requestDetails(p)}`;
   document.querySelector("#configure").onsubmit = e => action(e, async () => {
     const f = new FormData(e.currentTarget);
     await api(`/api/projects/${p.id}/configure`, {paused: f.get("paused") === "true", budget: Number(f.get("budget")), meeting_at: f.get("meeting_at") ? new Date(f.get("meeting_at")).getTime()/1000 : null});
@@ -541,14 +363,21 @@ function openSettings() {
 }
 async function newConversation() {
   navigation++;
-  currentProject = null; currentMeeting = null; projectData = null; meetingData = []; editing = false; wizard = null;
+  currentProject = null; projectData = null; meetingData = [];
   content.onclick = null;
   document.querySelector("#project-title").textContent = "新的研究群";
   document.querySelector("#work-status").textContent = "";
-  document.querySelector("#project-actions").innerHTML = "";
-  modeLabel(false);
+  document.querySelector("#project-actions").innerHTML = '<button id="new-settings" aria-label="群聊设置">···</button>';
+  document.querySelector("#new-settings").onclick = () => {
+    showSheet("群聊设置", `<form id="new-executor">${executorSettings()}<button type="submit">保存</button></form>`);
+    const form=document.querySelector("#new-executor"); form.querySelector("details").open=true;
+    form.elements.namedItem("mode").value=setupSettings.mode || "research";
+    form.elements.namedItem("backend").value=setupSettings.backend || "codex_cli";
+    form.onsubmit=e=>action(e,async()=>{setupSettings=Object.fromEntries(new FormData(form));modeLabel(setupSettings.mode !== "simulation", setupSettings.mode === "research", setupSettings.backend);document.querySelector("#settings").close();});
+  };
+  modeLabel((setupSettings.mode || "research") !== "simulation", (setupSettings.mode || "research") === "research", setupSettings.backend || "codex_cli");
   announce("");
-  content.innerHTML = `<div id="transcript" class="transcript"><div class="round-marker">新的研究群</div>${bubble("welcome", "协调助手", '<p>我们在这里一起做研究。</p><p>先说说你的 idea。接着我会问资源、权限、本轮工作时长和额外要求，确认后大家开始工作。</p>')}</div><div id="setup-slot" class="transcript"></div>`;
+  content.innerHTML = `<div id="transcript" class="transcript"><div class="round-marker">新的研究群</div>${bubble("welcome", "协调助手", '<p>我们在这里一起做研究。</p><p>直接说你的 idea，或者交代想做的事情。资源、权限、投入上限和额外要求可以边聊边补充；有新的工作安排时，我会先复述，再按你的意见做。</p>')}</div><div id="setup-slot" class="transcript"></div>`;
   setComposer(true);
   await sidebar();
   document.querySelector("#sidebar").classList.remove("mobile-open");

@@ -121,6 +121,21 @@ CREATE TABLE IF NOT EXISTS round_inputs (
  body TEXT NOT NULL, plan TEXT NOT NULL, created REAL NOT NULL,
  PRIMARY KEY(project_id,version)
 );
+CREATE TABLE IF NOT EXISTS group_messages (
+ id TEXT PRIMARY KEY, project_id TEXT NOT NULL REFERENCES projects(id),
+ version INTEGER NOT NULL, user_text TEXT NOT NULL, answer TEXT,
+ speaker TEXT NOT NULL DEFAULT '协调助手', context TEXT NOT NULL,
+ status TEXT NOT NULL, request_id TEXT REFERENCES model_requests(id),
+ created REAL NOT NULL, finished REAL
+);
+CREATE TABLE IF NOT EXISTS group_proposals (
+ project_id TEXT PRIMARY KEY REFERENCES projects(id), version INTEGER NOT NULL,
+ brief TEXT NOT NULL, scenario TEXT NOT NULL, approved INTEGER NOT NULL DEFAULT 0,
+ message_id TEXT NOT NULL REFERENCES group_messages(id), created REAL NOT NULL,
+ reset_clock INTEGER NOT NULL DEFAULT 0
+);
+CREATE TRIGGER IF NOT EXISTS group_context_no_update BEFORE UPDATE OF context,user_text ON group_messages
+ BEGIN SELECT RAISE(ABORT,'Group message context is immutable'); END;
 CREATE TABLE IF NOT EXISTS meeting_input_drafts (
  meeting_id TEXT PRIMARY KEY REFERENCES meetings(id), body TEXT NOT NULL
 );
@@ -153,6 +168,8 @@ class Store:
                 con.execute('ALTER TABLE project_execution ADD COLUMN source_budget INTEGER NOT NULL DEFAULT 24')
             if 'backend' not in [row[1] for row in con.execute('PRAGMA table_info(project_execution)')]:
                 con.execute("ALTER TABLE project_execution ADD COLUMN backend TEXT NOT NULL DEFAULT 'deepseek'")
+            if 'reset_clock' not in [row[1] for row in con.execute('PRAGMA table_info(group_proposals)')]:
+                con.execute('ALTER TABLE group_proposals ADD COLUMN reset_clock INTEGER NOT NULL DEFAULT 0')
             con.commit()
 
     @contextmanager
@@ -226,7 +243,9 @@ class Store:
         version = project['version'] if version is None else version
         row = con.execute('SELECT * FROM round_inputs WHERE project_id=? AND version=?', (project['id'], version)).fetchone()
         if row:
-            return {**dict(row), 'body': json.loads(row['body']), 'plan': json.loads(row['plan']), 'legacy': False}
+            carried=con.execute("SELECT json_extract(body,'$.started_at') FROM events WHERE project_id=? AND kind='chat_budget_carried' AND json_extract(body,'$.version')=? ORDER BY created DESC LIMIT 1",(project['id'],version)).fetchone()
+            return {**dict(row), 'body': json.loads(row['body']), 'plan': json.loads(row['plan']), 'legacy': False,
+                    **({'budget_started_at':carried[0]} if carried else {})}
         execution = con.execute('SELECT mode FROM project_execution WHERE project_id=?', (project['id'],)).fetchone()
         mode = execution['mode'] if execution else 'simulation'
         decision = con.execute('SELECT instruction,created FROM decisions WHERE project_id=? AND to_version=?', (project['id'], version)).fetchone()
@@ -241,7 +260,7 @@ class Store:
     def project(self, identifier):
         with self.connection() as con:
             result = self.row(con, "projects", identifier)
-            for table in ("tasks", "artifacts", "meetings", "decisions", "events", "tool_operations"):
+            for table in ("tasks", "artifacts", "meetings", "decisions", "events", "tool_operations", "group_messages"):
                 result[table] = [dict(r) for r in con.execute(f"SELECT * FROM {table} WHERE project_id=? ORDER BY created", (identifier,))]
             for artifact in result["artifacts"]:
                 artifact["body"] = json.loads(artifact["body"])
@@ -249,6 +268,10 @@ class Store:
                 meeting["snapshot"] = json.loads(meeting["snapshot"])
             for operation in result["tool_operations"]:
                 operation["body"]=json.loads(operation["body"])
+            for msg in result['group_messages']:
+                msg['context'] = json.loads(msg['context'])
+            proposal = con.execute('SELECT * FROM group_proposals WHERE project_id=?',(identifier,)).fetchone()
+            result['group_proposal'] = {**dict(proposal),'brief':json.loads(proposal['brief'])} if proposal else None
             execution = con.execute("SELECT * FROM project_execution WHERE project_id=?",(identifier,)).fetchone()
             result["execution"] = dict(execution) if execution else {"mode":"simulation","api_budget":0,"qa_api_budget":0}
             # Legacy QA budget fields remain stored for compatibility, not enforcement.
@@ -259,7 +282,7 @@ class Store:
             result['input_history'] = [{**dict(r), 'body': json.loads(r['body']), 'plan': json.loads(r['plan'])}
                 for r in con.execute('SELECT * FROM round_inputs WHERE project_id=? ORDER BY version', (identifier,))]
             result['round_time'] = round_time(result['current_inputs'],time.time())
-            result['work_blocker'] = start_blocker(result['current_inputs']['body'], result['execution']['mode'], time.time(),result['current_inputs']['created'])
+            result['work_blocker'] = start_blocker(result['current_inputs']['body'], result['execution']['mode'], time.time(),result['round_time']['started_at'])
             result["model_requests"] = [dict(r) for r in con.execute("SELECT * FROM model_requests WHERE project_id=? ORDER BY created",(identifier,))]
             for request in result["model_requests"]:
                 for key in ("request","response","usage"):
@@ -306,10 +329,13 @@ class Store:
                     con.execute("UPDATE source_requests SET status='unknown' WHERE task_id=? AND status='started'", (old['id'],))
                     con.execute("UPDATE model_requests SET status='unknown',error='worker lease expired' WHERE task_id=? AND status='started'",(old["id"],))
                 self.event(con, p["id"], "lease_expired", {"task_id": old["id"], "status": new_status})
+            from .chat import activate_approved
+            activate_approved(self,con)
             self._expire_rounds(con,now)
             rows = con.execute("""SELECT t.* FROM tasks t JOIN projects p ON p.id=t.project_id
                 LEFT JOIN tasks d ON d.id=t.dependency
                 WHERE t.status='queued' AND p.paused=0 AND t.version=p.version
+                  AND NOT EXISTS (SELECT 1 FROM group_proposals g WHERE g.project_id=p.id AND g.approved=1)
                   AND (t.dependency IS NULL OR d.status='completed')
                   AND (t.charged=1 OR p.used<p.budget)
                 ORDER BY t.created""").fetchall()
@@ -323,7 +349,7 @@ class Store:
                     cap = con.execute('SELECT api_budget FROM project_execution WHERE project_id=?', (p['id'],)).fetchone()[0]
                     if cap - used < 2: continue
                 inputs = self.inputs(con,p)
-                if not start_blocker(inputs['body'], mode, now,inputs['created']):
+                if not start_blocker(inputs['body'], mode, now,inputs.get('budget_started_at',inputs['created'])):
                     eligible.append(row)
                     break
             rows = eligible
@@ -545,11 +571,23 @@ class Store:
                     raise Conflict("任务已不由当前 worker 持有")
                 if current["version"]!=p["version"]:raise Conflict("计划已更新，停止旧任务后续模型请求")
             if category=="qa":
-                m=self.row(con,"meetings",meeting_id)
-                if m["project_id"]!=project_id or m["status"]=="closed":raise Conflict("组会已经结束")
+                if meeting_id is not None:
+                    m=self.row(con,"meetings",meeting_id)
+                    if m["project_id"]!=project_id or m["status"]=="closed":raise Conflict("组会已经结束")
+                elif phase != 'group-chat':
+                    raise Conflict('组会请求需要材料快照')
                 con.execute("UPDATE projects SET qa_used=qa_used+1 WHERE id=?",(project_id,))
             con.execute("INSERT INTO model_requests(id,project_id,task_id,meeting_id,category,phase,status,request,created) VALUES(?,?,?,?,?,?,'started',?,?)",
                 (identifier,project_id,task["id"] if task else None,meeting_id,category,phase,encode(payload),time.time()))
+            if phase == 'group-chat':
+                try:
+                    chat_id=json.loads(payload['messages'][-1]['content'])['chat_message_id']
+                except (KeyError,TypeError,ValueError):
+                    raise ValueError('群聊请求缺少消息关联') from None
+                chat=self.row(con,'group_messages',chat_id)
+                if chat['project_id']!=project_id or chat['status']!='processing' or chat['request_id'] is not None:
+                    raise Conflict('群聊请求已经保存或失效')
+                con.execute('UPDATE group_messages SET request_id=? WHERE id=?',(identifier,chat_id))
             self.event(con,project_id,"model_request_reserved",{"request_id":identifier,"category":category})
         return identifier
 
@@ -595,32 +633,35 @@ class Store:
         if type(expected_version) is not int:
             raise ValueError("计划版本应为整数")
         with self.connection(write=True) as con:
-            m = self.row(con, "meetings", meeting_id)
-            p = self.row(con, "projects", m["project_id"])
-            execution = con.execute('SELECT mode FROM project_execution WHERE project_id=?', (p['id'],)).fetchone()
-            mode = execution['mode'] if execution else 'simulation'
-            normalized = normalize(brief if brief is not None else {**self.inputs(con,p,m['version'])['body'],'idea':instruction},instruction,mode)
-            if normalized['idea'] != instruction:
-                raise ValueError('下一轮idea和指令须一致')
-            existing = con.execute("SELECT * FROM decisions WHERE meeting_id=?", (meeting_id,)).fetchone()
-            if existing:
-                if existing["instruction"] != instruction or existing["scenario"] != selected or existing["from_version"] != expected_version:
-                    raise Conflict("这场组会已确认其他决定；重复确认只能重放原决定")
-                if brief is not None and self.inputs(con, p, existing['to_version'])['body'] != normalized:
-                    raise Conflict('这场组会已确认不同的资源、权限或时间')
-                return dict(existing)
-            if m["version"] != expected_version or p["version"] != expected_version:
-                raise Conflict("计划已更新，请刷新后重新评审")
-            new_version = expected_version+1
-            decision = dict(id=uuid.uuid4().hex, meeting_id=meeting_id, project_id=p["id"], from_version=expected_version, to_version=new_version, instruction=instruction, scenario=selected, created=time.time())
-            con.execute("INSERT INTO decisions VALUES(:id,:meeting_id,:project_id,:from_version,:to_version,:instruction,:scenario,:created)", decision)
-            con.execute("UPDATE projects SET version=?,scenario=? WHERE id=?", (new_version, selected, p["id"]))
-            con.execute("UPDATE tasks SET status='cancelled' WHERE project_id=? AND status='queued' AND version<?", (p["id"], new_version))
-            con.execute("UPDATE meetings SET status='closed' WHERE id=?", (meeting_id,))
-            self.save_inputs(con, p['id'], new_version, normalized, mode)
-            self.add_round(con, p["id"], new_version, instruction, selected, mode)
-            self.event(con, p["id"], "decision_confirmed", decision)
-            return decision
+            return self._confirm(con, meeting_id, expected_version, instruction, selected, brief)
+
+    def _confirm(self, con, meeting_id, expected_version, instruction, selected, brief=None):
+        m = self.row(con, "meetings", meeting_id)
+        p = self.row(con, "projects", m["project_id"])
+        execution = con.execute('SELECT mode FROM project_execution WHERE project_id=?', (p['id'],)).fetchone()
+        mode = execution['mode'] if execution else 'simulation'
+        normalized = normalize(brief if brief is not None else {**self.inputs(con,p,m['version'])['body'],'idea':instruction},instruction,mode)
+        if normalized['idea'] != instruction:
+            raise ValueError('下一轮idea和指令须一致')
+        existing = con.execute("SELECT * FROM decisions WHERE meeting_id=?", (meeting_id,)).fetchone()
+        if existing:
+            if existing["instruction"] != instruction or existing["scenario"] != selected or existing["from_version"] != expected_version:
+                raise Conflict("这场组会已确认其他决定；重复确认只能重放原决定")
+            if brief is not None and self.inputs(con, p, existing['to_version'])['body'] != normalized:
+                raise Conflict('这场组会已确认不同的资源、权限或时间')
+            return dict(existing)
+        if m["version"] != expected_version or p["version"] != expected_version:
+            raise Conflict("计划已更新，请刷新后重新评审")
+        new_version = expected_version+1
+        decision = dict(id=uuid.uuid4().hex, meeting_id=meeting_id, project_id=p["id"], from_version=expected_version, to_version=new_version, instruction=instruction, scenario=selected, created=time.time())
+        con.execute("INSERT INTO decisions VALUES(:id,:meeting_id,:project_id,:from_version,:to_version,:instruction,:scenario,:created)", decision)
+        con.execute("UPDATE projects SET version=?,scenario=? WHERE id=?", (new_version, selected, p["id"]))
+        con.execute("UPDATE tasks SET status='cancelled' WHERE project_id=? AND status='queued' AND version<?", (p["id"], new_version))
+        con.execute("UPDATE meetings SET status='closed' WHERE id=?", (meeting_id,))
+        self.save_inputs(con, p['id'], new_version, normalized, mode)
+        self.add_round(con, p["id"], new_version, instruction, selected, mode)
+        self.event(con, p["id"], "decision_confirmed", decision)
+        return decision
 
     def reserve_source(self, task, fingerprint, url, allow_new=True):
         """One durable attempt per exact source request, including failed/unknown reads."""
