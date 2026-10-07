@@ -172,7 +172,7 @@ class HTTPTests(unittest.TestCase):
     def test_static_ui_available_with_csp(self):
         status, headers, body = self.request("GET", "/")
         self.assertEqual(status, 200)
-        self.assertIn("本地模拟原型", body.decode())
+        self.assertIn("LabCouncil 资料与活动", body.decode())
         self.assertIn("frame-ancestors 'none'", headers["Content-Security-Policy"])
         self.assertEqual(self.request("GET", "/app.js")[0], 200)
         self.assertEqual(self.request("GET", "/style.css")[0], 200)

@@ -1,6 +1,6 @@
 # LabCouncil
 
-**Set the research inputs. Let agents work. Review and steer the next round.**
+**Share an idea. Let agents work. Keep the conversation going.**
 
 LabCouncil is an open-source prototype for a personal research group with AI agents and a human researcher. The main interface is a continuous group chat: share an idea, discuss progress, add resources or constraints, and agree on work in the conversation. Agents save reports, tool results and failed attempts. The project retains its inputs, plans, evidence and discussion as work changes.
 
@@ -14,7 +14,7 @@ From the repository root, with Python 3.11+ on Linux:
 python3 -m labcouncil start
 ```
 
-Open [http://127.0.0.1:8765](http://127.0.0.1:8765). Send an idea to create a group, then talk to it directly. Questions do not need a meeting mode. Clear work instructions proceed within existing permissions and budgets. Tentative ideas become a coordinator proposal; agree or revise it in conversation. Say “暂停一下” or “恢复工作” to control new task starts. Resources, time and requirements can be added in chat; explicit permission statements such as “允许模型调用” are repeated for agreement before execution. Reports and original evidence open from message attachments; the ellipsis menu retains executor settings and consumption records.
+Open [http://127.0.0.1:8765](http://127.0.0.1:8765). Send an idea to create a group, then talk to it directly. Questions do not need a meeting mode. Clear work instructions proceed within existing permissions and budgets. Tentative ideas become a coordinator proposal; agree or revise it in conversation. Say “暂停一下” or “恢复工作” to control new task starts. Resources, time and requirements can be added in chat; explicit permission statements such as “允许模型调用” are repeated for agreement before execution. Reports and original evidence open from message attachments. Click the LabCouncil character/name for activity, context and settings; the clock button opens activity. A new group's optional ellipsis menu selects the executor.
 
 [运行说明](docs/RUNNING.md) covers service lifecycle, conversation controls and limitations. [持续群聊的执行约定](docs/CONTINUOUS-CHAT.md) explains evidence freshness, agreement, mid-step handover and failure records. Choose simulation in a new group's optional settings to test without model calls. Codex CLI reuses local `codex login`; DeepSeek uses the ignored local `.env`. Model calls may consume paid or account usage. Background requests remain bounded and are not retried automatically; conversation requests have no cumulative cap. Hard token, monetary and GPU budgets are not implemented. Earlier dated acceptance records document the interface that existed at the time, including its former meeting buttons and guided setup.
 
@@ -43,6 +43,7 @@ The initial focus is computational research that can be checked through document
 
 ## Documents
 
+- [Dots 设计适配](docs/DOTS-DESIGN.md): official references, continuous chat, real activity records and current capability limits; [local UI acceptance](reproductions/2026-10-07-dots-ui/REPORT.md).
 - [Codex CLI 后台验收](reproductions/2026-10-07-codex-backend/REPORT.md): real two-round planning, saved experiment evidence and meeting Q&A with `gpt-6.1-sol / high`.
 - [测评分数卡](docs/SCORECARD.md): transparent 0–100 scores from saved runs, with separate unmeasured capabilities and public benchmark candidates.
 - [现有测评：题目、结果与缺口](docs/EVALUATION.md): inspect the two synthetic tasks, twelve runs, meeting cases and platform tests without confusing workflow checks with research quality.
@@ -60,7 +61,7 @@ The initial focus is computational research that can be checked through document
 
 ## 中文简介
 
-LabCouncil 已有本地组会平台，完成了真实 Flash 参与的两轮合成案例；默认模拟模式仍可无 key 使用。正在向个人虚拟研究组平台推进。目标流程是：你提供 idea、资源、权限、每日工作时段、额外要求；agent 据此规划、探索论文和仓库、复现、整理实验并在后台 loop；你选择开组会，阅读大白话报告、追问，再回到同一套输入修改下一轮。每轮保留上下文。当前执行器仍限固定计算，通用研究能力尚待接入。
+LabCouncil 已有本地持续研究群聊。直接发送 idea 建群，再在同一个对话中讨论、补充资源、明确授权、交代工作或反馈。界面参考 Dots：点名称或头像查看活动、上下文与设置，专业角色把进展和报告发回群里。网页新群默认 Codex CLI / gpt-6.1-sol / high，权限初始关闭；程序演示无需 key。既有输入、规划、证据、失败和讨论持续保留。当前研究工具能读公开摘要和固定提交 README、运行受控合成计算；任意仓库执行、完整论文实验复现和长周期自主研究尚未完成。
 
 核心目标是验证：**人工组会能否让 agent 的下一轮工作更符合研究意图，并持续产出可检查的新证据。**
 

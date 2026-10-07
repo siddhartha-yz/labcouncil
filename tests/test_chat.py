@@ -50,6 +50,25 @@ class GroupChatTests(unittest.TestCase):
         self.assertEqual(fixture.seen[-1]['history'][0]['user'],'能先聊一下方向吗？')
         self.assertEqual(fixture.seen[-1]['earlier_discussion'][0]['answer'],'老答复')
 
+    def test_explicit_resources_and_requirements_can_be_saved_without_model_permission(self):
+        pid=self.real(False);fixture=ProviderFixture()
+        original=self.store.project(pid)['current_inputs']['body']
+        self.say('资源：自有数据，不挂载机器','context-input-01',fixture,pid)
+        self.say('额外要求：先保留失败记录','context-input-02',fixture,pid)
+        p=self.store.project(pid)
+        self.assertEqual(p['version'],1)
+        self.assertEqual(p['group_proposal']['brief']['resources'],'自有数据，不挂载机器')
+        self.assertIn('先保留失败记录',p['group_proposal']['brief']['requirements'])
+        self.assertEqual(p['group_proposal']['brief']['idea'],original['idea'])
+        self.assertEqual(p['group_proposal']['brief']['permissions'],original['permissions'])
+        self.assertEqual(fixture.calls,0)
+        self.say('按这个做','context-input-03',fixture,pid)
+        p=self.store.project(pid)
+        self.assertEqual(p['current_inputs']['body']['resources'],'自有数据，不挂载机器')
+        self.assertFalse(p['current_inputs']['body']['permissions']['model_calls'])
+        self.assertEqual(p['used'],0)
+        self.assertEqual(p['model_requests'],[])
+
     def test_current_reply_uses_latest_evidence_without_rewriting_old_snapshot(self):
         fixture=ProviderFixture();pid=self.real()
         self.store.configure(self.pid,True,30)

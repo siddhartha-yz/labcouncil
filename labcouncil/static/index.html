@@ -9,15 +9,17 @@
 </head>
 <body>
   <div class="layout">
-    <aside id="sidebar"><div class="sidebar-header"><a href="/" class="brand">LabCouncil</a><button id="new-project" aria-label="新建研究群" title="新建研究群">＋</button></div><label class="sr-only" for="group-search">搜索研究群</label><input id="group-search" type="search" placeholder="搜索研究群"><nav id="projects" aria-label="研究群列表"></nav></aside>
+    <aside id="sidebar"><div class="sidebar-header"><a href="/" class="brand">LabCouncil</a><button id="close-projects" class="icon-button" aria-label="关闭研究群列表">×</button></div><button id="new-project" class="new-conversation">＋ 新建研究群</button><label class="sr-only" for="group-search">搜索研究群</label><input id="group-search" type="search" placeholder="搜索研究群"><nav id="projects" aria-label="研究群列表"></nav><div class="sidebar-footer">你的研究，持续在这里。</div></aside>
     <main>
-      <header class="topbar"><button id="toggle-projects" aria-controls="sidebar" aria-expanded="false">‹ 群聊</button><div class="heading"><h1 id="project-title">新的研究群</h1><div class="group-status"><span class="badge">本地模拟原型</span><span id="work-status"></span></div></div><div id="project-actions"></div></header>
+      <header class="topbar"><button id="toggle-projects" class="icon-button" aria-label="研究群列表" aria-controls="sidebar" aria-expanded="false"><span aria-hidden="true">☰</span></button><button id="open-profile" class="profile-trigger" aria-label="LabCouncil 资料与活动" aria-controls="agent-panel" aria-expanded="false"><span class="dot-character" aria-hidden="true"><i></i><i></i></span><span class="identity-pill">LabCouncil <span aria-hidden="true">⌄</span></span><span id="work-status">随时聊聊</span></button><div id="project-actions"></div><h1 id="project-title">新的研究群</h1></header>
       <div id="message" role="status" aria-live="polite"></div>
       <div id="content"><p>请通过本地服务打开研究群。</p></div>
       <div id="compose-area"></div>
       <footer></footer>
     </main>
+    <aside id="agent-panel" aria-label="LabCouncil 资料与活动" hidden><div class="profile-heading"><span class="dot-character small-character" aria-hidden="true"><i></i><i></i></span><div><strong>LabCouncil</strong><p>协调 · 研究 · 实验 · 复核</p></div><button id="close-profile" class="icon-button" aria-label="关闭资料与活动">×</button></div><div class="profile-tabs" role="tablist" aria-label="资料页"><button id="tab-activity" role="tab" aria-selected="true" aria-controls="profile-body" data-profile-tab="activity">活动</button><button id="tab-context" role="tab" aria-selected="false" aria-controls="profile-body" data-profile-tab="context" tabindex="-1">上下文</button><button id="tab-settings" role="tab" aria-selected="false" aria-controls="profile-body" data-profile-tab="settings" tabindex="-1">设置</button></div><div id="profile-body" role="tabpanel" aria-labelledby="tab-activity"></div></aside>
   </div>
+  <button id="drawer-backdrop" aria-label="关闭侧栏" hidden></button>
   <dialog id="settings" aria-labelledby="settings-title"><div class="dialog-heading"><h2 id="settings-title">群聊设置</h2><button id="close-settings" aria-label="关闭详情">关闭</button></div><div id="settings-body"></div></dialog>
 </body>
 </html>

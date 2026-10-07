@@ -225,7 +225,8 @@ def send(store,pid,message,identifier,provider=None):
         p=store.project(pid)
         answer=local_control(store,p,message)
         if answer:return finish(store,identifier,answer)
-        if (permission_patch(message) or minutes_patch(message) is not None) and (not direct_assignment(message) or not p['current_inputs']['body']['permissions']['model_calls'] or p['execution']['mode']=='simulation'):
+        explicit_context = bool(re.match(r'^(?:资源|可用资源|额外要求)\s*[：:]',message))
+        if (explicit_context or permission_patch(message) or minutes_patch(message) is not None) and (not direct_assignment(message) or not p['current_inputs']['body']['permissions']['model_calls'] or p['execution']['mode']=='simulation'):
             instruction=message if direct_assignment(message) else p['group_proposal']['brief']['idea'] if p['group_proposal'] else p['current_inputs']['body']['idea']
             b=proposal_brief(p,message,instruction)
             return finish(store,identifier,proposal_answer('收到，先把你补充的条件记到工作安排里。',b,direct_assignment(message)),brief=b,start_work=direct_assignment(message))

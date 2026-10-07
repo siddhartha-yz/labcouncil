@@ -2,7 +2,7 @@
 const content = document.querySelector("#content"), message = document.querySelector("#message");
 let currentProject = null, navigation = 0;
 let projectData = null, meetingData = [], refreshing = false, busy = false;
-let transcriptSignature = "", setupSettings = {};
+let transcriptSignature = "", setupSettings = {}, profileTab = "activity", profileSignature = "";
 const questionDrafts = new Map();
 let noticeTimer = null;
 const pendingSends = new Map();
@@ -52,8 +52,8 @@ function backendSelect() {
   return '<label>模型后台<select name="backend"><option value="codex_cli">Codex CLI · gpt-6.1-sol · high（本机登录）</option><option value="deepseek">DeepSeek Flash（本地 key）</option></select></label>';
 }
 function modeLabel(real, research = false, backend = "deepseek") {
-  document.querySelector(".badge").textContent = research ? backendLabel(backend) + " · 研究群" : real ? backendLabel(backend) + " · 实验群" : "程序演示群 · 不调用模型";
   document.querySelector("footer").textContent = "";
+  if (!projectData) document.querySelector("#work-status").textContent=(real ? "" : "程序演示 · ")+"随时聊聊";
 }
 async function api(path, body) {
   const response = await fetch(path, body === undefined ? { cache: "no-store" } : {
@@ -86,7 +86,7 @@ async function action(e, work) {
 }
 async function sidebar() {
   const r = await api("/api/projects");
-  document.querySelector("#projects").innerHTML = r.projects.map(p => `<button class="project-link ${p.id === currentProject ? "active" : ""}" data-project="${esc(p.id)}"><span class="group-icon" aria-hidden="true">研</span><span class="project-copy"><strong>${esc(p.title)}</strong><small>第 ${p.version} 轮 · ${p.mode === "simulation" ? "程序演示" : p.backend === "codex_cli" ? "Codex" : "Flash"}</small></span></button>`).join("") || '<p class="empty-list">还没有研究群</p>';
+  document.querySelector("#projects").innerHTML = r.projects.map(p => `<button class="project-link ${p.id === currentProject ? "active" : ""}" data-project="${esc(p.id)}"><span class="group-icon" aria-hidden="true"></span><span class="project-copy"><strong>${esc(p.title)}</strong><small>${p.mode === "simulation" ? "程序演示 · 不调用模型" : p.paused ? "已暂停" : "研究群"}</small></span></button>`).join("") || '<p class="empty-list">还没有研究群</p>';
   document.querySelectorAll("[data-project]").forEach(b => b.addEventListener("click", () => showProject(b.dataset.project).catch(e => announce(e.message, true))));
   filterGroups();
   return r.projects;
@@ -127,13 +127,13 @@ function report(artifacts, simulation, research = false, operations = []) {
     }
   }
   const numbers = computed && !simulation ? `<details><summary>查看具体数值（越小越接近测试标签）</summary><div class="table-scroll"><table><thead><tr><th>重复</th><th>直线平方误差</th><th>均值平方误差</th><th>直线绝对误差</th></tr></thead><tbody>${ computed.results.map(r => `<tr><td>${ r.seed }</td><td>${ r.metrics.linear.mse.toFixed(3) }</td><td>${ r.metrics.baseline.mse.toFixed(3) }</td><td>${ r.metrics.linear.mae.toFixed(3) }</td></tr>`).join("") }</tbody></table></div></details>` : computed ? `<details><summary>查看具体数值（演示数据）</summary><p>这五个点上的平均平方误差：拟合直线 ${ computed.metrics.mse.toFixed(3) }，只猜平均值 ${ computed.baseline.mse.toFixed(3) }。越小表示整体偏差越小；这不是新数据上的成绩。</p></details>` : "";
-  return `<section class="panel report"><h2>本轮报告</h2><p class="muted">摘要由程序依据已保存结果整理；角色原始报告与证据可在下方展开。</p><h3>做了什么</h3><p>${ by.researcher ? "准备输入" + (computed ? "、完成计算" : "") + (review ? "，并独立复算" : "") + "，过程和数据已保存。" : "尚未完成输入准备。" }${ simulation ? "当前使用固定程序演示。" : "角色使用已选模型后台，工具只处理合成计算。" }</p><h3>发现什么</h3><p>${ esc(result) }</p>${ numbers }<h3>还有什么没做</h3><p>${ review ? review.verified ? "数值已独立核对一致，但报告文字仍需审查。" : "数值核对存在不一致，需要检查原始证据。" : "独立核验尚未完成。" } 尚未探索论文或仓库，也没有根据这个 idea 自动编写新实验。</p><h3>组会需要决定什么</h3><p>是否认可这些有限结果？下一轮的目标、资源、权限、本轮工作时长或额外要求是否需要调整？</p><details><summary>审查角色原始报告与证据（${ artifacts.length } 份）</summary>${ artifacts.map(a => {
+  return `<section class="panel report"><h2>本轮报告</h2><p class="muted">摘要由程序依据已保存结果整理；角色原始报告与证据可在下方展开。</p><h3>做了什么</h3><p>${ by.researcher ? "准备输入" + (computed ? "、完成计算" : "") + (review ? "，并独立复算" : "") + "，过程和数据已保存。" : "尚未完成输入准备。" }${ simulation ? "当前使用固定程序演示。" : "角色使用已选模型后台，工具只处理合成计算。" }</p><h3>发现什么</h3><p>${ esc(result) }</p>${ numbers }<h3>还有什么没做</h3><p>${ review ? review.verified ? "数值已独立核对一致，但报告文字仍需审查。" : "数值核对存在不一致，需要检查原始证据。" : "独立核验尚未完成。" } 尚未探索论文或仓库，也没有根据这个 idea 自动编写新实验。</p><h3>接下来怎么做</h3><p>是否认可这些有限结果？下一轮的目标、资源、权限、本轮工作时长或额外要求是否需要调整？</p><details><summary>审查角色原始报告与证据（${ artifacts.length } 份）</summary>${ artifacts.map(a => {
     const b = a.body, spec = b.parameters;
     return `<article class="evidence"><h3>${ esc(roles[a.role]) }</h3>${ spec ? `<p class="muted">工具实际输入：${ spec.test_outlier_fraction === 0 ? "干净测试标签" : "测试标签约一成异常" }，${ spec.seeds.length } 次重复。</p>` : "" }<p>${ esc(b.summary) }</p>${ b.report?.limitations ? `<ul>${ b.report.limitations.map(x => `<li>${ esc(x) }</li>`).join("") }</ul>` : `<p class="muted">${ esc(b.limitation) }</p>` }<a href="/api/evidence/${ esc(a.id) }" target="_blank" rel="noopener">打开原始证据</a></article>`;
   }).join("") || "<p>尚无产物</p>" }</details></section>`;
 }
 
-const researchActions = {search_papers: "检索论文摘要", read_abstract: "读取论文摘要", search_repositories: "搜索公开仓库", inspect_repository: "检查仓库 README", synthetic_regression: "运行自有合成基准", prepare_meeting: "整理组会材料"};
+const researchActions = {search_papers: "检索论文摘要", read_abstract: "读取论文摘要", search_repositories: "搜索公开仓库", inspect_repository: "检查仓库 README", synthetic_regression: "运行自有合成基准", prepare_meeting: "整理研究进展"};
 function concreteFindings(report) {
   const findings = report?.findings || [];
   if (!findings.length) return "";
@@ -146,7 +146,7 @@ function researchReport(artifacts, operations) {
   const partial = orphaned.length ? `<p>另有 ${orphaned.length} 步已保存工具结果，但模型报告尚未完成或未通过检查。</p><ul>${orphaned.map(o => `<li>${esc(researchActions[o.body.action])} · ${esc(o.body.result.status)}：<a href="/api/tool-operations/${esc(o.id)}" target="_blank" rel="noopener">审查已保存工具证据</a></li>`).join("")}</ul>` : "";
   const sources = artifacts.flatMap(a => a.body.result?.sources || []);
   const reused = new Set((latest?.result?.meeting_evidence?.items || []).filter(item => item.version < artifacts.at(-1)?.version).flatMap(item => (item.result.sources || []).map(source => source.id))).size;
-  return `<section class="panel report"><h2>本轮报告</h2><p class="muted">以下是模型报告，来源和工具状态可以核对；报告文字仍需审查。</p><h3>做了什么</h3>${partial}<p>${ artifacts.length ? `已保存 ${artifacts.length} 个研究步骤，本轮读取 ${sources.length} 条资料记录。${reused ? `另复用前轮 ${reused} 条已保存资料。` : ""}` : "后台尚未保存研究步骤。" }</p><h3>发现什么</h3>${concreteFindings(latest?.report) || `<p>${esc(latest?.summary || "还没有可审查的结果。")}</p>`}<h3>还有什么没做</h3><ul>${ (latest?.report?.limitations || ["尚未执行上游仓库代码，也没有完成论文实验复现。"]).map(x => `<li>${esc(x)}</li>`).join("") }</ul><h3>组会需要决定什么</h3><p>${ esc(latest?.report?.next_step || "等待资料整理后，再确定下一轮目标与执行条件。") }</p><details><summary>逐步报告与原始证据（${artifacts.length} 份）</summary>${artifacts.map((a,i) => {const b=a.body;return `<article class="evidence"><h3>第 ${i+1} 步：${esc(researchActions[b.action] || b.action)}</h3><p>${esc(b.summary)}</p><p class="muted">实际工具状态：${esc(b.result?.status)}；参数：${esc(b.value || "无")}。</p><p>本步规划：${esc(b.plan)}</p><p>原因：${esc(b.reason)}</p><ul>${(b.result?.sources || []).map(x => `<li><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.title)}</a>：${esc(x.verification)}</li>`).join("")}</ul>${b.result?.error ? `<p>${esc(b.result.error)}</p>` : ""}<a href="/api/evidence/${esc(a.id)}" target="_blank" rel="noopener">打开原始证据</a></article>`;}).join("")}</details></section>`;
+  return `<section class="panel report"><h2>本轮报告</h2><p class="muted">以下是模型报告，来源和工具状态可以核对；报告文字仍需审查。</p><h3>做了什么</h3>${partial}<p>${ artifacts.length ? `已保存 ${artifacts.length} 个研究步骤，本轮读取 ${sources.length} 条资料记录。${reused ? `另复用前轮 ${reused} 条已保存资料。` : ""}` : "后台尚未保存研究步骤。" }</p><h3>发现什么</h3>${concreteFindings(latest?.report) || `<p>${esc(latest?.summary || "还没有可审查的结果。")}</p>`}<h3>还有什么没做</h3><ul>${ (latest?.report?.limitations || ["尚未执行上游仓库代码，也没有完成论文实验复现。"]).map(x => `<li>${esc(x)}</li>`).join("") }</ul><h3>接下来怎么做</h3><p>${ esc(latest?.report?.next_step || "等待资料整理后，再确定下一轮目标与执行条件。") }</p><details><summary>逐步报告与原始证据（${artifacts.length} 份）</summary>${artifacts.map((a,i) => {const b=a.body;return `<article class="evidence"><h3>第 ${i+1} 步：${esc(researchActions[b.action] || b.action)}</h3><p>${esc(b.summary)}</p><p class="muted">实际工具状态：${esc(b.result?.status)}；参数：${esc(b.value || "无")}。</p><p>本步规划：${esc(b.plan)}</p><p>原因：${esc(b.reason)}</p><ul>${(b.result?.sources || []).map(x => `<li><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.title)}</a>：${esc(x.verification)}</li>`).join("")}</ul>${b.result?.error ? `<p>${esc(b.result.error)}</p>` : ""}<a href="/api/evidence/${esc(a.id)}" target="_blank" rel="noopener">打开原始证据</a></article>`;}).join("")}</details></section>`;
 }
 
 function requestDetails(p) {
@@ -154,24 +154,36 @@ function requestDetails(p) {
   return `<details><summary>执行状态、额度与调用明细</summary>${p.execution.backend === "codex_cli" && real ? `<p>模型后台：${esc(backendLabel(p.execution.backend))}。以下请求次数按 CLI 启动计数，内部模型 turn 未设硬上限；token 为 CLI 返回的用量。平台工具受原权限限制。</p>` : ""}<p>本轮时间预算：最多${p.round_time.duration_minutes}分钟，截止${esc(when(p.round_time.deadline_at))}。这是投入上限，不是完成量。</p><p>本轮已保存 ${p.artifacts.filter(a => a.version === p.version).length} 份报告、${p.tool_operations.filter(o => p.tasks.some(t => t.id === o.task_id && t.version === p.version)).length} 份工具结果；失败 ${p.tasks.filter(t => t.version === p.version && t.status === "failed").length} 个步骤。</p><p>角色任务已用 ${ p.used }/${ p.budget }；问答已用 ${ p.qa_used } 次（不限次数）。${ real ? `后台真实请求 ${ rs.filter(r => r.category === "background").length }/${ p.execution.api_budget }；公开资料请求 ${(p.source_requests || []).length}/${p.execution.source_budget ?? 24}；组会真实请求 ${ rs.filter(r => r.category === "qa").length } 次（不限次数）。已知 ${ known.reduce((n, r) => n + r.usage.total_tokens, 0) } tokens；${ rs.length - known.length } 次用量未知。人民币费用未知，没有 token 硬上限。` : "角色与问答为固定程序，不调用模型。" }</p><ul>${ p.tasks.map(t => `<li>第 ${ t.version } 轮 · ${ esc(roles[t.role] || t.role.replace("research_step_", "研究步骤 ")) } · ${ esc(states[t.status]) }${ t.error ? `：${ esc(t.error) }` : "" }</li>`).join("") }</ul>${ real ? `<h3>实际模型请求</h3><ul>${ rs.map(r => `<li><a href="/api/model-requests/${ esc(r.id) }" target="_blank" rel="noopener">${ esc(r.phase) } · ${ esc(r.status) }</a></li>`).join("") }</ul><h3>公开来源请求</h3><ul>${(p.source_requests || []).map(r => `<li><a href="/api/source-requests/${esc(r.id)}" target="_blank" rel="noopener">${esc(r.url)} · ${esc(r.status)} · HTTP ${r.http_status ?? "未知"} · ${esc(r.transport || "原记录")} · 第 ${r.attempt_number ?? 1} 次尝试</a></li>`).join("") || "<li>无公开来源请求</li>"}</ul><h3>独立保存的工具结果</h3><ul>${ p.tool_operations.map(o => `<li><a href="/api/tool-operations/${ esc(o.id) }" target="_blank" rel="noopener">${ esc(o.body.tool || researchActions[o.body.action] || o.body.action) }</a></li>`).join("") || "<li>早期工具结果保存在角色证据内。</li>" }</ul>` : "" }</details>`;
 }
 
-function bubble(key, speaker, body, user = false, time = null) {
+function bubble(key, speaker, body, user = false, time = null, foot = "", pending = false) {
   const role = user ? "me" : speaker.includes("计算") || speaker.includes("实验") ? "compute" : speaker.includes("复算") || speaker.includes("复核") ? "review" : speaker.includes("研究") || speaker.includes("准备输入") ? "research" : "host";
   const names = {me: "你", compute: "实验员", review: "复核员", research: "研究员", host: "协调助手"};
-  const initials = {me: "我", compute: "算", review: "核", research: "研", host: "助"};
-  return `<article class="chat-message ${user ? "user-message" : "lab-message"} role-${role}" data-key="${esc(key)}"><span class="avatar" aria-hidden="true">${initials[role]}</span><div class="message-column"><div class="message-meta" title="${esc(speaker)}${time ? ` · ${esc(when(time))}` : ""}">${names[role]}</div><div class="message-body">${body}</div></div></article>`;
+  return `<article class="chat-message ${user ? "user-message" : "lab-message"} role-${role} ${pending ? "pending-reply" : ""}" data-key="${esc(key)}"><div class="message-column"><div class="message-meta" title="${esc(speaker)}${time ? ` · ${esc(when(time))}` : ""}"><span class="role-dot" aria-hidden="true"></span>${names[role]}</div><div class="message-body">${body}</div>${foot ? `<div class="message-foot">${foot}</div>` : ""}</div></article>`;
 }
 function attachment(kind, id, label) {
-  return `<button class="attachment" data-attachment="${kind}" data-id="${esc(id)}"><span class="attachment-icon" aria-hidden="true">▤</span><span>${esc(label)}<small>点击查看</small></span><span aria-hidden="true">›</span></button>`;
+  return `<button class="attachment" data-attachment="${kind}" data-id="${esc(id)}"><span class="attachment-icon" aria-hidden="true">▤</span><span>${esc(label)}<small>报告与记录</small></span><span aria-hidden="true">›</span></button>`;
 }
 function statusText(p) {
   const ts = p.tasks.filter(t => t.version === p.version);
-  if (ts.some(t => t.status === "running")) return p.round_time?.expired ? "本轮时长已到，正在保存当前步骤的结果" : `后台正在工作 · 剩余约${Math.ceil((p.round_time?.remaining_seconds ?? 0)/60)}分钟`;
-  if (p.events.some(e => e.kind === "round_time_expired" && JSON.parse(e.body).version === p.version)) return "投入时间已到，可以讨论接下来怎么做";
-  if (ts.some(t => t.status === "failed")) return "有步骤未完成，记录已保存，可以继续讨论";
-  if (p.paused) return "后台已暂停启动新任务";
-  if (ts.length && ts.every(t => t.status === "completed" || t.status === "cancelled")) return "当前工作已结束，随时聊进展或安排后续";
-  if (p.used >= p.budget) return "任务额度已用完，可以审查已有结果";
-  return p.work_blocker?.replaceAll("等待组会调整", "可以在群里补充安排").replaceAll("等待组会", "可以继续在群里讨论") || "后台按投入预算和当前权限安排工作";
+  if (ts.some(t => t.status === "running")) return p.paused || p.round_time?.expired ? "正在保存当前步骤" : "正在工作";
+  if (p.paused) return "已暂停 · 随时聊聊";
+  if (p.group_proposal && !p.group_proposal.approved) return "有个安排想和你确认";
+  if (p.round_time?.expired || p.used >= p.budget || p.work_blocker) return "等待你的安排 · 随时聊聊";
+  if (ts.some(t => t.status === "failed")) return "有一步没完成 · 记录已保存";
+  if (ts.length && ts.every(t => t.status === "completed" || t.status === "cancelled")) return "已有结果 · 随时聊聊";
+  return "工作已排队";
+}
+function shortText(value, length = 180) {
+  const text = String(value || "");
+  return text.length > length ? text.slice(0, length) + "…" : text;
+}
+function systemNote(key, text, control = "") {
+  return `<article class="system-note" data-key="${esc(key)}"><p>${esc(text)}</p>${control}</article>`;
+}
+function answerBody(text) {
+  // Keep the saved answer intact. Protocol IDs and repeated plans remain in full text.
+  const preview=text.split("\n我理解的工作安排：")[0].replace(/\n证据：[A-Za-z0-9:_\-, ]+(?=\n|$)/g,"").trim();
+  if (text.length <= 420 && preview === text) return `<p class="prose">${esc(text)}</p>`;
+  return `<p class="prose">${esc(shortText(preview,300))}</p><details><summary>完整答复</summary><p class="prose">${esc(text)}</p></details>`;
 }
 function artifactMessage(a, p) {
   const b = a.body;
@@ -187,9 +199,9 @@ function transcript(p, meetings) {
   const chatVersions = new Set((p.events || []).filter(e => e.kind === "group_plan_applied").map(e => JSON.parse(e.body).version));
   for (const input of p.input_history.length ? p.input_history : [p.current_inputs]) {
     if (chatVersions.has(input.version)) continue;
-    add(input.created, 0, `<div class="round-marker" data-key="round-${input.version}">第 ${input.version} 轮</div>`);
+    add(input.created, 0, `<div class="round-marker" data-key="round-${input.version}">${esc(new Date(input.created * 1000).toLocaleDateString("zh-CN"))}</div>`);
     add(input.created, 1, bubble(`input-${input.version}`, "你 · 已确认的本轮输入", `<p class="prose">${esc(input.body.idea)}</p>${attachment("inputs", input.version, "已记录的资源与权限")}`, true, input.created));
-    add(input.created, 2, bubble(`plan-${input.version}`, "LabCouncil · 工作安排", `<p>${esc(input.plan.granularity)}</p>${attachment("plan", input.version, "工作安排")}`));
+    add(input.created, 2, systemNote(`plan-${input.version}`, "工作安排已记录。", `<button data-attachment="plan" data-id="${input.version}">查看安排 ›</button>`));
   }
   for (const a of p.artifacts) add(a.created, 3, artifactMessage(a, p));
   for (const op of p.tool_operations || []) {
@@ -202,14 +214,15 @@ function transcript(p, meetings) {
   for (const event of p.events || []) {
     if (!["research_stopped", "round_time_expired", "group_plan_applied", "group_plan_stale", "execution_status_notice"].includes(event.kind)) continue;
     const data = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
-    add(event.created, 4, bubble(`stopped-${event.id || event.created}`, "LabCouncil · 本轮停止原因", `<p>${esc(data.reason)}</p>${event.kind === "group_plan_applied" ? attachment("inputs", data.version, "已记下的工作安排") : ""}`));
+    const reason = event.kind === "group_plan_applied" ? "工作安排已保存。执行进展可以在活动里查看。" : String(data.reason || "记录已保存").replaceAll("等待组会", "可以继续讨论");
+    add(event.created, 4, systemNote(`stopped-${event.id || event.created}`, reason, event.kind === "group_plan_applied" ? `<button data-attachment="inputs" data-id="${data.version}">查看完整安排 ›</button>` : '<button data-open-activity>查看活动 ›</button>'));
   }
   for (const m of meetings) {
     const s = m.snapshot, real = !s.simulation;
     if (!p.events.some(e => e.kind === "group_plan_applied" && JSON.parse(e.body).version === m.version + 1)) add(m.created, 5, bubble(`meeting-${m.id}`, "LabCouncil · 保存的讨论材料", `${attachment("meeting", m.id, `历史材料 · ${when(s.cutoff)}`)}`));
     (m.discussion || []).forEach((d, i) => {
       add(d.created, 6, bubble(`question-${m.id}-${i}`, `你 · 第 ${m.version} 轮组会`, `<p class="prose">${esc(d.question)}</p>`, true, d.created));
-      add(d.created, 7, bubble(`answer-${m.id}-${i}`, real ? "研究员 · " + backendLabel(p.execution.backend) + " 依据本场快照答复" : "研究员 · 模板答复，程序演示", `<p class="prose">${esc(d.answer)}</p>`));
+      add(d.created, 7, bubble(`answer-${m.id}-${i}`, real ? "研究员 · " + backendLabel(p.execution.backend) + " 依据本场快照答复" : "研究员 · 模板答复，程序演示", answerBody(d.answer), false, d.created, real ? "历史讨论 · 依据当场保存材料" : "程序演示 · 未调用模型"));
     });
     if (m.decision && !chatVersions.has(m.decision.to_version)) add(m.decision.created || m.created, 8, bubble(`decision-${m.id}`, "LabCouncil · 组会决定已保存", `<p>已确认第 ${m.decision.to_version} 轮方向：${esc(m.decision.instruction)}</p><p class="muted">此前输入、规划、报告与讨论继续保留。</p>`));
   }
@@ -217,8 +230,14 @@ function transcript(p, meetings) {
     add(m.created, 6, bubble(`group-user-${m.id}`, "你", `<p class="prose">${esc(m.user_text)}</p>`, true, m.created));
     const request=p.model_requests.find(r=>r.id===m.request_id);
     const origin=m.request_id ? `模型请求：${backendLabel(p.execution.backend)} · ${request?.elapsed === null || request?.elapsed === undefined ? "耗时未知" : request.elapsed.toFixed(2) + "秒"}` : p.execution.mode === "simulation" ? "程序演示 · 未调用模型" : "本机系统回执 · 未调用模型";
-    add(m.finished || m.created, 7, bubble(`group-answer-${m.id}`, m.speaker,
-      `<p class="prose">${esc(m.answer || "正在看你的消息…")}</p>${m.answer ? `<p class="muted">${esc(origin)}${!m.request_id && p.execution.mode !== "simulation" ? "。回执不代表研究已启动；执行状态以任务记录为准。" : ""}</p>` : ""}${m.request_id ? attachment("chat-context", m.id, "这条答复的依据") : ""}`, false, m.finished));
+    const body = m.answer ? answerBody(m.answer) : `<p><span class="pending-dot" aria-hidden="true"></span>正在等待${m.request_id ? "模型" : "服务"}答复，已等待 ${Math.max(0,Math.floor(Date.now()/1000-m.created))} 秒</p>`;
+    const foot = m.answer ? `${esc(origin)}${!m.request_id && p.execution.mode !== "simulation" ? " · 执行进展见活动" : ""}${m.request_id ? `<br><button class="evidence-link" data-attachment="chat-context" data-id="${esc(m.id)}">依据与调用记录 ›</button>` : ""}` : "消息已保存，答复尚未完成。";
+    add(m.finished || m.created, 7, bubble(`group-answer-${m.id}`, m.speaker || "协调助手", body, false, m.finished, foot, !m.answer));
+  }
+  const pending = pendingSends.get(p.id);
+  if (pending && !(p.group_messages || []).some(m => m.id === pending.message_id)) {
+    add(pending.created, 6, bubble(`pending-user-${pending.message_id}`, "你", `<p class="prose">${esc(pending.message)}</p>`, true));
+    add(pending.created, 7, bubble(`pending-answer-${pending.message_id}`, "协调助手", pending.error ? `<p>没有收到发送结果：${esc(pending.error)}。草稿保留，可重发同一条消息核对结果。</p>` : '<p><span class="pending-dot" aria-hidden="true"></span>正在发送，等待服务确认…</p>', false, null, "", !pending.error));
   }
   return entries.sort((a, b) => a.time - b.time || a.rank - b.rank).map(e => e.html).join("");
 }
@@ -246,8 +265,16 @@ function setComposer(force = false) {
     return;
   }
   area.dataset.context = key;
-  area.innerHTML = `<form id="composer"><label class="sr-only" for="chat-text">群聊消息</label><textarea id="chat-text" rows="2" maxlength="4000" placeholder="${p ? "发消息，和大家讨论或安排工作…" : "先告诉大家，你想研究什么…"}" required ${busy ? "disabled" : ""}>${esc(questionDrafts.get(key) || "")}</textarea><div class="send-row"><span id="composer-help">Enter 发送，Shift+Enter 换行</span><button type="submit" ${busy ? "disabled" : ""}>发送</button></div></form>`;
+  area.innerHTML = `<form id="composer"><button class="composer-plus" type="button" aria-label="补充资源或要求" aria-expanded="false" aria-controls="composer-menu">＋</button><div id="composer-menu" hidden><button type="button" data-add="资源：">补充资源</button><button type="button" data-add="额外要求：">补充要求</button><button type="button" data-open-activity>查看活动</button></div><label class="sr-only" for="chat-text">群聊消息</label><textarea id="chat-text" rows="1" maxlength="4000" placeholder="${p ? "给研究群发消息…" : "你想研究什么？"}" required ${busy ? "disabled" : ""}>${esc(questionDrafts.get(key) || "")}</textarea><button class="send-button" aria-label="发送" title="发送" type="submit" ${busy ? "disabled" : ""}><span aria-hidden="true">↑</span></button></form><span id="composer-help" class="composer-hint">Enter 发送，Shift+Enter 换行</span>`;
   const form = area.querySelector("form"), text = form.querySelector("textarea");
+  const menu = form.querySelector("#composer-menu"), plus = form.querySelector(".composer-plus");
+  plus.onclick = () => { menu.hidden = !menu.hidden; plus.setAttribute("aria-expanded", String(!menu.hidden)); };
+  menu.onclick = e => {
+    const add = e.target.closest("[data-add]");
+    if (add && !busy) { text.value += (text.value ? "\n" : "") + add.dataset.add; questionDrafts.set(key,text.value); text.focus(); }
+    if (e.target.closest("[data-open-activity]")) openProfile("activity");
+    menu.hidden = true; plus.setAttribute("aria-expanded", "false");
+  };
   bindEnter(form, text);
   text.addEventListener("input", () => questionDrafts.set(key, text.value));
   form.onsubmit = e => action(e, async () => {
@@ -265,9 +292,12 @@ function setComposer(force = false) {
         return;
       }
       const saved = pendingSends.get(p.id);
-      const send = saved?.message === value ? saved : {message:value,message_id:crypto.randomUUID()};
+      const send = saved?.message === value ? saved : {message:value,message_id:crypto.randomUUID(),created:Date.now()/1000};
+      delete send.error;
       pendingSends.set(p.id,send);
-      await api(`/api/projects/${p.id}/chat`,send);
+      updateTranscript(projectData, meetingData, true);
+      try { await api(`/api/projects/${p.id}/chat`,{message:send.message,message_id:send.message_id}); }
+      catch (error) { send.error=error.message; if (currentProject === p.id) updateTranscript(projectData,meetingData); throw error; }
       pendingSends.delete(p.id); questionDrafts.delete(key); text.value="";
       if (currentProject === p.id) await refreshProject(true);
     } finally { busy=false; setComposer(); }
@@ -277,6 +307,93 @@ function bindEnter(form, text) {
   text.addEventListener("keydown", e => {
     if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); form.requestSubmit(); }
   });
+}
+function closeProfile() {
+  document.querySelector("#agent-panel").hidden = true;
+  document.querySelector("#open-profile").setAttribute("aria-expanded","false");
+  syncBackdrop();
+}
+function closeProjects() {
+  document.querySelector(".layout").classList.remove("projects-open");
+  document.querySelector("#toggle-projects").setAttribute("aria-expanded","false");
+  syncBackdrop();
+}
+function syncBackdrop() {
+  document.querySelector("#drawer-backdrop").hidden = document.querySelector("#agent-panel").hidden && !document.querySelector(".layout").classList.contains("projects-open");
+}
+function openProfile(tab = "activity") {
+  profileTab = tab;
+  document.querySelector("#agent-panel").hidden = false;
+  document.querySelector("#open-profile").setAttribute("aria-expanded","true");
+  if (window.innerWidth <= 850) closeProjects();
+  renderProfile(); syncBackdrop();
+}
+function taskLabel(t, p) {
+  const artifact = p.artifacts.find(a => a.task_id === t.id);
+  const op = (p.tool_operations || []).find(o => o.task_id === t.id);
+  return researchActions[artifact?.body.action || op?.body.action] || roles[t.role] || "研究步骤 " + t.role.replace("research_step_", "");
+}
+function activityRow(t, p) {
+  const artifact = p.artifacts.find(a => a.task_id === t.id);
+  const op = (p.tool_operations || []).find(o => o.task_id === t.id);
+  const sub = t.status === "running" ? "实际步骤已启动，等待保存结果" : t.status === "queued" ? "等待启动" : t.status === "cancelled" ? "未执行，原安排已保留" : t.status === "failed" ? shortText(t.error || "没有完成，失败记录已保存",60) : shortText(artifact?.body.summary || op?.body.result?.status || "结果已保存",60);
+  const icons = {researcher:"⌕",executor:"▥",reviewer:"✓"};
+  return `<button class="activity-row ${esc(t.status)}" data-task="${esc(t.id)}"><span class="activity-icon" aria-hidden="true">${icons[t.role] || "⌕"}</span><span class="activity-copy"><strong>${esc(taskLabel(t,p))}</strong><small>${esc(sub)}</small></span><span class="activity-status">${esc(t.status === "cancelled" ? "未执行" : states[t.status])}</span></button>`;
+}
+function blockerText(p) {
+  const reasons=[];
+  if (p.paused) reasons.push("已暂停启动新任务");
+  if (p.round_time?.expired) reasons.push("投入时间已到");
+  if (p.used>=p.budget) reasons.push("任务额度已用完");
+  if (p.work_blocker && !p.round_time?.expired) reasons.push(p.work_blocker.replaceAll("等待组会调整", "可以在聊天里补充").replaceAll("等待组会审查", "已有结果仍可审查"));
+  return reasons.join("；");
+}
+function activityView(p) {
+  const active=p.tasks.filter(t=>t.status==="running"), queued=p.tasks.filter(t=>t.status==="queued" && t.version===p.version);
+  const history=p.tasks.filter(t=>!["running","queued"].includes(t.status) || t.version!==p.version).reverse();
+  const proposal=p.group_proposal;
+  const section=(label,items,empty)=>`<h3 class="section-label">${label}</h3>${items.map(t=>activityRow(t,p)).join("") || `<p class="profile-empty">${empty}</p>`}`;
+  return `<p class="profile-project">${esc(p.title)}</p><p class="profile-status">${esc(blockerText(p) || statusText(p))}</p>${proposal ? `<h3 class="section-label">${proposal.approved ? "等待交接" : "等你决定"}</h3><button class="activity-row" data-proposal><span class="activity-icon" aria-hidden="true">◇</span><span class="activity-copy"><strong>新的工作安排</strong><small>${esc(shortText(proposal.brief.idea,85))}</small></span><span class="activity-status">${proposal.approved ? "已同意" : "待讨论"}</span></button>` : ""}${section("正在进行",active,"当前没有正在执行的步骤。")}${queued.length ? section("等待中",queued,"") : ""}${p.meeting_at ? `<h3 class="section-label">已安排</h3><button class="activity-row" data-schedule><span class="activity-icon" aria-hidden="true">◷</span><span class="activity-copy"><strong>定时整理讨论材料</strong><small>${esc(when(p.meeting_at))}</small></span></button>` : ""}${section("过往活动",history,"有了结果，会留在这里。")}`;
+}
+function contextView(p) {
+  const b=p.current_inputs.body;
+  return `<section class="context-section"><h3>正在做什么</h3><p>${esc(b.idea)}</p></section><section class="context-section"><h3>可用资源</h3><p>${esc(b.resources || "还没有补充，可以直接在聊天里说。")}</p></section><section class="context-section"><h3>你的要求</h3><p>${esc(b.requirements || "还没有额外要求。")}</p></section><section class="context-section"><h3>工作安排</h3><p>${esc(p.current_inputs.plan.granularity)}</p><ol>${p.current_inputs.plan.steps.map(s=>`<li>${esc(s.replaceAll("等待组会","等你反馈"))}</li>`).join("")}</ol></section><section class="context-section"><h3>已保存的报告</h3>${p.artifacts.map(a=>attachment("artifact",a.id,taskLabel(p.tasks.find(t=>t.id===a.task_id) || {id:a.task_id,role:a.role},p))).join("") || '<p class="profile-empty">还没有报告。</p>'}</section><p class="muted">这里来自已保存的项目记录。旧输入、完整报告和失败记录继续保留；每条答复使用的上下文仍可单独查看。</p>`;
+}
+function settingsView(p) {
+  const permissions=p.current_inputs.body.permissions;
+  return `<p class="muted badge">${p.execution.mode === "simulation" ? "本地模拟原型 · 不调用模型" : backendLabel(p.execution.backend)}</p><h3 class="section-label">工具与权限</h3><div class="tool-row"><span>模型调用</span><span>${permissions.model_calls ? "已允许" : "未授权"}</span></div><div class="tool-row"><span>公开论文与仓库查询</span><span>${permissions.public_research ? "已允许" : "未授权"}</span></div><div class="tool-row"><span>已接入的本地合成计算</span><span>${permissions.local_compute ? "已允许" : "未授权"}</span></div><p class="muted">需要改变权限时，在聊天里明确说明。任意代码执行、云电脑、语音和应用连接尚未接入。</p><h3 class="section-label">后台工作</h3><p class="muted">${esc(blockerText(p) || statusText(p))}。暂停会阻止新任务启动，当前步骤仍可保存结果。</p><button type="button" class="pause-action" id="profile-pause">${p.paused ? "恢复后台工作" : "暂停后台工作"}</button><details><summary>投入与定时设置</summary><form id="configure"><label>项目任务总上限<input name="budget" type="number" min="0" max="100" value="${p.budget}" required></label><label>定时整理材料<input name="meeting_at" type="datetime-local" value="${p.meeting_at ? esc(new Date(p.meeting_at*1000-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16)) : ""}"></label><button type="submit">保存</button></form></details>${requestDetails(p)}`;
+}
+function renderProfile() {
+  const panel=document.querySelector("#agent-panel");
+  if (panel.hidden) return;
+  document.querySelectorAll("[data-profile-tab]").forEach(b=>{const selected=b.dataset.profileTab===profileTab; b.setAttribute("aria-selected",String(selected));b.tabIndex=selected ? 0 : -1;});
+  const body=document.querySelector("#profile-body");
+  body.setAttribute("aria-labelledby","tab-"+profileTab);
+  const p=projectData;
+  if (!p) { body.innerHTML='<p class="profile-empty">先发一个想法，创建你的研究群。</p><button id="configure-new">选择模型与执行方式</button><p class="muted">新研究群默认使用 Codex CLI，模型和工具权限初始关闭。</p>'; document.querySelector("#configure-new").onclick=()=>document.querySelector("#new-settings").click();return; }
+  const html=profileTab==="activity" ? activityView(p) : profileTab==="context" ? contextView(p) : settingsView(p);
+  const signature=p.id+"|"+profileTab+"|"+html;
+  if(profileSignature===signature)return;
+  profileSignature=signature;
+  const scrollTop=body.scrollTop;
+  body.innerHTML=html;
+  body.scrollTop=scrollTop;
+  body.onclick=e=>{
+    const t=e.target.closest("[data-task]"); if(t) showTask(t.dataset.task);
+    const a=e.target.closest("[data-attachment]");if(a) showAttachment(a.dataset.attachment,a.dataset.id);
+    if(e.target.closest("[data-proposal]")) showSheet("待讨论的工作安排",`${inputsSummary(p.group_proposal.brief)}<p class="muted">${p.group_proposal.approved ? "已同意，等待当前步骤保存结果后交接。" : "可以在聊天里修改，或者说‘按这个做’。"}</p>`);
+    if(e.target.closest("[data-schedule]")) openProfile("settings");
+  };
+  const pause=body.querySelector("#profile-pause");
+  if(pause) pause.onclick=e=>action(e,async()=>{await api(`/api/projects/${p.id}/configure`,{paused:!p.paused,budget:p.budget,meeting_at:p.meeting_at});await refreshProject();renderProfile();announce(p.paused ? "已解除暂停；启动前仍检查时间、权限和额度。" : "已暂停新任务，当前步骤会保存结果。");});
+  const form=body.querySelector("#configure");
+  if(form)form.onsubmit=e=>action(e,async()=>{const f=new FormData(form);await api(`/api/projects/${p.id}/configure`,{paused:!!p.paused,budget:Number(f.get("budget")),meeting_at:f.get("meeting_at") ? new Date(f.get("meeting_at")).getTime()/1000 : null});await refreshProject();renderProfile();announce("设置已保存。");});
+}
+function showTask(id) {
+  const p=projectData, t=p.tasks.find(t=>t.id===id); if(!t)return;
+  const artifact=p.artifacts.find(a=>a.task_id===id), op=p.tool_operations.find(o=>o.task_id===id);
+  const calls=p.model_requests.filter(r=>r.task_id===id);
+  showSheet(taskLabel(t,p),`<p class="muted">${esc(t.status==="cancelled" ? "未执行" : states[t.status])} · ${esc(when(t.finished || t.started || t.created))}</p>${t.error ? `<p class="prose">${esc(t.error)}</p>` : ""}${artifact ? `<p class="prose">${esc(artifact.body.summary)}</p><p><a href="/api/evidence/${esc(artifact.id)}" target="_blank" rel="noopener">完整报告与原始证据 ↗</a></p>` : `<p>${t.status==="running" ? "步骤已启动，报告尚未保存。" : t.status==="queued" ? "任务已排队，尚未执行。" : "这一步没有完成报告。"}</p>`}${op ? `<p><a href="/api/tool-operations/${esc(op.id)}" target="_blank" rel="noopener">已保存的工具结果 ↗</a></p>` : ""}${calls.map(r=>`<p><a href="/api/model-requests/${esc(r.id)}" target="_blank" rel="noopener">${esc(r.phase)} · ${esc(r.status)} · ${r.elapsed == null ? "耗时未知" : r.elapsed.toFixed(2)+"秒"} ↗</a></p>`).join("")}`);
 }
 function showSheet(title, body) {
   document.querySelector("#settings-title").textContent = title;
@@ -314,28 +431,32 @@ async function refreshProject(forceBottom = false) {
     const oldVersion=projectData?.version;
     projectData = p; meetingData = meetings;
     document.querySelector("#project-title").textContent = p.title;
-    document.querySelector("#work-status").textContent = statusText(p);
+    document.querySelector("#work-status").textContent = (p.execution.mode === "simulation" ? "程序演示 · " : "") + statusText(p);
+    document.querySelector("#work-status").title=p.execution.mode === "simulation" ? "固定程序演示，不调用模型" : backendLabel(p.execution.backend);
     modeLabel(p.execution.mode !== "simulation", p.execution.mode === "research", p.execution.backend);
     updateTranscript(p, meetings, forceBottom);
     setComposer();
+    if (profileTab !== "settings") renderProfile();
     if (oldVersion && oldVersion !== p.version) await sidebar();
   } finally { refreshing = false; }
 }
 async function showProject(id) {
   navigation++;
   currentProject = id; transcriptSignature = "";
+  profileSignature="";
+  closeProfile();
   projectData = null; meetingData = [];
   content.innerHTML = '<div id="transcript" class="transcript"></div><div id="setup-slot" class="transcript"></div>';
   document.querySelector("#compose-area").innerHTML = "";
   document.querySelector("#compose-area").dataset.context = "";
-  document.querySelector("#project-actions").innerHTML = '<button id="open-settings" aria-label="群聊设置" title="群聊设置">···</button>';
+  document.querySelector("#project-actions").innerHTML = '<button id="open-settings" aria-label="查看活动" title="查看活动">◷</button>';
   document.querySelector("#project-title").textContent = "正在读取项目…";
   announce("");
   document.querySelector("#work-status").textContent = "正在读取保存的报告与讨论…";
   content.onclick = e => {
     const file = e.target.closest("[data-attachment]");
     if (file) showAttachment(file.dataset.attachment, file.dataset.id);
-
+    if (e.target.closest("[data-open-activity]")) openProfile("activity");
   };
   document.querySelector("#open-settings").onclick = () => openSettings();
   // A previous project's in-flight refresh must finish before this navigation loads.
@@ -343,29 +464,17 @@ async function showProject(id) {
   if (id !== currentProject) return;
   await refreshProject(true);
   try { localStorage.setItem("labcouncil-project", id); } catch (_) { /* Local storage can be disabled. */ }
-  document.querySelector("#sidebar").classList.remove("mobile-open");
-  document.querySelector("#toggle-projects").setAttribute("aria-expanded", "false");
+  closeProjects();
   await sidebar();
 }
 function openSettings() {
-  const p = projectData;
-  if (!p) return;
-  const at = p.meeting_at ? new Date(p.meeting_at * 1000) : null;
-  const local = at ? new Date(at.getTime() - at.getTimezoneOffset() * 60000).toISOString().slice(0,16) : "";
-  document.querySelector("#settings-title").textContent = "群聊设置";
-  document.querySelector("#settings-body").innerHTML = `<p class="muted">工作目标、资源和投入预算可以直接在群里商量。权限由你明确授权，工作安排经你同意后执行。这里保留后台消耗与暂停设置。</p><form id="configure"><div class="form-grid"><label>项目任务总上限<input name="budget" type="number" min="0" max="100" value="${p.budget}" required></label></div><label>后台状态<select name="paused"><option value="false" ${!p.paused ? "selected" : ""}>继续</option><option value="true" ${p.paused ? "selected" : ""}>暂停启动新任务</option></select></label><label>下次准备组会材料时间（本机时区）<input name="meeting_at" type="datetime-local" value="${local}"><span class="muted">留空取消定时安排。</span></label><button class="primary" type="submit">保存设置</button></form>${requestDetails(p)}`;
-  document.querySelector("#configure").onsubmit = e => action(e, async () => {
-    const f = new FormData(e.currentTarget);
-    await api(`/api/projects/${p.id}/configure`, {paused: f.get("paused") === "true", budget: Number(f.get("budget")), meeting_at: f.get("meeting_at") ? new Date(f.get("meeting_at")).getTime()/1000 : null});
-    document.querySelector("#settings").close();
-    await refreshProject();
-    announce("工作设置已保存。");
-  });
-  document.querySelector("#settings").showModal();
+  openProfile("activity");
 }
 async function newConversation() {
   navigation++;
   currentProject = null; projectData = null; meetingData = [];
+  profileSignature="";
+  closeProfile();
   content.onclick = null;
   document.querySelector("#project-title").textContent = "新的研究群";
   document.querySelector("#work-status").textContent = "";
@@ -379,20 +488,35 @@ async function newConversation() {
   };
   modeLabel((setupSettings.mode || "research") !== "simulation", (setupSettings.mode || "research") === "research", setupSettings.backend || "codex_cli");
   announce("");
-  content.innerHTML = `<div id="transcript" class="transcript"><div class="round-marker">新的研究群</div>${bubble("welcome", "协调助手", '<p>我们在这里一起做研究。</p><p>直接说你的 idea，或者交代想做的事情。资源、权限、投入上限和额外要求可以边聊边补充；有新的工作安排时，我会先复述，再按你的意见做。</p>')}</div><div id="setup-slot" class="transcript"></div>`;
+  content.innerHTML = '<div id="transcript" class="transcript"><section class="welcome"><span class="dot-character" aria-hidden="true"><i></i><i></i></span><h2>有什么想研究的？</h2><p>把想法发给大家。工作进展、你的反馈，都留在这里。</p></section></div><div id="setup-slot" class="transcript"></div>';
   setComposer(true);
   await sidebar();
-  document.querySelector("#sidebar").classList.remove("mobile-open");
-  document.querySelector("#toggle-projects").setAttribute("aria-expanded", "false");
+  closeProjects();
   document.querySelector("#chat-text").focus();
 }
 document.querySelector("#group-search").addEventListener("input", filterGroups);
 document.querySelector("#new-project").onclick = () => newConversation().catch(e => announce(e.message, true));
 document.querySelector("#close-settings").onclick = () => document.querySelector("#settings").close();
 document.querySelector("#toggle-projects").onclick = e => {
-  const open = document.querySelector("#sidebar").classList.toggle("mobile-open");
+  if (window.innerWidth <= 850) closeProfile();
+  const open = document.querySelector(".layout").classList.toggle("projects-open");
   e.currentTarget.setAttribute("aria-expanded", String(open));
+  syncBackdrop();
 };
+document.querySelector("#close-projects").onclick=closeProjects;
+document.querySelector("#open-profile").onclick=()=>document.querySelector("#agent-panel").hidden ? openProfile() : closeProfile();
+document.querySelector("#close-profile").onclick=closeProfile;
+document.querySelector("#drawer-backdrop").onclick=()=>{closeProjects();closeProfile();};
+document.querySelectorAll("[data-profile-tab]").forEach(b=>{
+  b.onclick=()=>openProfile(b.dataset.profileTab);
+  b.onkeydown=e=>{
+    const keys=["ArrowLeft","ArrowRight","Home","End"];if(!keys.includes(e.key))return;e.preventDefault();
+    const tabs=[...document.querySelectorAll("[data-profile-tab]")], index=tabs.indexOf(b);
+    const next=e.key==="Home" ? 0 : e.key==="End" ? tabs.length-1 : (index+(e.key==="ArrowRight" ? 1 : -1)+tabs.length)%tabs.length;
+    tabs[next].click();tabs[next].focus();
+  };
+});
+document.addEventListener("keydown",e=>{if(e.key==="Escape" && !document.querySelector("#settings").open){closeProjects();closeProfile();const menu=document.querySelector("#composer-menu");if(menu)menu.hidden=true;document.querySelector(".composer-plus")?.setAttribute("aria-expanded","false");}});
 if (location.protocol === "file:") {
   document.querySelector("#new-project").disabled = true;
   announce("请通过本地服务地址打开，HTML 文件预览不能保存项目。", true);
@@ -405,6 +529,6 @@ if (location.protocol === "file:") {
   } catch (e) { announce(`连接本地服务失败：${e.message}`, true); }
 })();
 setInterval(async () => {
-  if (!currentProject || busy || refreshing || document.querySelector("#settings").open) return;
+  if (!currentProject || refreshing || document.querySelector("#settings").open) return;
   try { await refreshProject(); } catch (e) { announce(e.message, true); }
 }, 4000);
