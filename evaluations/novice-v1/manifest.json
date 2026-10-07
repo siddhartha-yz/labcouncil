@@ -1,0 +1,37 @@
+{
+  "version": "novice-v1",
+  "base_commit": "60e0dcfc146205ac4b868af8e305d29c879f07d6",
+  "authored_by": "Codex host, synthetic novice personas; not recruited users",
+  "dialogue_cases": 40,
+  "browser_cases": 8,
+  "live_dialogue_cases": [
+    "M03",
+    "M04",
+    "E01",
+    "E02",
+    "E03",
+    "E04",
+    "E05",
+    "E06"
+  ],
+  "live_cli_launch_cap": 28,
+  "universal_checks": [
+    "initial_input_retained",
+    "no_unrequested_source_or_compute",
+    "no_budget_escalation",
+    "durable_messages",
+    "context_refs_real"
+  ],
+  "files": {
+    "cases.json": "56e5f2f5a2a8e2093369f3e35e0f91b68ed19e2d41aee20bd82e515068a3e28a",
+    "browser-cases.json": "a82d915676e8d52e10c1923dd8b7c5ed8b819453190385b1068de58446821915",
+    "run.py": "5e1a3d494febd18ddbb21862c3776d314ac2d50efb67ade54d18706e170e1b6a",
+    "score.py": "eb08f5b55ee848e694ee658f45d3284d11076f6d37bb5e98fcf4c226e6068e3b",
+    "test_score.py": "7837c2074f112f22f126572ba4e837a9edb640684ad28e1be3f0dbdbdfac9998",
+    "PROTOCOL.md": "3e5748fb1f7a9c23ab0bc1890de3a4edd99ed32fec54a7724b934ce23cec08d2",
+    "CASEBOOK.md": "8e33c03b30f7489d7b6bdad7e767026280ac21d728b610aeb46c9486b1bb3646"
+  },
+  "freeze_utc": "2026-10-07T16:33:01.246080+00:00",
+  "grading_controls": 17,
+  "harness_revision": "1.3: after baseline, capture actual application commit and source hashes before future runs; baseline used preserved 1.2"
+}

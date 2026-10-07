@@ -43,6 +43,7 @@ The initial focus is computational research that can be checked through document
 
 ## Documents
 
+- [菜鸟使用测评 v1](evaluations/novice-v1/README.md): 40 multi-turn state/dialogue cases and 8 visible browser journeys; frozen novice inputs, real CLI lane, negative grader controls, and retained failures.
 - [Dots 设计适配](docs/DOTS-DESIGN.md): official references, continuous chat, real activity records and current capability limits; [local UI acceptance](reproductions/2026-10-07-dots-ui/REPORT.md) [three iteration rounds](reproductions/2026-10-07-dots-iterations/REPORT.md), and [first-use and review improvements](reproductions/2026-10-08-human-design/REPORT.md).
 - [Codex CLI 后台验收](reproductions/2026-10-07-codex-backend/REPORT.md): real two-round planning, saved experiment evidence and meeting Q&A with `gpt-6.1-sol / high`.
 - [测评分数卡](docs/SCORECARD.md): transparent 0–100 scores from saved runs, with separate unmeasured capabilities and public benchmark candidates.
