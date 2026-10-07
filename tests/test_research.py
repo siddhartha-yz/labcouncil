@@ -31,7 +31,9 @@ class FixtureProvider:
         else:
             if self.plan_failed: raise ValueError('fixture report failure')
             ref=json.loads(messages[-1]['content'])['evidence_ref']
-            result={'content':encode({'summary':'已保存这一步的真实工具状态。','limitations':['读取摘要和说明不能验证作者结论。'], 'next_step':'继续核对已有证据并准备组会。','evidence_refs':[ref]})}
+            context=json.loads(messages[-1]['content'])
+            findings=[{'finding':'已有工具记录可审查。','verification':'仅检查离线fixture。','evidence_refs':[i['id']]} for i in context.get('result',{}).get('meeting_evidence',{}).get('items',[])[:3]]
+            result={'content':encode({'findings':findings,'summary':'已保存这一步的真实工具状态。','limitations':['读取摘要和说明不能验证作者结论。'], 'next_step':'继续核对已有证据并准备组会。','evidence_refs':[ref]})}
         store.finish_request(rid,response={'fixture':True},http_status=200)
         return result,rid
 

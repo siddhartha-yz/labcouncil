@@ -231,12 +231,19 @@ function report(artifacts, simulation, research = false, operations = []) {
 }
 
 const researchActions = {search_papers: "检索论文摘要", read_abstract: "读取论文摘要", search_repositories: "搜索公开仓库", inspect_repository: "检查仓库 README", synthetic_regression: "运行自有合成基准", prepare_meeting: "整理组会材料"};
+function concreteFindings(report) {
+  const findings = report?.findings || [];
+  if (!findings.length) return "";
+  return `<ul>${findings.map(item => `<li><p>${esc(item.finding)}</p><p class="muted">${esc(item.verification)}</p>${item.evidence_refs.map((ref,i) => ref.startsWith("operation:") ? `<a href="/api/tool-operations/${esc(ref.slice(10))}" target="_blank" rel="noopener">查看依据${i+1}</a>` : esc(ref)).join(" · ")}</li>`).join("")}</ul>`;
+}
+
 function researchReport(artifacts, operations) {
   const latest = artifacts.at(-1)?.body;
   const orphaned = operations.filter(o => o.body.kind === "research" && !artifacts.some(a => a.task_id === o.task_id));
   const partial = orphaned.length ? `<p>另有 ${orphaned.length} 步已保存工具结果，但模型报告尚未完成或未通过检查。</p><ul>${orphaned.map(o => `<li>${esc(researchActions[o.body.action])} · ${esc(o.body.result.status)}：<a href="/api/tool-operations/${esc(o.id)}" target="_blank" rel="noopener">审查已保存工具证据</a></li>`).join("")}</ul>` : "";
   const sources = artifacts.flatMap(a => a.body.result?.sources || []);
-  return `<section class="panel report"><h2>本轮报告</h2><p class="muted">以下是模型报告，来源和工具状态可以核对；报告文字仍需审查。</p><h3>做了什么</h3>${partial}<p>${ artifacts.length ? `已保存 ${artifacts.length} 个研究步骤，找到 ${sources.length} 条资料记录。` : "后台尚未保存研究步骤。" }</p><h3>发现什么</h3><p>${ esc(latest?.summary || "还没有可审查的结果。") }</p><h3>还有什么没做</h3><ul>${ (latest?.report?.limitations || ["尚未执行上游仓库代码，也没有完成论文实验复现。"]).map(x => `<li>${esc(x)}</li>`).join("") }</ul><h3>组会需要决定什么</h3><p>${ esc(latest?.report?.next_step || "等待资料整理后，再确定下一轮目标与执行条件。") }</p><details><summary>逐步报告与原始证据（${artifacts.length} 份）</summary>${artifacts.map((a,i) => {const b=a.body;return `<article class="evidence"><h3>第 ${i+1} 步：${esc(researchActions[b.action] || b.action)}</h3><p>${esc(b.summary)}</p><p class="muted">实际工具状态：${esc(b.result?.status)}；参数：${esc(b.value || "无")}。</p><p>本步规划：${esc(b.plan)}</p><p>原因：${esc(b.reason)}</p><ul>${(b.result?.sources || []).map(x => `<li><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.title)}</a>：${esc(x.verification)}</li>`).join("")}</ul>${b.result?.error ? `<p>${esc(b.result.error)}</p>` : ""}<a href="/api/evidence/${esc(a.id)}" target="_blank" rel="noopener">打开原始证据</a></article>`;}).join("")}</details></section>`;
+  const reused = new Set((latest?.result?.meeting_evidence?.items || []).filter(item => item.version < artifacts.at(-1)?.version).flatMap(item => (item.result.sources || []).map(source => source.id))).size;
+  return `<section class="panel report"><h2>本轮报告</h2><p class="muted">以下是模型报告，来源和工具状态可以核对；报告文字仍需审查。</p><h3>做了什么</h3>${partial}<p>${ artifacts.length ? `已保存 ${artifacts.length} 个研究步骤，本轮读取 ${sources.length} 条资料记录。${reused ? `另复用前轮 ${reused} 条已保存资料。` : ""}` : "后台尚未保存研究步骤。" }</p><h3>发现什么</h3>${concreteFindings(latest?.report) || `<p>${esc(latest?.summary || "还没有可审查的结果。")}</p>`}<h3>还有什么没做</h3><ul>${ (latest?.report?.limitations || ["尚未执行上游仓库代码，也没有完成论文实验复现。"]).map(x => `<li>${esc(x)}</li>`).join("") }</ul><h3>组会需要决定什么</h3><p>${ esc(latest?.report?.next_step || "等待资料整理后，再确定下一轮目标与执行条件。") }</p><details><summary>逐步报告与原始证据（${artifacts.length} 份）</summary>${artifacts.map((a,i) => {const b=a.body;return `<article class="evidence"><h3>第 ${i+1} 步：${esc(researchActions[b.action] || b.action)}</h3><p>${esc(b.summary)}</p><p class="muted">实际工具状态：${esc(b.result?.status)}；参数：${esc(b.value || "无")}。</p><p>本步规划：${esc(b.plan)}</p><p>原因：${esc(b.reason)}</p><ul>${(b.result?.sources || []).map(x => `<li><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.title)}</a>：${esc(x.verification)}</li>`).join("")}</ul>${b.result?.error ? `<p>${esc(b.result.error)}</p>` : ""}<a href="/api/evidence/${esc(a.id)}" target="_blank" rel="noopener">打开原始证据</a></article>`;}).join("")}</details></section>`;
 }
 
 function requestDetails(p) {

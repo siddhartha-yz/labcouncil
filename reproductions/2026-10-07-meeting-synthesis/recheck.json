@@ -1,0 +1,540 @@
+{
+  "id": "cca0fdd1e24147eb9fecf69351dfa736",
+  "title": "【真实工程修订复验】具体发现与资源边界",
+  "version": 1,
+  "used": 2,
+  "qa_used": 0,
+  "execution": {
+    "project_id": "cca0fdd1e24147eb9fecf69351dfa736",
+    "mode": "research",
+    "api_budget": 6,
+    "qa_api_budget": 0,
+    "source_budget": 8
+  },
+  "current_inputs": {
+    "project_id": "cca0fdd1e24147eb9fecf69351dfa736",
+    "version": 1,
+    "body": {
+      "idea": "【Codex工程修订复验】先读arXiv 2602.08990摘要，再读InternScience/scp固定commit README，然后prepare_meeting。最终给出两到三条普通中文的具体发现，解释怎样用于个人云组会的输入、后台工作、开组会再规划，标出作者声明与未验证范围。不只复述产品术语或工具数量。",
+      "permissions": {
+        "local_compute": false,
+        "model_calls": true,
+        "public_research": true,
+        "retry_public_reads": false
+      },
+      "requirements": "全文读取和任意仓库执行未接入。不执行代码，不做无关合成基准。仅读有限摘要/README节选，不能断言完整来源缺少复现步骤。建议下一步必须适合当前实际额度和工具边界；完成两份读取即准备组会。",
+      "resources": "DeepSeek Flash；后台模型总上限6，组会0，公开HTTP8；本轮工程验收全天。最终report后模型额度为0。此前SCP SDK本地调用组件已另有验收记录，不能再次跑通SDK就当作论文科研复现。",
+      "work_time": {
+        "all_day": true,
+        "end": "18:00",
+        "start": "09:00",
+        "timezone": "Asia/Shanghai"
+      }
+    },
+    "plan": {
+      "executor": "真实Flash与有界研究工具",
+      "granularity": "每步选择一个查询或核对；依据资源与每日时段安排后续，最多六步后等组会",
+      "objective": "【Codex工程修订复验】先读arXiv 2602.08990摘要，再读InternScience/scp固定commit README，然后prepare_meeting。最终给出两到三条普通中文的具体发现，解释怎样用于个人云组会的输入、后台工作、开组会再规划，标出作者声明与未验证范围。不只复述产品术语或工具数量。",
+      "requirements": "全文读取和任意仓库执行未接入。不执行代码，不做无关合成基准。仅读有限摘要/README节选，不能断言完整来源缺少复现步骤。建议下一步必须适合当前实际额度和工具边界；完成两份读取即准备组会。",
+      "resources": "DeepSeek Flash；后台模型总上限6，组会0，公开HTTP8；本轮工程验收全天。最终report后模型额度为0。此前SCP SDK本地调用组件已另有验收记录，不能再次跑通SDK就当作论文科研复现。",
+      "source": "platform research boundaries; actual agent plan in each artifact",
+      "steps": [
+        "agent根据输入规划下一步",
+        "保存公开资料或受控计算证据",
+        "依据已有证据继续，达到边界后等组会"
+      ],
+      "unavailable": [
+        "任意仓库代码执行",
+        "完整论文全文阅读和论文实验复现",
+        "任意GPU训练"
+      ],
+      "work_window": "全天"
+    },
+    "created": 1791308162.3688266,
+    "legacy": false
+  },
+  "input_history": [
+    {
+      "project_id": "cca0fdd1e24147eb9fecf69351dfa736",
+      "version": 1,
+      "body": {
+        "idea": "【Codex工程修订复验】先读arXiv 2602.08990摘要，再读InternScience/scp固定commit README，然后prepare_meeting。最终给出两到三条普通中文的具体发现，解释怎样用于个人云组会的输入、后台工作、开组会再规划，标出作者声明与未验证范围。不只复述产品术语或工具数量。",
+        "permissions": {
+          "local_compute": false,
+          "model_calls": true,
+          "public_research": true,
+          "retry_public_reads": false
+        },
+        "requirements": "全文读取和任意仓库执行未接入。不执行代码，不做无关合成基准。仅读有限摘要/README节选，不能断言完整来源缺少复现步骤。建议下一步必须适合当前实际额度和工具边界；完成两份读取即准备组会。",
+        "resources": "DeepSeek Flash；后台模型总上限6，组会0，公开HTTP8；本轮工程验收全天。最终report后模型额度为0。此前SCP SDK本地调用组件已另有验收记录，不能再次跑通SDK就当作论文科研复现。",
+        "work_time": {
+          "all_day": true,
+          "end": "18:00",
+          "start": "09:00",
+          "timezone": "Asia/Shanghai"
+        }
+      },
+      "plan": {
+        "executor": "真实Flash与有界研究工具",
+        "granularity": "每步选择一个查询或核对；依据资源与每日时段安排后续，最多六步后等组会",
+        "objective": "【Codex工程修订复验】先读arXiv 2602.08990摘要，再读InternScience/scp固定commit README，然后prepare_meeting。最终给出两到三条普通中文的具体发现，解释怎样用于个人云组会的输入、后台工作、开组会再规划，标出作者声明与未验证范围。不只复述产品术语或工具数量。",
+        "requirements": "全文读取和任意仓库执行未接入。不执行代码，不做无关合成基准。仅读有限摘要/README节选，不能断言完整来源缺少复现步骤。建议下一步必须适合当前实际额度和工具边界；完成两份读取即准备组会。",
+        "resources": "DeepSeek Flash；后台模型总上限6，组会0，公开HTTP8；本轮工程验收全天。最终report后模型额度为0。此前SCP SDK本地调用组件已另有验收记录，不能再次跑通SDK就当作论文科研复现。",
+        "source": "platform research boundaries; actual agent plan in each artifact",
+        "steps": [
+          "agent根据输入规划下一步",
+          "保存公开资料或受控计算证据",
+          "依据已有证据继续，达到边界后等组会"
+        ],
+        "unavailable": [
+          "任意仓库代码执行",
+          "完整论文全文阅读和论文实验复现",
+          "任意GPU训练"
+        ],
+        "work_window": "全天"
+      },
+      "created": 1791308162.3688266
+    }
+  ],
+  "tasks": [
+    {
+      "id": "75dea578339040649247b0ef527b318e",
+      "project_id": "cca0fdd1e24147eb9fecf69351dfa736",
+      "version": 1,
+      "role": "research_step_01",
+      "instruction": "【Codex工程修订复验】先读arXiv 2602.08990摘要，再读InternScience/scp固定commit README，然后prepare_meeting。最终给出两到三条普通中文的具体发现，解释怎样用于个人云组会的输入、后台工作、开组会再规划，标出作者声明与未验证范围。不只复述产品术语或工具数量。",
+      "scenario": "clean",
+      "dependency": null,
+      "status": "completed",
+      "attempts": 1,
+      "charged": 1,
+      "owner": null,
+      "lease_until": null,
+      "created": 1791308162.368855,
+      "finished": 1791308166.5780163,
+      "error": null
+    },
+    {
+      "id": "ce24c2c32fb4440d95e3183916054319",
+      "project_id": "cca0fdd1e24147eb9fecf69351dfa736",
+      "version": 1,
+      "role": "research_step_02",
+      "instruction": "【Codex工程修订复验】先读arXiv 2602.08990摘要，再读InternScience/scp固定commit README，然后prepare_meeting。最终给出两到三条普通中文的具体发现，解释怎样用于个人云组会的输入、后台工作、开组会再规划，标出作者声明与未验证范围。不只复述产品术语或工具数量。",
+      "scenario": "clean",
+      "dependency": "75dea578339040649247b0ef527b318e",
+      "status": "failed",
+      "attempts": 1,
+      "charged": 1,
+      "owner": null,
+      "lease_until": null,
+      "created": 1791308166.5781844,
+      "finished": 1791333942.340026,
+      "error": "真实模型传输或响应失败；这次请求已计入，不自动重试"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "d3e9e2dcb11e4874be22ef0291e3accb",
+      "task_id": "75dea578339040649247b0ef527b318e",
+      "project_id": "cca0fdd1e24147eb9fecf69351dfa736",
+      "version": 1,
+      "role": "research_step_01",
+      "body": {
+        "action": "read_abstract",
+        "continue_work": true,
+        "kind": "research",
+        "limitation": "检索摘要和固定commit README；仅自有合成工具可计算；尚未执行上游仓库或完成论文复现",
+        "model_request_ids": [
+          "ca8300c98dba4ec9b3e455442824f378",
+          "348b3ba512054193a0dad3f315d69418"
+        ],
+        "operation_ref": "operation:75dea578339040649247b0ef527b318e",
+        "plan": "本轮为工程验收轮，任务明确：先读 arXiv 2602.08990 摘要，再读 InternScience/scp 固定 commit README，最后 prepare_meeting。当前是第一步，公开 HTTP 额度 8，足够两次读取。先做摘要读取，只获取有限节选，不做全文复现断言。",
+        "reason": "按确认输入的顺序，第一步就是读取该 arXiv 摘要；这是当前唯一被明确要求且工具支持的真实短任务，且不涉及本地计算或代码执行。",
+        "report": {
+          "evidence_refs": [
+            "operation:75dea578339040649247b0ef527b318e"
+          ],
+          "limitations": [
+            "只读取了摘要与元数据，未读全文，摘要中的性能声明与任务结论均属作者声明，未经验证。",
+            "摘要为有限节选，后续内容被截断，不能据此推断全文缺失部分。",
+            "未读取 InternScience/scp 固定 commit README，也未运行任何代码或实验，无本地计算证据。",
+            "本轮未执行 prepare_meeting，组会输入尚未成形。"
+          ],
+          "next_step": "按计划继续第二步：读取 InternScience/scp 固定 commit 的 README 节选，记录其定位、依赖与使用方式，并明确区分 README 声明与已验证内容。随后再执行 prepare_meeting，把摘要要点与 README 要点整理成两到三条中文发现，标注哪些是作者声明、哪些尚未验证，作为个人云组会的输入与后台工作项，并据此再规划后续复验动作。",
+          "summary": "本轮只完成了第一步：读取 arXiv 2602.08990 的摘要元数据，拿到标题、作者列表和一段节选摘要，确认该文提出 InternAgent-1.5，一个面向长周期自主科学发现的统一智能体框架，含生成、验证、演化三个子系统，并声称在 GAIA、HLE、GPQA、FrontierScience 等基准上取得领先表现，还涉及算法发现与实验发现两类任务。尚未读取 InternScience/scp 的固定 commit README，也未做任何复现或代码执行。"
+        },
+        "result": {
+          "http_requests": [
+            {
+              "attempt_number": 1,
+              "cached": false,
+              "elapsed_seconds": 0.471,
+              "http_status": 200,
+              "id": "29303720bb0d49f0add202bc358bfc82",
+              "sha256": "f0abfa49cb55ed5088746d11ca5a14fc8f8d73db798132d02c8f6aea72f733c6",
+              "status": "completed",
+              "transport": "urllib",
+              "url": "https://export.arxiv.org/api/query?id_list=2602.08990&max_results=1"
+            }
+          ],
+          "sources": [
+            {
+              "authors": [
+                "Shiyang Feng",
+                "Runmin Ma",
+                "Xiangchao Yan",
+                "Yue Fan",
+                "Yusong Hu",
+                "Songtao Huang",
+                "Shuaiyu Zhang",
+                "Zongsheng Cao",
+                "Tianshuo Peng",
+                "Jiakang Yuan",
+                "Zijie Guo",
+                "Zhijie Zhong",
+                "Shangheng Du",
+                "Weida Wang",
+                "Jinxin Shi",
+                "Yuhao Zhou",
+                "Xiaohan He",
+                "Zhiyin Yu",
+                "Fangchen Yu",
+                "Qihao Zheng",
+                "Jiamin Wu",
+                "Mianxin Liu",
+                "Chi Zhang",
+                "Shaowei Hou",
+                "Shuya Li",
+                "Yankai Jiang",
+                "Wenjie Lou",
+                "Lilong Wang",
+                "Zifu Wang",
+                "Jiong Wang",
+                "Wanghan Xu",
+                "Yue Deng",
+                "Dongrui Liu",
+                "Yiheng Wang",
+                "Wenlong Zhang",
+                "Fenghua Ling",
+                "Shufei Zhang",
+                "Xiaosong Wang",
+                "Shuangjia Zheng",
+                "Xun Huang",
+                "Siqi Sun",
+                "Shuyue Hu",
+                "Peng Ye",
+                "Chunfeng Song",
+                "Bin Wang",
+                "Conghui He",
+                "Yihao Liu",
+                "Xin Li",
+                "Qibin Hou",
+                "Tao Chen",
+                "Xiangyu Yue",
+                "Bin Wang",
+                "Liang He",
+                "Dahua Lin",
+                "Bowen Zhou",
+                "Bo Zhang",
+                "Lei Bai"
+              ],
+              "id": "2602.08990v1",
+              "kind": "paper_abstract",
+              "published": "2026-02-09T18:36:06Z",
+              "title": "InternAgent-1.5: A Unified Agentic Framework for Long-Horizon Autonomous Scientific Discovery",
+              "updated": "2026-02-09T18:36:06Z",
+              "url": "https://arxiv.org/abs/2602.08990v1",
+              "verification": "只读取元数据和摘要，未读全文、未复现实验"
+            }
+          ],
+          "status": "completed"
+        },
+        "simulation": false,
+        "summary": "本轮只完成了第一步：读取 arXiv 2602.08990 的摘要元数据，拿到标题、作者列表和一段节选摘要，确认该文提出 InternAgent-1.5，一个面向长周期自主科学发现的统一智能体框架，含生成、验证、演化三个子系统，并声称在 GAIA、HLE、GPQA、FrontierScience 等基准上取得领先表现，还涉及算法发现与实验发现两类任务。尚未读取 InternScience/scp 的固定 commit README，也未做任何复现或代码执行。",
+        "value": "2602.08990"
+      },
+      "sha256": "903897fdd6c26301e1d59c708627b307f1c5e550d669d2ffe50d753afd47e7d7",
+      "created": 1791308166.57798
+    }
+  ],
+  "tool_operations": [
+    {
+      "id": "75dea578339040649247b0ef527b318e",
+      "project_id": "cca0fdd1e24147eb9fecf69351dfa736",
+      "task_id": "75dea578339040649247b0ef527b318e",
+      "body": {
+        "action": "read_abstract",
+        "kind": "research",
+        "plan": "本轮为工程验收轮，任务明确：先读 arXiv 2602.08990 摘要，再读 InternScience/scp 固定 commit README，最后 prepare_meeting。当前是第一步，公开 HTTP 额度 8，足够两次读取。先做摘要读取，只获取有限节选，不做全文复现断言。",
+        "reason": "按确认输入的顺序，第一步就是读取该 arXiv 摘要；这是当前唯一被明确要求且工具支持的真实短任务，且不涉及本地计算或代码执行。",
+        "result": {
+          "http_requests": [
+            {
+              "attempt_number": 1,
+              "cached": false,
+              "elapsed_seconds": 0.471,
+              "http_status": 200,
+              "id": "29303720bb0d49f0add202bc358bfc82",
+              "sha256": "f0abfa49cb55ed5088746d11ca5a14fc8f8d73db798132d02c8f6aea72f733c6",
+              "status": "completed",
+              "transport": "urllib",
+              "url": "https://export.arxiv.org/api/query?id_list=2602.08990&max_results=1"
+            }
+          ],
+          "sources": [
+            {
+              "authors": [
+                "Shiyang Feng",
+                "Runmin Ma",
+                "Xiangchao Yan",
+                "Yue Fan",
+                "Yusong Hu",
+                "Songtao Huang",
+                "Shuaiyu Zhang",
+                "Zongsheng Cao",
+                "Tianshuo Peng",
+                "Jiakang Yuan",
+                "Zijie Guo",
+                "Zhijie Zhong",
+                "Shangheng Du",
+                "Weida Wang",
+                "Jinxin Shi",
+                "Yuhao Zhou",
+                "Xiaohan He",
+                "Zhiyin Yu",
+                "Fangchen Yu",
+                "Qihao Zheng",
+                "Jiamin Wu",
+                "Mianxin Liu",
+                "Chi Zhang",
+                "Shaowei Hou",
+                "Shuya Li",
+                "Yankai Jiang",
+                "Wenjie Lou",
+                "Lilong Wang",
+                "Zifu Wang",
+                "Jiong Wang",
+                "Wanghan Xu",
+                "Yue Deng",
+                "Dongrui Liu",
+                "Yiheng Wang",
+                "Wenlong Zhang",
+                "Fenghua Ling",
+                "Shufei Zhang",
+                "Xiaosong Wang",
+                "Shuangjia Zheng",
+                "Xun Huang",
+                "Siqi Sun",
+                "Shuyue Hu",
+                "Peng Ye",
+                "Chunfeng Song",
+                "Bin Wang",
+                "Conghui He",
+                "Yihao Liu",
+                "Xin Li",
+                "Qibin Hou",
+                "Tao Chen",
+                "Xiangyu Yue",
+                "Bin Wang",
+                "Liang He",
+                "Dahua Lin",
+                "Bowen Zhou",
+                "Bo Zhang",
+                "Lei Bai"
+              ],
+              "id": "2602.08990v1",
+              "kind": "paper_abstract",
+              "published": "2026-02-09T18:36:06Z",
+              "title": "InternAgent-1.5: A Unified Agentic Framework for Long-Horizon Autonomous Scientific Discovery",
+              "updated": "2026-02-09T18:36:06Z",
+              "url": "https://arxiv.org/abs/2602.08990v1",
+              "verification": "只读取元数据和摘要，未读全文、未复现实验"
+            }
+          ],
+          "status": "completed"
+        },
+        "value": "2602.08990"
+      },
+      "sha256": "35f1c5cfe8d90f317a711678899e4edce9def9b01a786ce9eeb5a16272a6867f",
+      "created": 1791308164.2415335
+    }
+  ],
+  "decisions": [],
+  "events": [
+    {
+      "id": 110,
+      "project_id": "cca0fdd1e24147eb9fecf69351dfa736",
+      "kind": "project_created",
+      "body": "{\"simulation\":false}",
+      "created": 1791308162.3688922
+    },
+    {
+      "id": 111,
+      "project_id": "cca0fdd1e24147eb9fecf69351dfa736",
+      "kind": "task_started",
+      "body": "{\"attempt\":1,\"task_id\":\"75dea578339040649247b0ef527b318e\"}",
+      "created": 1791308162.5488775
+    },
+    {
+      "id": 112,
+      "project_id": "cca0fdd1e24147eb9fecf69351dfa736",
+      "kind": "model_request_reserved",
+      "body": "{\"category\":\"background\",\"request_id\":\"ca8300c98dba4ec9b3e455442824f378\"}",
+      "created": 1791308162.5933292
+    },
+    {
+      "id": 113,
+      "project_id": "cca0fdd1e24147eb9fecf69351dfa736",
+      "kind": "tool_result_saved",
+      "body": "{\"operation_id\":\"75dea578339040649247b0ef527b318e\"}",
+      "created": 1791308164.24157
+    },
+    {
+      "id": 114,
+      "project_id": "cca0fdd1e24147eb9fecf69351dfa736",
+      "kind": "model_request_reserved",
+      "body": "{\"category\":\"background\",\"request_id\":\"348b3ba512054193a0dad3f315d69418\"}",
+      "created": 1791308164.244891
+    },
+    {
+      "id": 115,
+      "project_id": "cca0fdd1e24147eb9fecf69351dfa736",
+      "kind": "task_completed",
+      "body": "{\"task_id\":\"75dea578339040649247b0ef527b318e\",\"version\":1}",
+      "created": 1791308166.578042
+    },
+    {
+      "id": 116,
+      "project_id": "cca0fdd1e24147eb9fecf69351dfa736",
+      "kind": "task_started",
+      "body": "{\"attempt\":1,\"task_id\":\"ce24c2c32fb4440d95e3183916054319\"}",
+      "created": 1791308166.5810146
+    },
+    {
+      "id": 117,
+      "project_id": "cca0fdd1e24147eb9fecf69351dfa736",
+      "kind": "model_request_reserved",
+      "body": "{\"category\":\"background\",\"request_id\":\"5da567aceae2498b87a417e6251deea1\"}",
+      "created": 1791308166.5841794
+    },
+    {
+      "id": 118,
+      "project_id": "cca0fdd1e24147eb9fecf69351dfa736",
+      "kind": "task_failed",
+      "body": "{\"error\":\"真实模型传输或响应失败；这次请求已计入，不自动重试\",\"task_id\":\"ce24c2c32fb4440d95e3183916054319\"}",
+      "created": 1791333942.3400567
+    }
+  ],
+  "model_requests": [
+    {
+      "id": "ca8300c98dba4ec9b3e455442824f378",
+      "task_id": "75dea578339040649247b0ef527b318e",
+      "category": "background",
+      "phase": "research-plan",
+      "status": "completed",
+      "http_status": 200,
+      "usage": {
+        "completion_tokens": 190,
+        "prompt_cache_hit_tokens": 384,
+        "prompt_cache_miss_tokens": 687,
+        "prompt_tokens": 1071,
+        "prompt_tokens_details": {
+          "cached_tokens": 384
+        },
+        "total_tokens": 1261
+      },
+      "error": null,
+      "created": 1791308162.5933018,
+      "finished": 1791308163.727913,
+      "finish_reason": "tool_calls",
+      "request_sha256": "406a932ce71d46e1b093aa88885ef468c9d623e839292c3486bf8a2d1090cea2",
+      "response_sha256": "91504ad5e5394d4b60c99dc9dda2f4549067b72a7e8fcf999c0fbe701dc221c0",
+      "context_evidence_ids": [],
+      "execution_constraints": null
+    },
+    {
+      "id": "348b3ba512054193a0dad3f315d69418",
+      "task_id": "75dea578339040649247b0ef527b318e",
+      "category": "background",
+      "phase": "research-report",
+      "status": "completed",
+      "http_status": 200,
+      "usage": {
+        "completion_tokens": 336,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 1250,
+        "prompt_tokens": 1250,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "total_tokens": 1586
+      },
+      "error": null,
+      "created": 1791308164.2448444,
+      "finished": 1791308166.538556,
+      "finish_reason": "stop",
+      "request_sha256": "8a34b2677a0aa218152b0b5931d6b0e226168425bd2df22a615ebd83f1df69fa",
+      "response_sha256": "da603d36a9d2de2b019a1cd0bd97499411e405c7f7b16ea7bac3a3a3c1fa15dc",
+      "context_evidence_ids": [],
+      "execution_constraints": {
+        "available_actions": [
+          "search_papers",
+          "read_abstract",
+          "search_repositories",
+          "inspect_repository",
+          "synthetic_regression",
+          "prepare_meeting"
+        ],
+        "permissions": {
+          "local_compute": false,
+          "model_calls": true,
+          "public_research": true,
+          "retry_public_reads": false
+        },
+        "remaining_background_requests_after_report": 4,
+        "remaining_public_http_requests": 7,
+        "source_scope": "只读摘要与有限README节选，不能从节选推断全文缺失内容",
+        "unavailable": [
+          "论文全文读取",
+          "任意仓库代码执行",
+          "任意GPU训练"
+        ]
+      }
+    },
+    {
+      "id": "5da567aceae2498b87a417e6251deea1",
+      "task_id": "ce24c2c32fb4440d95e3183916054319",
+      "category": "background",
+      "phase": "research-plan",
+      "status": "error",
+      "http_status": null,
+      "usage": null,
+      "error": "transport_or_response_error",
+      "created": 1791308166.584146,
+      "finished": 1791333942.3377497,
+      "finish_reason": null,
+      "request_sha256": "9656c81917a7649536a20048aa01353d81287614f656e5daa0a7961e144f7904",
+      "response_sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "context_evidence_ids": [],
+      "execution_constraints": null
+    }
+  ],
+  "source_requests": [
+    {
+      "id": "29303720bb0d49f0add202bc358bfc82",
+      "task_id": "75dea578339040649247b0ef527b318e",
+      "url": "https://export.arxiv.org/api/query?id_list=2602.08990&max_results=1",
+      "status": "completed",
+      "sha256": "f0abfa49cb55ed5088746d11ca5a14fc8f8d73db798132d02c8f6aea72f733c6",
+      "http_status": 200,
+      "created": 1791308163.7312903,
+      "finished": 1791308164.204777,
+      "transport": "urllib",
+      "attempt_number": 1,
+      "elapsed_seconds": 0.471,
+      "raw_sha256": "7d18dc42dfe748566b23851f915084136505e6f876a2deeb636ad678f371fb52"
+    }
+  ],
+  "meetings": []
+}

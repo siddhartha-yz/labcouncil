@@ -119,3 +119,5 @@ The [Virtual Lab individual-meeting supplement](reproductions/2026-10-04-virtual
 The [historical-source audit](reproductions/2026-10-04-source-mapping/REPORT.md) distinguishes the paper-era Assistants interface from the newer Chat Completions implementation. The [controlled comparison](reproductions/2026-10-05-comparison/REPORT.md) contains 12 real runs across single-agent, multi-agent, and actual user-review conditions; its small synthetic tasks do not establish general scientific superiority.
 
 研究模式由真实Flash逐步规划、读取资料并准备组会。[首轮记录](reproductions/2026-10-06-research-loop/REPORT.md)保留早期失败；[恢复验收](reproductions/2026-10-06-network-recovery/REPORT.md)实际取得论文摘要和固定commit README。网络仍可能中断：明确勾选后，每个URL全项目最多三次连接尝试，每次单独记账；不重试模型请求。尚未接入完整论文复现实验。
+
+最终组会报告现可综合保存的来源与工具证据，逐条列发现、验证边界和依据链接，并复用前轮材料。[综合报告验收](reproductions/2026-10-07-meeting-synthesis/REPORT.md)保留截断失败、跨轮成功、语义纠错和连接失败；最新提示的完整真实复验仍待完成。
