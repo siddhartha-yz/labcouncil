@@ -10,7 +10,7 @@ from pathlib import Path
 import sqlite3
 import time
 import uuid
-from .brief import normalize, start_blocker, make_plan
+from .brief import normalize, start_blocker, make_plan, round_time
 
 
 class Conflict(ValueError):
@@ -229,9 +229,10 @@ class Store:
             return {**dict(row), 'body': json.loads(row['body']), 'plan': json.loads(row['plan']), 'legacy': False}
         execution = con.execute('SELECT mode FROM project_execution WHERE project_id=?', (project['id'],)).fetchone()
         mode = execution['mode'] if execution else 'simulation'
-        decision = con.execute('SELECT instruction FROM decisions WHERE project_id=? AND to_version=?', (project['id'], version)).fetchone()
+        decision = con.execute('SELECT instruction,created FROM decisions WHERE project_id=? AND to_version=?', (project['id'], version)).fetchone()
         brief = normalize(None, decision['instruction'] if decision else project['idea'], mode)
-        return {'project_id': project['id'], 'version': version, 'body': brief, 'plan': make_plan(brief, mode), 'legacy': True}
+        return {'project_id': project['id'], 'version': version, 'body': brief, 'plan': make_plan(brief, mode), 'legacy': True,
+                'created':decision['created'] if decision else project['created']}
 
     def projects(self):
         with self.connection() as con:
@@ -257,12 +258,13 @@ class Store:
             result['current_inputs'] = self.inputs(con, result)
             result['input_history'] = [{**dict(r), 'body': json.loads(r['body']), 'plan': json.loads(r['plan'])}
                 for r in con.execute('SELECT * FROM round_inputs WHERE project_id=? ORDER BY version', (identifier,))]
-            result['work_blocker'] = start_blocker(result['current_inputs']['body'], result['execution']['mode'], time.time())
+            result['round_time'] = round_time(result['current_inputs'],time.time())
+            result['work_blocker'] = start_blocker(result['current_inputs']['body'], result['execution']['mode'], time.time(),result['current_inputs']['created'])
             result["model_requests"] = [dict(r) for r in con.execute("SELECT * FROM model_requests WHERE project_id=? ORDER BY created",(identifier,))]
             for request in result["model_requests"]:
                 for key in ("request","response","usage"):
                     if request[key] is not None:request[key]=json.loads(request[key])
-            if result['execution']['mode'] == 'research' and result['execution']['api_budget'] - sum(r['category']=='background' for r in result['model_requests']) < 2:
+            if not result['work_blocker'] and result['execution']['mode'] == 'research' and result['execution']['api_budget'] - sum(r['category']=='background' for r in result['model_requests']) < 2:
                 result['work_blocker'] = '剩余模型额度不足以完成下一步，等待组会审查'
             result['source_requests'] = [dict(r) for r in con.execute(
                 'SELECT id,task_id,url,status,sha256,http_status,created,finished,body FROM source_requests WHERE project_id=? ORDER BY created', (identifier,))]
@@ -304,6 +306,7 @@ class Store:
                     con.execute("UPDATE source_requests SET status='unknown' WHERE task_id=? AND status='started'", (old['id'],))
                     con.execute("UPDATE model_requests SET status='unknown',error='worker lease expired' WHERE task_id=? AND status='started'",(old["id"],))
                 self.event(con, p["id"], "lease_expired", {"task_id": old["id"], "status": new_status})
+            self._expire_rounds(con,now)
             rows = con.execute("""SELECT t.* FROM tasks t JOIN projects p ON p.id=t.project_id
                 LEFT JOIN tasks d ON d.id=t.dependency
                 WHERE t.status='queued' AND p.paused=0 AND t.version=p.version
@@ -319,7 +322,8 @@ class Store:
                     used = con.execute("SELECT COUNT(*) FROM model_requests WHERE project_id=? AND category='background'", (p['id'],)).fetchone()[0]
                     cap = con.execute('SELECT api_budget FROM project_execution WHERE project_id=?', (p['id'],)).fetchone()[0]
                     if cap - used < 2: continue
-                if not start_blocker(self.inputs(con, p)['body'], mode, now):
+                inputs = self.inputs(con,p)
+                if not start_blocker(inputs['body'], mode, now,inputs['created']):
                     eligible.append(row)
                     break
             rows = eligible
@@ -336,6 +340,17 @@ class Store:
                         (owner, now+lease, task["id"]))
             self.event(con, task["project_id"], "task_started", {"task_id": task["id"], "attempt": task["attempts"]+1})
             return {**self.row(con, "tasks", task["id"]),"mode":mode}
+
+    def _expire_rounds(self, con, now):
+        rows = con.execute("SELECT p.* FROM projects p WHERE EXISTS (SELECT 1 FROM tasks t WHERE t.project_id=p.id AND t.version=p.version AND t.status IN ('queued','running'))").fetchall()
+        for row in rows:
+            p = dict(row)
+            clock = round_time(self.inputs(con,p),now)
+            if not clock['expired']:continue
+            reason = '本轮工作时长已到，等待组会'
+            con.execute("UPDATE tasks SET status='cancelled',finished=?,error=? WHERE project_id=? AND version=? AND status='queued'",(now,reason,p['id'],p['version']))
+            emitted = con.execute("SELECT 1 FROM events WHERE project_id=? AND kind='round_time_expired' AND json_extract(body,'$.version')=?",(p['id'],p['version'])).fetchone()
+            if not emitted:self.event(con,p['id'],'round_time_expired',{'version':p['version'],'deadline_at':clock['deadline_at'],'reason':reason})
 
     def dependency_artifact(self, task):
         if not task["dependency"]:
@@ -371,6 +386,7 @@ class Store:
                 reason = 'agent准备好组会材料'
                 if body.get('continue_work'):
                     if p['version'] != task['version']: reason = '已确认新一轮，旧轮停止'
+                    elif round_time(self.inputs(con,p),time.time())['expired']: reason = '本轮工作时长已到，等待组会'
                     elif count >= 6: reason = '本轮六步上限已到'
                     elif p['used'] >= p['budget']: reason = '项目任务额度已到'
                     elif con.execute('SELECT COUNT(*) FROM source_requests WHERE project_id=?',(p['id'],)).fetchone()[0] >= execution['source_budget']: reason = '公开资料请求额度已到'
@@ -583,7 +599,7 @@ class Store:
             p = self.row(con, "projects", m["project_id"])
             execution = con.execute('SELECT mode FROM project_execution WHERE project_id=?', (p['id'],)).fetchone()
             mode = execution['mode'] if execution else 'simulation'
-            normalized = normalize(brief, instruction, mode) if brief is not None else {**self.inputs(con, p, m['version'])['body'], 'idea': instruction}
+            normalized = normalize(brief if brief is not None else {**self.inputs(con,p,m['version'])['body'],'idea':instruction},instruction,mode)
             if normalized['idea'] != instruction:
                 raise ValueError('下一轮idea和指令须一致')
             existing = con.execute("SELECT * FROM decisions WHERE meeting_id=?", (meeting_id,)).fetchone()

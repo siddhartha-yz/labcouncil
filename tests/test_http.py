@@ -95,6 +95,19 @@ class HTTPTests(unittest.TestCase):
         self.assertEqual(p['qa_budget'],0)
         self.assertTrue(p['paused'])
 
+    def test_round_time_is_confirmed_through_http(self):
+        from labcouncil.brief import normalize
+        b=normalize(None,'控制本轮投入','simulation')
+        b['work_time']={'duration_minutes':45}
+        status,_,raw=self.request('POST','/api/projects',{'title':'每轮时间预算','idea':b['idea'],'brief':b})
+        self.assertEqual(status,201)
+        pid=json.loads(raw)['id']
+        _,_,raw=self.request('GET',f'/api/projects/{pid}')
+        p=json.loads(raw)
+        self.assertEqual(p['round_time']['duration_minutes'],45)
+        self.assertEqual(p['round_time']['deadline_at']-p['round_time']['started_at'],2700)
+        self.assertIn('45分钟',p['current_inputs']['plan']['work_window'])
+
     def test_backend_selected_through_http_and_invalid_value_atomic(self):
         status,_,raw=self.request('POST','/api/projects',{'title':'CLI HTTP fixture','idea':'保留模型配置','mode':'research','backend':'codex_cli'})
         self.assertEqual(status,201)

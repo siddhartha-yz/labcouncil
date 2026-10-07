@@ -13,13 +13,14 @@ const esc = x => String(x ?? "").replace(/[&<>"']/g, c => ({
   "\"": "&quot;",
   "'": "&#39;"
 }[c]));
+const roundDuration = b => b.work_time?.duration_minutes ?? 120;
 const when = t => new Date(t * 1000).toLocaleString("zh-CN");
 const states = {
   queued: "等待",
   running: "进行中",
   completed: "完成",
   failed: "失败",
-  cancelled: "已被新一轮替代"
+  cancelled: "已停止启动"
 };
 const roles = {
   researcher: "准备输入",
@@ -36,12 +37,7 @@ const defaultBrief = () => ({
     public_research: false,
     retry_public_reads: false
   },
-  work_time: {
-    all_day: false,
-    start: "09:00",
-    end: "18:00",
-    timezone: "Asia/Shanghai"
-  }
+  work_time: { duration_minutes: 120 }
 });
 function announce(text, error = false) {
   clearTimeout(noticeTimer);
@@ -100,8 +96,8 @@ function filterGroups() {
   document.querySelectorAll(".project-link").forEach(b => { b.hidden = !b.textContent.toLowerCase().includes(query); });
 }
 function briefFields(b) {
-  const w = b.work_time;
-  return `<label>Idea：这一轮想解决什么？<textarea name="idea" maxlength="4000" required placeholder="写清楚你想知道什么、希望得到什么结果">${ esc(b.idea) }</textarea></label><label>可调用资源<textarea name="resources" maxlength="4000" placeholder="例如：可用模型和调用额度、本机算力、已有数据、论文或仓库地址。不要填写密钥。">${ esc(b.resources) }</textarea></label><fieldset><legend>权限：允许 agent 做什么？</legend><label class="check"><input type="checkbox" name="model_calls" ${ b.permissions.model_calls ? "checked" : "" }>调用已配置的模型（可能产生费用）</label><label class="check"><input type="checkbox" name="local_compute" ${ b.permissions.local_compute ? "checked" : "" }>运行已接入的本地计算工具</label><label class="check"><input type="checkbox" name="public_research" ${ b.permissions.public_research ? "checked" : "" }>查询公开论文与仓库</label><label class="check"><input type="checkbox" name="retry_public_reads" ${b.permissions.retry_public_reads ? "checked" : ""}>公开资料连接失败后，允许最多再试两次（每次留记录并计入额度）</label><p class="muted">这些勾选不授权任意 shell、安装依赖、公开发布或访问其他私人文件。</p></fieldset><fieldset><legend>工作时间：每天什么时段可以工作？</legend><div class="form-grid"><label>每天开始<input name="start" type="time" value="${ esc(w.start) }" required></label><label>每天结束<input name="end" type="time" value="${ esc(w.end) }" required></label></div><label>时区<input name="timezone" value="${ esc(w.timezone) }" required></label><label class="check"><input name="all_day" type="checkbox" ${ w.all_day ? "checked" : "" }>全天可工作</label><p class="muted">支持跨午夜。时段外不启动新任务，已开始的短任务可收尾保存；你可随时开组会。</p></fieldset><label>额外要求<textarea name="requirements" maxlength="4000" placeholder="例如：先复现再采用；保留失败记录；报告用大白话；不要重复已有实验。">${ esc(b.requirements) }</textarea></label>`;
+  const minutes = roundDuration(b);
+  return `<label>Idea：这一轮想解决什么？<textarea name="idea" maxlength="4000" required placeholder="写清楚你想知道什么、希望得到什么结果">${ esc(b.idea) }</textarea></label><label>可调用资源<textarea name="resources" maxlength="4000" placeholder="例如：可用模型和调用额度、本机算力、已有数据、论文或仓库地址。不要填写密钥。">${ esc(b.resources) }</textarea></label><fieldset><legend>权限：允许 agent 做什么？</legend><label class="check"><input type="checkbox" name="model_calls" ${ b.permissions.model_calls ? "checked" : "" }>调用已配置的模型（可能产生费用）</label><label class="check"><input type="checkbox" name="local_compute" ${ b.permissions.local_compute ? "checked" : "" }>运行已接入的本地计算工具</label><label class="check"><input type="checkbox" name="public_research" ${ b.permissions.public_research ? "checked" : "" }>查询公开论文与仓库</label><label class="check"><input type="checkbox" name="retry_public_reads" ${b.permissions.retry_public_reads ? "checked" : ""}>公开资料连接失败后，允许最多再试两次（每次留记录并计入额度）</label><p class="muted">这些勾选不授权任意 shell、安装依赖、公开发布或访问其他私人文件。</p></fieldset><fieldset><legend>本轮研究预算：最多工作多久？</legend><label>本轮工作时长（分钟）<input name="duration_minutes" type="number" min="1" max="10080" step="1" value="${esc(minutes)}" required></label><p class="muted">确认后开始计时，暂停和服务离线也计入。到时不启动新步骤，已启动的步骤可保存结果。任务完成或资源用完可以提前停止；时长不是完成量。</p></fieldset><label>额外要求<textarea name="requirements" maxlength="4000" placeholder="例如：先复现再采用；保留失败记录；报告用大白话；不要重复已有实验。">${ esc(b.requirements) }</textarea></label>`;
 }
 function readBrief(form) {
   const f = new FormData(form);
@@ -115,12 +111,7 @@ function readBrief(form) {
       public_research: f.has("public_research"),
       retry_public_reads: f.has("retry_public_reads")
     },
-    work_time: {
-      all_day: f.has("all_day"),
-      start: f.get("start"),
-      end: f.get("end"),
-      timezone: f.get("timezone")
-    }
+    work_time: { duration_minutes: Number(f.get("duration_minutes")) }
   };
 }
 function scenarioOptions(s = "clean", real = false) {
@@ -137,7 +128,7 @@ function inputsSummary(b) {
     b.permissions.local_compute ? "已接入本地计算" : null,
     b.permissions.public_research ? "公开论文与仓库查询" : null,
     b.permissions.retry_public_reads ? "连接失败后最多重试两次（每次计入）" : null
-  ].filter(Boolean).join("、") || "未授权执行" }</dd><dt>每日时间</dt><dd>${ w.all_day ? "全天" : `${ esc(w.start) }–${ esc(w.end) }` } · ${ esc(w.timezone) }</dd><dt>额外要求</dt><dd>${ esc(b.requirements) || "未补充" }</dd></dl>`;
+  ].filter(Boolean).join("、") || "未授权执行" }</dd><dt>本轮研究预算</dt><dd>${w.duration_minutes === undefined ? "旧版每日时段已停用；下一轮默认120分钟，可重新选择" : `最多${esc(w.duration_minutes)}分钟，确认后计时`}</dd><dt>额外要求</dt><dd>${ esc(b.requirements) || "未补充" }</dd></dl>`;
 }
 function report(artifacts, simulation, research = false, operations = []) {
   if (research || artifacts.some(a => a.body.kind === "research")) return researchReport(artifacts, operations);
@@ -155,7 +146,7 @@ function report(artifacts, simulation, research = false, operations = []) {
     }
   }
   const numbers = computed && !simulation ? `<details><summary>查看具体数值（越小越接近测试标签）</summary><div class="table-scroll"><table><thead><tr><th>重复</th><th>直线平方误差</th><th>均值平方误差</th><th>直线绝对误差</th></tr></thead><tbody>${ computed.results.map(r => `<tr><td>${ r.seed }</td><td>${ r.metrics.linear.mse.toFixed(3) }</td><td>${ r.metrics.baseline.mse.toFixed(3) }</td><td>${ r.metrics.linear.mae.toFixed(3) }</td></tr>`).join("") }</tbody></table></div></details>` : computed ? `<details><summary>查看具体数值（演示数据）</summary><p>这五个点上的平均平方误差：拟合直线 ${ computed.metrics.mse.toFixed(3) }，只猜平均值 ${ computed.baseline.mse.toFixed(3) }。越小表示整体偏差越小；这不是新数据上的成绩。</p></details>` : "";
-  return `<section class="panel report"><h2>本轮报告</h2><p class="muted">摘要由程序依据已保存结果整理；角色原始报告与证据可在下方展开。</p><h3>做了什么</h3><p>${ by.researcher ? "准备输入" + (computed ? "、完成计算" : "") + (review ? "，并独立复算" : "") + "，过程和数据已保存。" : "尚未完成输入准备。" }${ simulation ? "当前使用固定程序演示。" : "角色使用已选模型后台，工具只处理合成计算。" }</p><h3>发现什么</h3><p>${ esc(result) }</p>${ numbers }<h3>还有什么没做</h3><p>${ review ? review.verified ? "数值已独立核对一致，但报告文字仍需审查。" : "数值核对存在不一致，需要检查原始证据。" : "独立核验尚未完成。" } 尚未探索论文或仓库，也没有根据这个 idea 自动编写新实验。</p><h3>组会需要决定什么</h3><p>是否认可这些有限结果？下一轮的目标、资源、权限、每日时段或额外要求是否需要调整？</p><details><summary>审查角色原始报告与证据（${ artifacts.length } 份）</summary>${ artifacts.map(a => {
+  return `<section class="panel report"><h2>本轮报告</h2><p class="muted">摘要由程序依据已保存结果整理；角色原始报告与证据可在下方展开。</p><h3>做了什么</h3><p>${ by.researcher ? "准备输入" + (computed ? "、完成计算" : "") + (review ? "，并独立复算" : "") + "，过程和数据已保存。" : "尚未完成输入准备。" }${ simulation ? "当前使用固定程序演示。" : "角色使用已选模型后台，工具只处理合成计算。" }</p><h3>发现什么</h3><p>${ esc(result) }</p>${ numbers }<h3>还有什么没做</h3><p>${ review ? review.verified ? "数值已独立核对一致，但报告文字仍需审查。" : "数值核对存在不一致，需要检查原始证据。" : "独立核验尚未完成。" } 尚未探索论文或仓库，也没有根据这个 idea 自动编写新实验。</p><h3>组会需要决定什么</h3><p>是否认可这些有限结果？下一轮的目标、资源、权限、本轮工作时长或额外要求是否需要调整？</p><details><summary>审查角色原始报告与证据（${ artifacts.length } 份）</summary>${ artifacts.map(a => {
     const b = a.body, spec = b.parameters;
     return `<article class="evidence"><h3>${ esc(roles[a.role]) }</h3>${ spec ? `<p class="muted">工具实际输入：${ spec.test_outlier_fraction === 0 ? "干净测试标签" : "测试标签约一成异常" }，${ spec.seeds.length } 次重复。</p>` : "" }<p>${ esc(b.summary) }</p>${ b.report?.limitations ? `<ul>${ b.report.limitations.map(x => `<li>${ esc(x) }</li>`).join("") }</ul>` : `<p class="muted">${ esc(b.limitation) }</p>` }<a href="/api/evidence/${ esc(a.id) }" target="_blank" rel="noopener">打开原始证据</a></article>`;
   }).join("") || "<p>尚无产物</p>" }</details></section>`;
@@ -179,7 +170,7 @@ function researchReport(artifacts, operations) {
 
 function requestDetails(p) {
   const real = p.execution.mode !== "simulation", rs = p.model_requests, known = rs.filter(r => r.usage && Number.isFinite(r.usage.total_tokens));
-  return `<details><summary>执行状态、额度与调用明细</summary>${p.execution.backend === "codex_cli" && real ? `<p>模型后台：${esc(backendLabel(p.execution.backend))}。以下请求次数按 CLI 启动计数，内部模型 turn 未设硬上限；token 为 CLI 返回的用量。平台工具受原权限限制。</p>` : ""}<p>角色任务已用 ${ p.used }/${ p.budget }；问答已用 ${ p.qa_used } 次（不限次数）。${ real ? `后台真实请求 ${ rs.filter(r => r.category === "background").length }/${ p.execution.api_budget }；公开资料请求 ${(p.source_requests || []).length}/${p.execution.source_budget ?? 24}；组会真实请求 ${ rs.filter(r => r.category === "qa").length } 次（不限次数）。已知 ${ known.reduce((n, r) => n + r.usage.total_tokens, 0) } tokens；${ rs.length - known.length } 次用量未知。人民币费用未知，没有 token 硬上限。` : "角色与问答为固定程序，不调用模型。" }</p><ul>${ p.tasks.map(t => `<li>第 ${ t.version } 轮 · ${ esc(roles[t.role] || t.role.replace("research_step_", "研究步骤 ")) } · ${ esc(states[t.status]) }${ t.error ? `：${ esc(t.error) }` : "" }</li>`).join("") }</ul>${ real ? `<h3>实际模型请求</h3><ul>${ rs.map(r => `<li><a href="/api/model-requests/${ esc(r.id) }" target="_blank" rel="noopener">${ esc(r.phase) } · ${ esc(r.status) }</a></li>`).join("") }</ul><h3>公开来源请求</h3><ul>${(p.source_requests || []).map(r => `<li><a href="/api/source-requests/${esc(r.id)}" target="_blank" rel="noopener">${esc(r.url)} · ${esc(r.status)} · HTTP ${r.http_status ?? "未知"} · ${esc(r.transport || "原记录")} · 第 ${r.attempt_number ?? 1} 次尝试</a></li>`).join("") || "<li>无公开来源请求</li>"}</ul><h3>独立保存的工具结果</h3><ul>${ p.tool_operations.map(o => `<li><a href="/api/tool-operations/${ esc(o.id) }" target="_blank" rel="noopener">${ esc(o.body.tool || researchActions[o.body.action] || o.body.action) }</a></li>`).join("") || "<li>早期工具结果保存在角色证据内。</li>" }</ul>` : "" }</details>`;
+  return `<details><summary>执行状态、额度与调用明细</summary>${p.execution.backend === "codex_cli" && real ? `<p>模型后台：${esc(backendLabel(p.execution.backend))}。以下请求次数按 CLI 启动计数，内部模型 turn 未设硬上限；token 为 CLI 返回的用量。平台工具受原权限限制。</p>` : ""}<p>本轮时间预算：最多${p.round_time.duration_minutes}分钟，截止${esc(when(p.round_time.deadline_at))}。这是投入上限，不是完成量。</p><p>本轮已保存 ${p.artifacts.filter(a => a.version === p.version).length} 份报告、${p.tool_operations.filter(o => p.tasks.some(t => t.id === o.task_id && t.version === p.version)).length} 份工具结果；失败 ${p.tasks.filter(t => t.version === p.version && t.status === "failed").length} 个步骤。</p><p>角色任务已用 ${ p.used }/${ p.budget }；问答已用 ${ p.qa_used } 次（不限次数）。${ real ? `后台真实请求 ${ rs.filter(r => r.category === "background").length }/${ p.execution.api_budget }；公开资料请求 ${(p.source_requests || []).length}/${p.execution.source_budget ?? 24}；组会真实请求 ${ rs.filter(r => r.category === "qa").length } 次（不限次数）。已知 ${ known.reduce((n, r) => n + r.usage.total_tokens, 0) } tokens；${ rs.length - known.length } 次用量未知。人民币费用未知，没有 token 硬上限。` : "角色与问答为固定程序，不调用模型。" }</p><ul>${ p.tasks.map(t => `<li>第 ${ t.version } 轮 · ${ esc(roles[t.role] || t.role.replace("research_step_", "研究步骤 ")) } · ${ esc(states[t.status]) }${ t.error ? `：${ esc(t.error) }` : "" }</li>`).join("") }</ul>${ real ? `<h3>实际模型请求</h3><ul>${ rs.map(r => `<li><a href="/api/model-requests/${ esc(r.id) }" target="_blank" rel="noopener">${ esc(r.phase) } · ${ esc(r.status) }</a></li>`).join("") }</ul><h3>公开来源请求</h3><ul>${(p.source_requests || []).map(r => `<li><a href="/api/source-requests/${esc(r.id)}" target="_blank" rel="noopener">${esc(r.url)} · ${esc(r.status)} · HTTP ${r.http_status ?? "未知"} · ${esc(r.transport || "原记录")} · 第 ${r.attempt_number ?? 1} 次尝试</a></li>`).join("") || "<li>无公开来源请求</li>"}</ul><h3>独立保存的工具结果</h3><ul>${ p.tool_operations.map(o => `<li><a href="/api/tool-operations/${ esc(o.id) }" target="_blank" rel="noopener">${ esc(o.body.tool || researchActions[o.body.action] || o.body.action) }</a></li>`).join("") || "<li>早期工具结果保存在角色证据内。</li>" }</ul>` : "" }</details>`;
 }
 
 function bubble(key, speaker, body, user = false, time = null) {
@@ -193,12 +184,13 @@ function attachment(kind, id, label) {
 }
 function statusText(p) {
   const ts = p.tasks.filter(t => t.version === p.version);
-  if (ts.some(t => t.status === "running")) return "后台正在工作，完成的结果会出现在这里";
+  if (ts.some(t => t.status === "running")) return p.round_time?.expired ? "本轮时长已到，正在保存当前步骤的结果" : `后台正在工作 · 剩余约${Math.ceil((p.round_time?.remaining_seconds ?? 0)/60)}分钟`;
+  if (p.events.some(e => e.kind === "round_time_expired" && JSON.parse(e.body).version === p.version)) return "本轮工作时长已到，等待你开组会";
   if (ts.some(t => t.status === "failed")) return "本轮有任务失败，可以开组会审查已保存结果";
   if (p.paused) return "后台已暂停启动新任务";
   if (ts.length && ts.every(t => t.status === "completed" || t.status === "cancelled")) return "本轮工作已结束，可以开组会";
   if (p.used >= p.budget) return "任务额度已用完，可以审查已有结果";
-  return p.work_blocker || "后台按每日时段和当前权限安排工作";
+  return p.work_blocker || "后台按本轮时间预算和当前权限安排工作";
 }
 function qaBlocker(p, m) {
   if (m?.status === "closed") return "这场组会已结束。点“开组会”回到当前轮次。";
@@ -232,7 +224,7 @@ function transcript(p, meetings) {
     add(task.finished || task.created, 4, bubble(`failure-${task.id}`, "LabCouncil · 任务失败", `<p>第 ${task.version} 轮的${esc(roles[task.role] || task.role.replace("research_step_", "研究步骤 "))}没有完成。已保存的其他证据仍可审查。</p>${attachment("failure", task.id, "失败记录")}`));
   }
   for (const event of p.events || []) {
-    if (event.kind !== "research_stopped") continue;
+    if (!["research_stopped", "round_time_expired"].includes(event.kind)) continue;
     const data = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
     add(event.created, 4, bubble(`stopped-${event.id || event.created}`, "LabCouncil · 本轮停止原因", `<p>第 ${data.version} 轮：${esc(data.reason)}</p>`));
   }
@@ -333,6 +325,7 @@ function startWizard(step) {
   if (p && (!m || m.status === "closed" || m.version !== p.version)) return;
   const saved = m ? drafts.get(m.id) || m.draft : null;
   const brief = JSON.parse(JSON.stringify(saved?.brief || p?.current_inputs.body || setupDraft || defaultBrief()));
+  brief.work_time = {duration_minutes: roundDuration(brief)};
   wizard = {p, m, brief, settings: {...setupSettings}, scenario: saved?.scenario || p?.scenario || "clean", revision: saved?.revision || 0, step: saved ? "review" : step, messages: []};
   editing = true;
   if (!p) content.querySelector("#transcript").innerHTML = bubble("initial-idea", "你", `<p class="prose">${esc(brief.idea)}</p>`, true);
@@ -342,7 +335,7 @@ const wizardPrompts = {
   idea: "下一轮想让大家解决什么？原有资料和讨论都会接着用。",
   resources: "你手头有哪些资源？例如本机算力、已有数据、可用模型，或者想研究的论文和仓库。不要发密钥。",
   permissions: "开始前，明确一下我们能做哪些事。权限和执行方式由你选择。",
-  hours: "每天什么时间让大家工作？时段外不启动新任务，已开始的任务可以收尾。",
+  hours: "这一轮最多让大家工作多久？这是投入上限，完成任务或资源用完可提前停；到时等你开组会。",
   requirements: "还有其他要求吗？例如先复现再采用、保留失败记录，或者报告尽量简短。",
   review: "条件整理好了。你确认后，我们就按这些条件开始这一轮。"
 };
@@ -351,7 +344,7 @@ function renderWizard() {
   const w = wizard, b = w.brief;
   let controls = "";
   if (w.step === "permissions") controls = `<form id="permission-step"><label class="check"><input type="checkbox" name="model_calls" ${b.permissions.model_calls ? "checked" : ""}>调用已配置的模型</label><label class="check"><input type="checkbox" name="local_compute" ${b.permissions.local_compute ? "checked" : ""}>运行已接入的本地计算</label><label class="check"><input type="checkbox" name="public_research" ${b.permissions.public_research ? "checked" : ""}>查公开论文与仓库</label><label class="check"><input type="checkbox" name="retry_public_reads" ${b.permissions.retry_public_reads ? "checked" : ""}>公开连接失败后最多再试两次</label>${!w.p ? `<label>执行方式<select name="mode"><option value="simulation">程序演示 · 不调用模型</option><option value="research">逐步研究</option><option value="real_case">固定计算</option></select></label>${backendSelect()}` : ""}<button class="small" type="submit">按这些权限继续</button><button class="small" type="button" id="executor-options">执行设置</button></form>`;
-  if (w.step === "hours") controls = `<form id="hours-step"><div class="form-grid"><label>每天开始<input type="time" name="start" value="${esc(b.work_time.start)}" required></label><label>每天结束<input type="time" name="end" value="${esc(b.work_time.end)}" required></label></div><label class="check"><input type="checkbox" name="all_day" ${b.work_time.all_day ? "checked" : ""}>全天可工作</label><details><summary>时区</summary><input name="timezone" aria-label="工作时区" value="${esc(b.work_time.timezone)}" required></details><button class="small" type="submit">按这个时间工作</button></form>`;
+  if (w.step === "hours") controls = `<form id="hours-step"><label>本轮工作时长（分钟）<input type="number" name="duration_minutes" min="1" max="10080" step="1" value="${esc(roundDuration(b))}" required></label><p class="muted">确认后计时；暂停和服务离线也计入。已启动步骤可收尾保存，不保证凑满时长。</p><button class="small" type="submit">按这个预算继续</button></form>`;
   if (w.step === "review") controls = `${inputsSummary(b)}<div class="actions"><button id="confirm-round" class="primary">${w.p ? "确认下一轮" : "开始工作"}</button>${w.p ? '<button id="save-wizard">保存草稿</button>' : ""}<button id="edit-conditions">调整条件</button></div><p class="muted">${w.p ? "草稿不会启动任务，确认后才进入下一轮。" : "当前执行：" + ((w.settings.mode || "simulation") === "simulation" ? "程序演示，不调用模型。" : backendLabel(w.settings.backend || "codex_cli") + "，使用本机登录的额度或对应 key。")}</p>`;
   const intro = w.messages.length ? w.messages.join("") : "";
   document.querySelector("#setup-slot").innerHTML = intro + bubble("wizard-prompt", "协调助手", `<p>${esc(wizardPrompts[w.step])}</p>${controls}`);
@@ -376,9 +369,10 @@ function renderWizard() {
   }
   document.querySelector("#hours-step")?.addEventListener("submit", e => action(e, async () => {
     const f = new FormData(e.currentTarget);
-    b.work_time = {all_day: f.has("all_day"), start: f.get("start"), end: f.get("end"), timezone: f.get("timezone")};
-    if (!b.work_time.all_day && b.work_time.start === b.work_time.end) throw new Error("开始和结束相同时，请明确选择全天可工作。");
-    advanceWizard(b.work_time.all_day ? `每天全天 · ${b.work_time.timezone}` : `每天 ${b.work_time.start}—${b.work_time.end} · ${b.work_time.timezone}`, "requirements");
+    const minutes = Number(f.get("duration_minutes"));
+    if (!Number.isInteger(minutes) || minutes < 1 || minutes > 10080) throw new Error("请输入1–10080分钟的整数。");
+    b.work_time = {duration_minutes: minutes};
+    advanceWizard(`本轮最多工作${minutes}分钟，之后等组会。`, "requirements");
   }));
   document.querySelector("#confirm-round")?.addEventListener("click", e => action(e, () => confirmWizard()));
   document.querySelector("#save-wizard")?.addEventListener("click", e => action(e, async () => {
@@ -535,7 +529,7 @@ function openSettings() {
   const at = p.meeting_at ? new Date(p.meeting_at * 1000) : null;
   const local = at ? new Date(at.getTime() - at.getTimezoneOffset() * 60000).toISOString().slice(0,16) : "";
   document.querySelector("#settings-title").textContent = "群聊设置";
-  document.querySelector("#settings-body").innerHTML = `<p class="muted">每日工作时间、资源与权限在组会后调整下一轮时修改。后台任务额度是整个项目累计上限；组会问答不设次数上限。</p><form id="configure"><div class="form-grid"><label>项目任务总上限<input name="budget" type="number" min="0" max="100" value="${p.budget}" required></label></div><label>后台状态<select name="paused"><option value="false" ${!p.paused ? "selected" : ""}>继续</option><option value="true" ${p.paused ? "selected" : ""}>暂停启动新任务</option></select></label><label>下次准备组会材料时间（本机时区）<input name="meeting_at" type="datetime-local" value="${local}"><span class="muted">留空取消定时安排。</span></label><button class="primary" type="submit">保存设置</button></form>${requestDetails(p)}`;
+  document.querySelector("#settings-body").innerHTML = `<p class="muted">本轮工作时长、资源与权限在组会后调整下一轮时修改。后台任务额度是整个项目累计上限；组会问答不设次数上限。</p><form id="configure"><div class="form-grid"><label>项目任务总上限<input name="budget" type="number" min="0" max="100" value="${p.budget}" required></label></div><label>后台状态<select name="paused"><option value="false" ${!p.paused ? "selected" : ""}>继续</option><option value="true" ${p.paused ? "selected" : ""}>暂停启动新任务</option></select></label><label>下次准备组会材料时间（本机时区）<input name="meeting_at" type="datetime-local" value="${local}"><span class="muted">留空取消定时安排。</span></label><button class="primary" type="submit">保存设置</button></form>${requestDetails(p)}`;
   document.querySelector("#configure").onsubmit = e => action(e, async () => {
     const f = new FormData(e.currentTarget);
     await api(`/api/projects/${p.id}/configure`, {paused: f.get("paused") === "true", budget: Number(f.get("budget")), meeting_at: f.get("meeting_at") ? new Date(f.get("meeting_at")).getTime()/1000 : null});
@@ -554,7 +548,7 @@ async function newConversation() {
   document.querySelector("#project-actions").innerHTML = "";
   modeLabel(false);
   announce("");
-  content.innerHTML = `<div id="transcript" class="transcript"><div class="round-marker">新的研究群</div>${bubble("welcome", "协调助手", '<p>我们在这里一起做研究。</p><p>先说说你的 idea。接着我会问资源、权限、每天工作时间和额外要求，确认后大家开始工作。</p>')}</div><div id="setup-slot" class="transcript"></div>`;
+  content.innerHTML = `<div id="transcript" class="transcript"><div class="round-marker">新的研究群</div>${bubble("welcome", "协调助手", '<p>我们在这里一起做研究。</p><p>先说说你的 idea。接着我会问资源、权限、本轮工作时长和额外要求，确认后大家开始工作。</p>')}</div><div id="setup-slot" class="transcript"></div>`;
   setComposer(true);
   await sidebar();
   document.querySelector("#sidebar").classList.remove("mobile-open");
