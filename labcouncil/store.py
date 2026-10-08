@@ -220,6 +220,17 @@ class Store:
         source_budget = quota(source_budget)
         if source_budget>24: raise ValueError('公开HTTP请求上限不得超过24')
         brief = normalize(brief, idea, mode)
+        # A first message can contain ordinary resource/time constraints; it never
+        # grants new tool permissions. The complete original idea is retained.
+        from .conversation import resources, preferences
+        from .chat import minutes_patch
+        initial_minutes=minutes_patch(idea)
+        if initial_minutes is not None:brief['work_time']={'duration_minutes':initial_minutes}
+        initial_resources=resources(idea)
+        if initial_resources and initial_resources not in brief['resources']:
+            brief['resources']='\n'.join(filter(None,[brief['resources'],initial_resources]))
+        if preferences(idea) and idea not in brief['requirements']:
+            brief['requirements']='\n'.join(filter(None,[brief['requirements'],idea]))
         if meeting_at is not None and (type(meeting_at) not in (int, float) or not 0 < meeting_at < 4102444800):
             raise ValueError("组会时间无效")
         identifier = uuid.uuid4().hex
@@ -244,12 +255,17 @@ class Store:
         row = con.execute('SELECT * FROM round_inputs WHERE project_id=? AND version=?', (project['id'], version)).fetchone()
         if row:
             carried=con.execute("SELECT json_extract(body,'$.started_at') FROM events WHERE project_id=? AND kind='chat_budget_carried' AND json_extract(body,'$.version')=? ORDER BY created DESC LIMIT 1",(project['id'],version)).fetchone()
-            return {**dict(row), 'body': json.loads(row['body']), 'plan': json.loads(row['plan']), 'legacy': False,
+            body=json.loads(row['body'])
+            for restriction in con.execute("SELECT body FROM events WHERE project_id=? AND kind='group_permissions_restricted' AND json_extract(body,'$.version')=? ORDER BY created",(project['id'],version)):
+                body['permissions'].update({k:False for k,v in json.loads(restriction['body'])['permissions'].items() if v is False})
+            return {**dict(row), 'body': body, 'plan': json.loads(row['plan']), 'legacy': False,
                     **({'budget_started_at':carried[0]} if carried else {})}
         execution = con.execute('SELECT mode FROM project_execution WHERE project_id=?', (project['id'],)).fetchone()
         mode = execution['mode'] if execution else 'simulation'
         decision = con.execute('SELECT instruction,created FROM decisions WHERE project_id=? AND to_version=?', (project['id'], version)).fetchone()
         brief = normalize(None, decision['instruction'] if decision else project['idea'], mode)
+        for restriction in con.execute("SELECT body FROM events WHERE project_id=? AND kind='group_permissions_restricted' AND json_extract(body,'$.version')=? ORDER BY created",(project['id'],version)):
+            brief['permissions'].update({k:False for k,v in json.loads(restriction['body'])['permissions'].items() if v is False})
         return {'project_id': project['id'], 'version': version, 'body': brief, 'plan': make_plan(brief, mode), 'legacy': True,
                 'created':decision['created'] if decision else project['created']}
 
@@ -562,6 +578,8 @@ class Store:
             if not execution or execution["mode"]=="simulation":raise Conflict("模拟项目不能调用真实模型")
             if not self.inputs(con,p)['body']['permissions']['model_calls']:
                 raise Conflict('本轮未授权模型调用')
+            if category=='background' and p['paused']:
+                raise Conflict('后台已暂停，不启动新的模型请求；已保存结果保留')
             count=con.execute("SELECT COUNT(*) FROM model_requests WHERE project_id=? AND category=?",(project_id,category)).fetchone()[0]
             if category=="background" and count>=execution["api_budget"]:
                 raise Conflict("真实模型请求次数预算已用完；不会自动重试")
@@ -675,6 +693,7 @@ class Store:
             old = con.execute('SELECT * FROM source_requests WHERE project_id=? AND fingerprint=?', (p['id'],fingerprint)).fetchone()
             if old: return dict(old), False
             if not allow_new: return None, False
+            if p['paused']:raise Conflict('后台已暂停，不启动新的公开查询')
             count = con.execute('SELECT COUNT(*) FROM source_requests WHERE project_id=?',(p['id'],)).fetchone()[0]
             execution = con.execute('SELECT source_budget FROM project_execution WHERE project_id=?',(p['id'],)).fetchone()
             cap = execution['source_budget'] if execution else 24

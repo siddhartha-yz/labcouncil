@@ -40,7 +40,9 @@ def condensed(result):
             **({'abstract_excerpt':source['abstract'][:1500]} if 'abstract' in source else {}),
             **({'readme_excerpt':source['readme'][:3000]} if 'readme' in source else {})})
     return {**{k:v for k,v in result.items() if k not in ('sources','datasets','results')},'sources':sources,
-        **({'metrics': [{'seed':r['seed'],'metrics':r['metrics']} for r in result['results']]} if 'results' in result else {})}
+        **({'metrics': [{'seed':r['seed'],'metrics':r['metrics'],'slope':r.get('slope'),'intercept':r.get('intercept'),'baseline_mean':r.get('baseline_mean')} for r in result['results']]} if 'results' in result else {}),
+        **({'data_summary':[{'seed':d['seed'],'train_count':len(d['train']),'test_count':len(d['test']),'changed_test_count':len(d.get('changed_test_indices',[])),
+                'generation':'自有合成 y=2+3*x+噪声，训练40点、独立测试100点；同种子使用相同基础数据与划分','train_examples':d['train'][:2],'test_examples':d['test'][:2]} for d in result['datasets']]} if 'datasets' in result else {})}
 
 
 def meeting_materials(project, task, operations):
@@ -89,6 +91,7 @@ def execute(store,task,provider=None):
         for a in p['artifacts']][-8:]
     # Retain complete inputs in SQLite; bounded prompt excerpts are labelled.
     context = {**brief,**{key:brief[key][:800] for key in ('idea','resources','requirements')}}
+    context['synthetic_capabilities']={'clean':'固定线性关系，只种子7，0%测试标签异常','outlier':'固定线性关系，种子7/19/31，只支持10%测试标签异常，训练干净','unsupported':'调整比例、训练污染、无关系对照和任意代码均未接入；不能承诺未支持设置'}
     known_sources = [{k:(s.get(k)[:200] if isinstance(s.get(k),str) else s.get(k)) for k in ('kind','id','title','url','verification')}
         for op in prior for s in op['body']['result'].get('sources',[])][-12:]
     timing = {**round_time(p['current_inputs'],time.time()),
@@ -115,6 +118,11 @@ def execute(store,task,provider=None):
     if action in ACTIONS[:4]: value = validate(action,value)
     if action=='synthetic_regression' and value not in ('clean','outlier'): raise ValueError('合成实验只支持明确场景')
     if action=='prepare_meeting' and value!='': raise ValueError('准备组会不接受执行参数')
+    # The plan call may finish after a human withdrawal; use current scope before
+    # any new tool, and keep the original request/failed step as evidence.
+    latest=store.project(p['id'])
+    if latest['paused']:raise Conflict('后台已暂停，本步未启动新工具')
+    brief=latest['current_inputs']['body']
     duplicate = next((o for o in prior if o['body']['action']==action and o['body']['value']==value and action!='prepare_meeting'),None)
     versions = {t['id']:t['version'] for t in p['tasks']}
     matching = [o for o in prior if o['body']['action']==action and o['body']['value']==value]
